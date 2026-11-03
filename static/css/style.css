@@ -1481,6 +1481,167 @@ thead th.sticky-col-2 {
     .show-mobile-only { display: none !important; }
 }
 
+/* Supabase Cloud Connection & Sync Styles */
+.cloud-status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+.status-green { background-color: #10b981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.6); }
+.status-amber { background-color: #f59e0b; }
+.btn-supabase.cloud-active {
+    border-color: #10b981;
+    color: #065f46;
+    background-color: #ecfdf5;
+}
+.cloud-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+}
+.banner-connected { background-color: #f0fdf4; border: 1px solid #bbf7d0; }
+.banner-pending { background-color: #fffbeb; border: 1px solid #fde68a; }
+
+/* Student Search & Filter Bar (Optimized for 150+ Students) */
+.student-search-bar-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    gap: 12px;
+}
+.search-input-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 480px;
+}
+.search-icon {
+    position: absolute;
+    left: 10px;
+    font-size: 0.85rem;
+    color: #64748b;
+    pointer-events: none;
+}
+.search-student-field {
+    padding-left: 32px !important;
+    border-radius: 20px !important;
+    height: 34px !important;
+    font-size: 0.85rem !important;
+}
+.btn-clear-search {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: #94a3b8;
+}
+
+/* Attendance (ഹാജർ) Column & Header Styles */
+.th-att, .td-att {
+    width: 45px;
+    min-width: 45px;
+    max-width: 50px;
+    text-align: center !important;
+    padding: 3px !important;
+}
+.att-input {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    text-align: center;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 3px 0;
+    transition: all 0.15s ease;
+}
+.att-input:focus {
+    border-color: #6366f1;
+    background: #f8fafc;
+    outline: none;
+}
+.th-subjects-super {
+    text-align: center;
+    background-color: #1e293b;
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px;
+}
+.vertical-text-head {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+/* SKIMVB Summary Table & Mu'allim Signature */
+.skimvb-bottom-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+}
+.skimvb-summary-table-wrap {
+    max-width: 480px;
+    width: 100%;
+}
+.skimvb-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1.5px solid #0f172a;
+    font-size: 0.85rem;
+}
+.skimvb-summary-table th, .skimvb-summary-table td {
+    border: 1px solid #334155;
+    padding: 5px 10px;
+    text-align: center;
+}
+.skimvb-summary-table thead th {
+    background-color: #f1f5f9;
+    font-weight: 700;
+    color: #0f172a;
+}
+.skimvb-summary-table .summary-row-label {
+    text-align: left;
+    font-weight: 700;
+    background-color: #f8fafc;
+}
+.skimvb-signature-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 180px;
+    padding-bottom: 8px;
+}
+.sig-line {
+    width: 160px;
+    border-top: 1.5px dotted #0f172a;
+    margin-bottom: 6px;
+}
+.sig-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
 /* Hide printable header & footer on normal screen */
 .print-only-header,
 .print-only-footer {
@@ -1489,6 +1650,7 @@ thead th.sticky-col-2 {
 
 /* ==========================================================================
    A4 Sheet Print Layout Stylesheet (@media print)
+   Matches Official Samastha (SKIMVB) Template
    ========================================================================== */
 @page {
     size: A4 landscape;
@@ -1529,6 +1691,8 @@ thead th.sticky-col-2 {
     .autosave-badge,
     .auth-wrapper,
     .empty-state,
+    .student-search-bar-wrap,
+    .hide-print,
     #modal-container {
         display: none !important;
     }
@@ -1545,37 +1709,44 @@ thead th.sticky-col-2 {
         background: transparent !important;
     }
 
-    /* Dedicated Print Header (Institutional Title & Meta) */
-    .print-only-header {
+    /* Official SKIMVB Print Header Box */
+    .print-only-header.print-skimvb-box {
         display: block !important;
-        text-align: center !important;
-        margin-bottom: 8px !important;
-        padding-bottom: 6px !important;
-        border-bottom: 1.5px solid #000000 !important;
+        border: 1.5px solid #000000 !important;
+        margin-bottom: 6px !important;
+        padding: 4px 8px !important;
     }
 
-    .print-institution-name {
-        font-size: 14pt !important;
-        font-weight: 800 !important;
-        margin: 0 0 2px 0 !important;
-        text-transform: uppercase !important;
-        color: #000000 !important;
-        letter-spacing: 0.5px;
-    }
-
-    .print-meta-line {
-        font-size: 9pt !important;
-        font-weight: 600 !important;
-        color: #222222 !important;
-        margin: 0 0 2px 0 !important;
-    }
-
-    .print-sheet-title {
+    .skimvb-header-row-1 {
+        display: flex !important;
+        justify-content: space-between !important;
         font-size: 9.5pt !important;
-        font-weight: 700 !important;
-        color: #111111 !important;
-        text-decoration: underline !important;
-        margin: 0 !important;
+        border-bottom: 1px solid #000000 !important;
+        padding-bottom: 3px !important;
+        margin-bottom: 3px !important;
+    }
+
+    .skimvb-header-row-2 {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        font-size: 8.5pt !important;
+    }
+
+    .skimvb-title-badge {
+        display: inline-block !important;
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        padding: 3px 16px !important;
+        font-size: 11pt !important;
+        font-weight: 800 !important;
+        border-radius: 3px !important;
+        text-align: center !important;
+    }
+
+    .skimvb-meta-right {
+        text-align: right !important;
+        font-size: 8pt !important;
     }
 
     /* Table Container and Alignment to A4 */
@@ -1592,7 +1763,7 @@ thead th.sticky-col-2 {
         width: 100% !important;
         border-collapse: collapse !important;
         border: 1.5px solid #000000 !important;
-        font-size: 8.5pt !important;
+        font-size: 8pt !important;
         page-break-inside: auto;
     }
 
@@ -1609,8 +1780,8 @@ thead th.sticky-col-2 {
         background-color: #f1f5f9 !important;
         color: #000000 !important;
         border: 1px solid #000000 !important;
-        padding: 4px 5px !important;
-        font-size: 8.5pt !important;
+        padding: 3px 4px !important;
+        font-size: 8pt !important;
         font-weight: 700 !important;
         text-align: center !important;
     }
@@ -1619,23 +1790,20 @@ thead th.sticky-col-2 {
         text-align: left !important;
     }
 
-    .topic-max-badge {
-        background-color: transparent !important;
-        color: #333333 !important;
-        font-size: 7pt !important;
-        padding: 0 !important;
-        font-weight: 600 !important;
+    .th-subjects-super {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        font-size: 8pt !important;
     }
 
     .marksheet-table td {
-        border: 1px solid #222222 !important;
-        padding: 3px 4px !important;
-        font-size: 8.5pt !important;
+        border: 1px solid #000000 !important;
+        padding: 2px 3px !important;
+        font-size: 8pt !important;
         color: #000000 !important;
         height: auto !important;
     }
 
-    /* Reset sticky columns in print mode to prevent layout overlap on paper */
     .sticky-col-1, 
     .sticky-col-2 {
         position: static !important;
@@ -1648,6 +1816,7 @@ thead th.sticky-col-2 {
         display: none !important;
     }
 
+    .att-input,
     .mark-input {
         background: transparent !important;
         border: none !important;
@@ -1655,7 +1824,7 @@ thead th.sticky-col-2 {
         box-shadow: none !important;
         text-align: center !important;
         width: 100% !important;
-        font-size: 8.5pt !important;
+        font-size: 8pt !important;
         font-weight: 600 !important;
         padding: 0 !important;
         margin: 0 !important;
@@ -1664,65 +1833,39 @@ thead th.sticky-col-2 {
         -webkit-appearance: none;
     }
 
-    /* Color indicators for print */
-    .mark-input.mark-fail {
-        color: #b91c1c !important;
-        font-weight: 700 !important;
-    }
-    .mark-input.mark-excellent {
-        color: #15803d !important;
-        font-weight: 700 !important;
-    }
-    .mark-input.mark-good {
-        color: #1d4ed8 !important;
-        font-weight: 700 !important;
-    }
-    .mark-input.mark-pass {
-        color: #b45309 !important;
-        font-weight: 700 !important;
-    }
-
-    .badge {
-        border: 1px solid #444444 !important;
-        background: transparent !important;
-        color: #000000 !important;
-        font-size: 7.5pt !important;
-        padding: 1px 4px !important;
-        font-weight: 700 !important;
-    }
-
-    .badge-success {
-        border-color: #15803d !important;
-        color: #15803d !important;
-    }
-
-    .badge-danger {
-        border-color: #b91c1c !important;
-        color: #b91c1c !important;
-    }
-
-    /* Dedicated Print Footer with Signatures */
-    .print-only-footer {
+    /* Print Summary Section */
+    .skimvb-bottom-section {
         display: flex !important;
         justify-content: space-between !important;
         align-items: flex-end !important;
-        margin-top: 24px !important;
-        padding-top: 10px !important;
+        margin-top: 8px !important;
+        padding: 0 !important;
+        border: none !important;
         page-break-inside: avoid !important;
     }
 
-    .print-sig-block {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        min-width: 140px !important;
-        font-size: 8.5pt !important;
-        font-weight: 600 !important;
+    .skimvb-summary-table {
+        border: 1.5px solid #000000 !important;
+        font-size: 7.5pt !important;
+        width: 320px !important;
     }
 
-    .print-sig-line {
-        width: 140px !important;
+    .skimvb-summary-table th, .skimvb-summary-table td {
+        border: 1px solid #000000 !important;
+        padding: 2px 5px !important;
+    }
+
+    .skimvb-signature-box {
+        min-width: 160px !important;
+    }
+
+    .sig-line {
         border-top: 1px dotted #000000 !important;
-        margin-bottom: 5px !important;
+        width: 150px !important;
+    }
+
+    .sig-title {
+        font-size: 8.5pt !important;
+        font-weight: 700 !important;
     }
 }

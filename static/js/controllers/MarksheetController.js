@@ -27,7 +27,8 @@ class MarksheetController {
             id: 'st_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
             rollNo: studentData.rollNo || (cls.students.length + 1).toString(),
             name: studentData.name,
-            gender: studentData.gender || 'boy'
+            gender: studentData.gender || 'boy',
+            attendance: studentData.attendance || ''
         };
 
         cls.students.push(newStudent);
@@ -47,12 +48,14 @@ class MarksheetController {
 
         if (!cls.students) cls.students = [];
 
-        studentsArray.forEach(st => {
+        studentsArray.forEach((st, idx) => {
+            const nextRoll = st.rollNo || (cls.students.length + idx + 1).toString();
             cls.students.push({
-                id: 'st_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-                rollNo: st.rollNo,
+                id: 'st_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5) + '_' + idx,
+                rollNo: nextRoll,
                 name: st.name,
-                gender: st.gender || 'boy'
+                gender: st.gender || 'boy',
+                attendance: st.attendance || ''
             });
         });
 
@@ -61,6 +64,10 @@ class MarksheetController {
 
         const firstGender = studentsArray[0]?.gender === 'girl' ? 'girls' : 'boys';
         this.openClass(classId, firstGender);
+    }
+
+    updateAttendance(classId, studentId, value) {
+        window.storageModel.updateStudentAttendance(classId, studentId, value);
     }
 
     deleteStudent(classId, studentId) {

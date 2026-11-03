@@ -178,6 +178,7 @@ class StorageModel {
                     ...classData,
                     updatedAt: now
                 };
+                classData = userData.classes[index];
             } else {
                 classData.updatedAt = now;
                 userData.classes.push(classData);
@@ -186,13 +187,16 @@ class StorageModel {
             // Create new
             const newClass = {
                 id: 'cls_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-                madrasaName: classData.madrasaName || 'Madrasa / School',
-                className: classData.className || 'Class 1',
-                examName: classData.examName || 'Assessment Exam',
-                academicYear: classData.academicYear || new Date().getFullYear().toString(),
+                madrasaName: classData.madrasaName || 'മദ്റസ',
+                place: classData.place || '',
+                skimvbRegNo: classData.skimvbRegNo || '',
+                className: classData.className || 'ക്ലാസ്സ് 1',
+                examName: classData.examName || 'വാർഷിക പരീക്ഷ',
+                term: classData.term || classData.examName || 'വാർഷിക പരീക്ഷ',
+                academicYear: classData.academicYear || '2025-2026',
                 passPercentage: Number(classData.passPercentage) || 36,
                 topics: classData.topics || [], // [{ id, name, maxMarks }]
-                students: classData.students || [], // [{ id, rollNo, name, gender: 'boy'|'girl' }]
+                students: classData.students || [], // [{ id, rollNo, name, gender: 'boy'|'girl', attendance }]
                 marks: classData.marks || {}, // { studentId: { topicId: number } }
                 createdAt: now,
                 updatedAt: now
@@ -202,6 +206,12 @@ class StorageModel {
         }
 
         this._saveUserData(session.userId, userData);
+
+        // Auto-sync to Supabase Cloud if configured
+        if (window.supabaseModel && window.supabaseModel.isConfigured()) {
+            window.supabaseModel.autoSync(classData, session.userId);
+        }
+
         return classData;
     }
 
@@ -234,6 +244,58 @@ class StorageModel {
         }
 
         cls.updatedAt = new Date().toISOString();
+        this._saveUserData(session.userId, userData);
+
+        // Auto-sync to Supabase
+        if (window.supabaseModel && window.supabaseModel.isConfigured()) {
+            window.supabaseModel.autoSync(cls, session.userId);
+        }
+
+        return true;
+    }
+
+    // Update Attendance (ഹാജർ) for student
+    updateStudentAttendance(classId, studentId, attendance) {
+        const session = this.getSession();
+        if (!session) return false;
+
+        const userData = this._getUserData(session.userId);
+        const cls = (userData.classes || []).find(c => c.id === classId);
+        if (!cls) return false;
+
+        const student = (cls.students || []).find(s => s.id === studentId);
+        if (!student) return false;
+
+        student.attendance = attendance;
+        cls.updatedAt = new Date().toISOString();
+        this._saveUserData(session.userId, userData);
+
+        // Auto-sync to Supabase
+        if (window.supabaseModel && window.supabaseModel.isConfigured()) {
+            window.supabaseModel.autoSync(cls, session.userId);
+        }
+
+        return true;
+    }
+
+    // Replace or merge classes when pulled from Supabase cloud
+    mergeCloudClasses(cloudClasses) {
+        const session = this.getSession();
+        if (!session) return false;
+
+        const userData = this._getUserData(session.userId);
+        if (!userData.classes) userData.classes = [];
+
+        cloudClasses.forEach(cc => {
+            const idx = userData.classes.findIndex(c => c.id === cc.id);
+            if (idx !== -1) {
+                // If local updated earlier than cloud, take cloud
+                userData.classes[idx] = cc;
+            } else {
+                userData.classes.push(cc);
+            }
+        });
+
         this._saveUserData(session.userId, userData);
         return true;
     }

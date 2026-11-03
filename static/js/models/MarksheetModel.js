@@ -179,6 +179,15 @@ class MarksheetModel {
         const passedCount = activeResults.filter(r => r.status === 'Pass').length;
         const totalMaxMarks = topics.reduce((sum, t) => sum + (Number(t.maxMarks) || 100), 0);
 
+        // SKIMVB Specific Summary Calculations (ആണ്, പെണ്, ആകെ)
+        const boysPassed = boysResults.filter(r => r.status === 'Pass').length;
+        const boysPassPct = boys.length > 0 ? Math.round((boysPassed / boys.length) * 100) : 0;
+
+        const girlsPassed = girlsResults.filter(r => r.status === 'Pass').length;
+        const girlsPassPct = girls.length > 0 ? Math.round((girlsPassed / girls.length) * 100) : 0;
+
+        const totalPassPct = students.length > 0 ? Math.round((passedCount / students.length) * 100) : 0;
+
         const avgScore = activeResults.length > 0 
             ? Math.round((activeResults.reduce((sum, r) => sum + r.totalScored, 0) / activeResults.length) * 10) / 10
             : 0;
@@ -211,8 +220,13 @@ class MarksheetModel {
             activeCount: activeResults.length,
             passedCount,
             failedCount: activeResults.length - passedCount,
-            passRate: activeResults.length > 0 ? Math.round((passedCount / activeResults.length) * 100) : 0,
+            passRate: totalPassPct,
             avgScore,
+            skimvbStats: {
+                students: { boys: boys.length, girls: girls.length, total: students.length },
+                passed: { boys: boysPassed, girls: girlsPassed, total: passedCount },
+                percentage: { boys: boysPassPct, girls: girlsPassPct, total: totalPassPct }
+            },
             topicStats,
             allResults,
             boysResults,
