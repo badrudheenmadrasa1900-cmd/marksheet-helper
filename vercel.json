@@ -2,8 +2,11 @@
   "version": 2,
   "routes": [
     { "src": "/static/(.*)", "dest": "/static/$1" },
-    { "src": "/result", "dest": "/result.html" },
-    { "src": "/results", "dest": "/result.html" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/teacher", "dest": "/admin.html" },
+    { "src": "/staff", "dest": "/admin.html" },
+    { "src": "/result", "dest": "/index.html" },
+    { "src": "/results", "dest": "/index.html" },
     { "src": "/api/(.*)", "dest": "/api/index.py" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]

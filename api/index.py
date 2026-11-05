@@ -8,20 +8,25 @@ from flask import Flask, jsonify, request, render_template
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
 @app.route('/')
+@app.route('/result')
+@app.route('/results')
 def home():
+    """Default public home page: Badrudheen Madrasa individual result lookup."""
     try:
-        return render_template('index.html')
+        return render_template('result.html')
     except Exception:
         with open(os.path.join(os.path.dirname(__file__), '../index.html'), 'r', encoding='utf-8') as f:
             return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
 
-@app.route('/result')
-@app.route('/results')
-def result_page():
+@app.route('/admin')
+@app.route('/teacher')
+@app.route('/staff')
+def admin_page():
+    """Hidden staff & admin mark management portal."""
     try:
-        return render_template('result.html')
+        return render_template('index.html')
     except Exception:
-        with open(os.path.join(os.path.dirname(__file__), '../result.html'), 'r', encoding='utf-8') as f:
+        with open(os.path.join(os.path.dirname(__file__), '../admin.html'), 'r', encoding='utf-8') as f:
             return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 @app.route('/api/status')

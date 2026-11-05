@@ -1,43 +1,649 @@
 <!DOCTYPE html>
-<html lang="ml">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#4f46e5">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Marksheet Helper | മാർക്ക്ഷീറ്റ് മാനേജർ</title>
-    <meta name="description" content="ലളിതമായ മാർക്ക്ഷീറ്റ് തയ്യാറാക്കൽ സഹായി. മദ്രസകൾക്കും സ്കൂളുകൾക്കും ഉപയോഗപ്രദമായ ലോക്കൽ മാർക്ക്ഷീറ്റ് ആപ്ലിക്കേഷൻ.">
-    <link rel="stylesheet" href="./static/css/style.css">
-    
-    <!-- Vendor Libraries (Self-contained offline first, CDN fallback) -->
-    <script src="./static/vendor/jspdf.umd.min.js"></script>
-    <script src="./static/vendor/jspdf.plugin.autotable.min.js"></script>
-    <script src="./static/vendor/xlsx.full.min.js"></script>
+    <meta name="theme-color" content="#156d3b">
+    <title>BADRUDHEEN MADRASA - PUBLIC EXAMINATION RESULT 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #156d3b;
+            --header-dark: #0f4f2a;
+            --accent-green: #1b8a4b;
+            --bg-light: #eaf5ee;
+            --card-border: #a3d9b8;
+            --text-main: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Banner */
+        .board-header {
+            background: linear-gradient(180deg, #166e3b 0%, #11572e 100%);
+            color: #ffffff;
+            text-align: center;
+            padding: 18px 14px 16px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .board-emblem {
+            width: 72px;
+            height: 72px;
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .board-emblem svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .board-titles {
+            text-align: center;
+        }
+
+        .arabic-header {
+            font-family: 'Amiri', serif;
+            font-size: 1.45rem;
+            color: #ffd54f;
+            line-height: 1.35;
+            font-weight: 700;
+        }
+
+        .board-main-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin: 3px 0;
+            line-height: 1.25;
+            color: #ffffff;
+        }
+
+        .board-sub-address {
+            font-size: 0.86rem;
+            opacity: 0.95;
+            font-weight: 500;
+            color: #d1fae5;
+        }
+
+        /* Nav links bar - Purely for student results, no admin/teacher links */
+        .nav-subbar {
+            background-color: #0d4624;
+            color: #ffffff;
+            padding: 9px 12px;
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .nav-subbar a {
+            color: #e2f1e8;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-subbar a:hover, .nav-subbar a.active {
+            color: #ffeb3b;
+            text-decoration: underline;
+        }
+
+        /* Main Container */
+        .page-body {
+            flex: 1;
+            max-width: 650px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #0b3d1f;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        /* Result Search Card */
+        .search-card {
+            background: #ffffff;
+            border: 2px solid var(--card-border);
+            border-radius: 14px;
+            padding: 24px 20px;
+            box-shadow: 0 4px 14px rgba(22, 110, 59, 0.08);
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            border: 1.5px solid #bcdac6;
+            border-radius: 8px;
+            background-color: #ffffff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(22, 110, 59, 0.15);
+        }
+
+        .btn-submit {
+            width: 100%;
+            max-width: 200px;
+            display: block;
+            margin: 22px auto 6px;
+            padding: 11px 24px;
+            background-color: var(--primary-green);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.98rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 3px 8px rgba(22, 110, 59, 0.3);
+        }
+
+        .btn-submit:hover {
+            background-color: #0f542c;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        /* Result Display Card */
+        .result-view-card {
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            border: 1px solid #c8e6d3;
+            margin-top: 10px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .student-header-box {
+            background: #d4eddb;
+            padding: 18px 14px;
+            text-align: center;
+            border-bottom: 1px solid #b8dfc4;
+        }
+
+        .student-name {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0e4422;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .arabic-name {
+            font-family: 'Amiri', serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #13552b;
+            margin: 2px 0 4px;
+        }
+
+        .parent-info {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 2px;
+        }
+
+        .madrasa-info {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #0b3d1f;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px dashed #a5d3b3;
+            text-transform: uppercase;
+        }
+
+        .meta-pills {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .pill-badge {
+            background-color: var(--primary-green);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 6px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(22, 110, 59, 0.25);
+        }
+
+        /* Subjects Marks Table */
+        .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .marks-table th {
+            background-color: #f1f8f4;
+            color: #0b3d1f;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1.5px solid #c2e2ce;
+            text-transform: uppercase;
+        }
+
+        .marks-table th.text-center {
+            text-align: center;
+        }
+
+        .marks-table th.text-right {
+            text-align: right;
+        }
+
+        .marks-table td {
+            padding: 12px 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-bottom: 1px solid #e5ede8;
+            color: #1f2937;
+        }
+
+        .marks-table tr:nth-child(even) td {
+            background-color: #fafdfb;
+        }
+
+        .sub-arabic {
+            font-family: 'Amiri', serif;
+            font-size: 1.15rem;
+            color: #0e4422;
+            text-align: right;
+            direction: rtl;
+        }
+
+        .sub-score {
+            font-weight: 800;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .total-row td {
+            background-color: #0d4624 !important;
+            color: #ffffff !important;
+            font-size: 1rem;
+            font-weight: 800;
+            padding: 12px 14px;
+        }
+
+        .status-banner {
+            padding: 14px;
+            text-align: center;
+            color: #ffffff;
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .status-distinction {
+            background: linear-gradient(135deg, #107c41, #0b532c);
+        }
+
+        .status-first-class, .status-pass {
+            background: linear-gradient(135deg, #15803d, #166534);
+        }
+
+        .status-fail {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+
+        /* Message feedback */
+        .alert-box {
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+            display: none;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #f87171;
+            display: block;
+        }
+
+        /* Footer */
+        .page-footer {
+            text-align: center;
+            padding: 18px 16px;
+            font-size: 0.82rem;
+            color: #4b5563;
+            margin-top: auto;
+            border-top: 1px solid #d1fae5;
+        }
+
+        @media (max-width: 480px) {
+            .board-main-title {
+                font-size: 1.15rem;
+            }
+            .arabic-header {
+                font-size: 1.3rem;
+            }
+            .meta-pills {
+                flex-direction: column;
+                gap: 8px;
+                align-items: center;
+            }
+            .pill-badge {
+                width: 100%;
+                max-width: 220px;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- App Mount Point for MVC Views -->
-    <div id="app-root"></div>
 
-    <!-- MVC Architecture Scripts -->
-    <!-- 1. Models -->
-    <script src="./static/js/models/SupabaseService.js"></script>
-    <script src="./static/js/models/StorageModel.js"></script>
-    <script src="./static/js/models/MarksheetModel.js"></script>
+    <!-- Header styled specifically for BADRUDHEEN MADRASA -->
+    <header class="board-header">
+        <div class="header-content">
+            <div class="board-emblem">
+                <!-- Mosque / Crescent Emblem SVG -->
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="#eaf5ee" stroke="#156d3b" stroke-width="3"/>
+                    <path d="M50 18L32 36H68L50 18Z" fill="#156d3b"/>
+                    <rect x="34" y="36" width="32" height="34" rx="2" fill="#156d3b"/>
+                    <path d="M44 70V54C44 50.7 46.7 48 50 48C53.3 48 56 50.7 56 54V70H44Z" fill="#ffffff"/>
+                    <path d="M22 40L28 45V70H22V40Z" fill="#156d3b"/>
+                    <path d="M78 40L72 45V70H78V40Z" fill="#156d3b"/>
+                    <circle cx="50" cy="14" r="3" fill="#ffd54f"/>
+                </svg>
+            </div>
+            <div class="board-titles">
+                <div class="arabic-header">مدرسة بدر الدين الإسلامية</div>
+                <h1 class="board-main-title">BADRUDHEEN MADRASA</h1>
+                <p class="board-sub-address">Islamic Education Centre • Examination Board</p>
+            </div>
+        </div>
+    </header>
 
-    <!-- 2. Views -->
-    <script src="./static/js/views/AuthView.js"></script>
-    <script src="./static/js/views/DashboardView.js"></script>
-    <script src="./static/js/views/MarksheetView.js"></script>
-    <script src="./static/js/views/ExportView.js"></script>
+    <!-- Sub Menu Navigation (Only Student / Individual Result, NO admin or teacher links) -->
+    <nav class="nav-subbar">
+        <a href="/" class="active">Individual Result (വ്യക്തിഗത ഫലം)</a>
+    </nav>
 
-    <!-- 3. Controllers -->
-    <script src="./static/js/controllers/AuthController.js"></script>
-    <script src="./static/js/controllers/ClassController.js"></script>
-    <script src="./static/js/controllers/MarksheetController.js"></script>
+    <!-- Main Container -->
+    <main class="page-body">
+        <h2 class="page-title">EXAMINATION RESULT 2026</h2>
 
-    <!-- 4. Bootstrap App -->
-    <script src="./static/js/app.js"></script>
+        <!-- Search Form -->
+        <section class="search-card">
+            <div id="error-box" class="alert-box"></div>
+            
+            <form id="result-query-form" onsubmit="handleResultSearch(event)">
+                <div class="form-group">
+                    <label for="syllabus-select">Syllabus</label>
+                    <select id="syllabus-select" class="form-control">
+                        <option value="GENERAL" selected>GENERAL</option>
+                        <option value="SPECIAL">SPECIAL</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="class-select">Class (ക്ലാസ്സ് 1 - 12)</label>
+                    <select id="class-select" class="form-control" required>
+                        <option value="" disabled selected>Select Class</option>
+                        <option value="1">Class 1</option>
+                        <option value="2">Class 2</option>
+                        <option value="3">Class 3</option>
+                        <option value="4">Class 4</option>
+                        <option value="5">Class 5</option>
+                        <option value="6">Class 6</option>
+                        <option value="7">Class 7</option>
+                        <option value="8">Class 8</option>
+                        <option value="9">Class 9</option>
+                        <option value="10">Class 10</option>
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-no-input">Register Number (രജിസ്റ്റർ നമ്പർ)</label>
+                    <input type="text" id="reg-no-input" class="form-control" placeholder="Enter Register Number (e.g. 35, 101)" required autocomplete="off">
+                </div>
+
+                <button type="submit" id="submit-btn" class="btn-submit">Submit</button>
+            </form>
+        </section>
+
+        <!-- Result Details Card Container -->
+        <div id="result-container" style="display: none;"></div>
+    </main>
+
+    <footer class="page-footer">
+        <p>© 2026 Badrudheen Madrasa | Examination Result Portal</p>
+    </footer>
+
+    <!-- Script to query Supabase & render result -->
+    <script>
+        const SUPABASE_URL = "https://wbwghcrvcwwdbayqrivz.supabase.co/rest/v1/";
+        const SUPABASE_KEY = "sb_publishable_CLg__H7hzI-W9eeIib6lnQ_bTd1Y19Q";
+
+        async function handleResultSearch(event) {
+            event.preventDefault();
+            const errorBox = document.getElementById('error-box');
+            const resultContainer = document.getElementById('result-container');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            errorBox.style.display = 'none';
+            resultContainer.style.display = 'none';
+
+            const selectedClass = document.getElementById('class-select').value;
+            const regNo = document.getElementById('reg-no-input').value.trim();
+
+            if (!selectedClass || !regNo) {
+                showError('ദയവായി ക്ലാസ്സും രജിസ്റ്റർ നമ്പറും നൽകുക.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Checking...';
+
+            try {
+                // Query students from Supabase
+                const queryUrl = `${SUPABASE_URL}students?class_number=eq.${encodeURIComponent(selectedClass)}&register_no=eq.${encodeURIComponent(regNo)}&select=*`;
+                const response = await fetch(queryUrl, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('റിസൾട്ട് ഡാറ്റ ലഭ്യമാക്കുന്നതിൽ തകരാർ.');
+                }
+
+                const students = await response.json();
+
+                if (!students || students.length === 0) {
+                    showError(`ക്ലാസ്സ് ${selectedClass}-ൽ രജിസ്റ്റർ നമ്പർ '${regNo}' ഉള്ള വിദ്യാർത്ഥിയുടെ ഫലം കണ്ടെത്തിയില്ല.`);
+                    return;
+                }
+
+                renderResultCard(students[0]);
+            } catch (err) {
+                console.error(err);
+                showError('കണക്ഷൻ തകരാർ: ദയവായി അല്പം കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit';
+            }
+        }
+
+        function showError(msg) {
+            const errorBox = document.getElementById('error-box');
+            errorBox.textContent = msg;
+            errorBox.className = 'alert-box alert-error';
+            errorBox.style.display = 'block';
+        }
+
+        function renderResultCard(student) {
+            const container = document.getElementById('result-container');
+            
+            let marksList = [];
+            try {
+                marksList = typeof student.marks === 'string' ? JSON.parse(student.marks) : (student.marks || []);
+            } catch (e) {
+                marksList = [];
+            }
+
+            let statusClass = 'status-pass';
+            const statusUpper = (student.status || 'PASS').toUpperCase();
+            if (statusUpper.includes('DISTINCTION')) {
+                statusClass = 'status-distinction';
+            } else if (statusUpper.includes('FAIL') || statusUpper.includes('തോറ്റു')) {
+                statusClass = 'status-fail';
+            }
+
+            let rowsHtml = '';
+            marksList.forEach(m => {
+                const subTitle = m.subject || m.title || 'SUBJECT';
+                const subArabic = m.arabic || '';
+                const score = (m.mark !== undefined && m.mark !== null && m.mark !== '') ? m.mark : '-';
+                
+                rowsHtml += `
+                    <tr>
+                        <td>${escapeHtml(subTitle)}</td>
+                        <td class="sub-score">${escapeHtml(String(score))}</td>
+                        <td class="sub-arabic">${escapeHtml(subArabic)}</td>
+                    </tr>
+                `;
+            });
+
+            const html = `
+                <div class="result-view-card">
+                    <div class="student-header-box">
+                        <div class="student-name">${escapeHtml(student.name || 'STUDENT NAME')}</div>
+                        ${student.name_arabic ? `<div class="arabic-name">${escapeHtml(student.name_arabic)}</div>` : ''}
+                        
+                        ${student.parent_name ? `
+                            <div class="parent-info">
+                                D/o / S/o ${escapeHtml(student.parent_name)}
+                                ${student.parent_name_arabic ? `<span style="font-family: 'Amiri', serif; margin-left: 6px;">(${escapeHtml(student.parent_name_arabic)})</span>` : ''}
+                            </div>
+                        ` : ''}
+
+                        <div class="madrasa-info">
+                            BADRUDHEEN MADRASA
+                        </div>
+
+                        <div class="meta-pills">
+                            <span class="pill-badge">Class : ${escapeHtml(String(student.class_number))}</span>
+                            <span class="pill-badge">Reg. No : ${escapeHtml(String(student.register_no))}</span>
+                        </div>
+                    </div>
+
+                    <table class="marks-table">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th class="text-center">Mark</th>
+                                <th class="text-right">المادة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                            <tr class="total-row">
+                                <td>Grand Total</td>
+                                <td class="text-center">${escapeHtml(String(student.grand_total || 0))}</td>
+                                <td class="text-right">المجموع</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="status-banner ${statusClass}">
+                        ${escapeHtml(student.status || 'PASS')}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            container.style.display = 'block';
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
 </body>
 </html>

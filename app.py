@@ -13,15 +13,18 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = os.environ.get('SECRET_KEY', 'marksheet_helper_local_key_2026')
 
 @app.route('/')
-def index():
-    """Renders the main single-page application view."""
-    return render_template('index.html')
-
 @app.route('/result')
 @app.route('/results')
-def public_result():
-    """Renders the public Samastha exam result lookup page."""
+def index():
+    """Renders the public Badrudheen Madrasa individual result lookup page."""
     return render_template('result.html')
+
+@app.route('/admin')
+@app.route('/teacher')
+@app.route('/staff')
+def admin_portal():
+    """Renders the admin and teacher marksheet management portal."""
+    return render_template('index.html')
 
 @app.route('/api/status')
 def status():
