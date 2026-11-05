@@ -13,7 +13,15 @@ class ClassController {
             return;
         }
 
-        const classes = window.storageModel.getClasses();
+        let classes = window.storageModel.getClasses();
+        // If teacher has assigned classes, filter visible classes accordingly
+        if (session.role === 'teacher' && Array.isArray(session.assignedClasses) && session.assignedClasses.length > 0) {
+            classes = classes.filter(cls => {
+                const clsNum = parseInt((cls.className || '').replace(/\D/g, ''), 10);
+                return isNaN(clsNum) || session.assignedClasses.includes(clsNum);
+            });
+        }
+
         window.dashboardView.render(classes, session);
     }
 

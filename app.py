@@ -17,6 +17,12 @@ def index():
     """Renders the main single-page application view."""
     return render_template('index.html')
 
+@app.route('/result')
+@app.route('/results')
+def public_result():
+    """Renders the public Samastha exam result lookup page."""
+    return render_template('result.html')
+
 @app.route('/api/status')
 def status():
     """Health check and application metadata endpoint."""

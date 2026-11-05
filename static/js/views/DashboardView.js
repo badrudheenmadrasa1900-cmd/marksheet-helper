@@ -1,7 +1,6 @@
 /**
  * DashboardView.js
- * MVC - View Layer: Class listing, quick overview, class creation modal,
- * Supabase Cloud Sync settings, and JSON backup/restore.
+ * MVC - View Layer: Class listing, quick overview, class creation modal, backup/restore.
  */
 
 class DashboardView {
@@ -21,8 +20,6 @@ class DashboardView {
             totalGirls += studs.filter(s => s.gender === 'girl').length;
         });
 
-        const isCloudConfigured = window.supabaseModel && window.supabaseModel.isConfigured();
-
         this.container.innerHTML = `
             <div class="app-layout">
                 <header class="navbar">
@@ -34,16 +31,18 @@ class DashboardView {
                         </div>
                     </div>
                     <div class="nav-actions">
-                        <!-- Supabase Cloud Connection Button -->
-                        <button class="btn btn-outline btn-sm btn-supabase ${isCloudConfigured ? 'cloud-active' : ''}" id="btn-supabase-modal" title="Supabase ക്ലൗഡ് സ്റ്റോറേജ്">
-                            <span class="cloud-status-dot ${isCloudConfigured ? 'status-green' : 'status-amber'}"></span>
-                            <span>Supabase ${isCloudConfigured ? 'ക്ലൗഡ്' : 'കണക്റ്റ്'}</span>
-                        </button>
-
                         <div class="user-pill">
                             <span class="user-avatar">${(user.fullName || 'T')[0].toUpperCase()}</span>
-                            <span class="user-name">${user.fullName || user.userId}</span>
+                            <span class="user-name">${user.fullName || user.userId} ${user.role === 'admin' ? '<span class="badge-admin">Admin</span>' : '<span class="badge-teacher">Teacher</span>'}</span>
                         </div>
+                        <a href="/result" target="_blank" class="btn btn-outline btn-sm" title="പബ്ലിക് റിസൾട്ട് പോർട്ടൽ കാണുക">
+                            പബ്ലിക് റിസൾട്ട് ↗
+                        </a>
+                        ${user.role === 'admin' ? `
+                            <button class="btn btn-outline btn-sm" id="btn-manage-teachers" title="അധ്യാപകരെ ക്രമീകരിക്കുക">
+                                അധ്യാപകർ (Teachers)
+                            </button>
+                        ` : ''}
                         <button class="btn btn-outline btn-sm" id="btn-backup" title="ഡാറ്റ ബാക്കപ്പ്">
                             ബാക്കപ്പ്
                         </button>
@@ -57,11 +56,10 @@ class DashboardView {
                     <div class="dashboard-hero">
                         <div class="hero-left">
                             <h2 class="hero-title">സ്വാഗതം, ${user.fullName || 'അധ്യാപകരെ'}</h2>
-                            <p class="hero-sub text-muted">150+ കുട്ടികളുടെ മദ്റസ മാർക്ക്ഷീറ്റ് ശേഖരണവും സമസ്ത (SKIMVB) പ്രിന്റും</p>
                         </div>
                         <div class="hero-right">
                             <button class="btn btn-primary" id="btn-add-class">
-                                + പുതിയ ക്ലാസ്
+                                പുതിയ ക്ലാസ്
                             </button>
                         </div>
                     </div>
@@ -77,12 +75,9 @@ class DashboardView {
                             <div class="stat-value">${totalStudents}</div>
                             <div class="stat-sub">${totalBoys} ആൺ • ${totalGirls} പെൺ</div>
                         </div>
-                        <div class="stat-card cursor-pointer" id="card-storage-status">
-                            <div class="stat-label">സ്റ്റോറേജ് / ക്ലൗഡ്</div>
-                            <div class="stat-value ${isCloudConfigured ? 'text-success' : 'text-primary'}">
-                                ${isCloudConfigured ? 'Supabase ക്ലൗഡ്' : 'ലോക്കൽ സ്റ്റോറേജ്'}
-                            </div>
-                            <div class="stat-sub">${isCloudConfigured ? 'തത്സമയം സിങ്ക് ആകുന്നു' : 'ക്ലൗഡ് കണക്റ്റ് ചെയ്യുക →'}</div>
+                        <div class="stat-card">
+                            <div class="stat-label">സ്റ്റോറേജ്</div>
+                            <div class="stat-value text-success">ലോക്കൽ</div>
                         </div>
                     </div>
 
@@ -106,7 +101,6 @@ class DashboardView {
         return `
             <div class="empty-state">
                 <h4 class="empty-title">ക്ലാസുകളൊന്നും ചേർത്തിട്ടില്ല</h4>
-                <p class="text-muted">മദ്റസ മാർക്ക് ലിസ്റ്റ് തയ്യാറാക്കാൻ പുതിയ ക്ലാസ് ചേർക്കുക.</p>
                 <div style="margin-top: 1rem;">
                     <button class="btn btn-primary" id="btn-empty-add-class">
                         ആദ്യ ക്ലാസ് ചേർക്കുക
@@ -135,9 +129,9 @@ class DashboardView {
                                 </div>
                             </div>
                             <div class="class-card-body">
-                                <div class="class-org-name">${cls.madrasaName || 'മദ്റസ'} ${cls.place ? `• ${cls.place}` : ''}</div>
-                                <h4 class="class-name-title">${cls.className || 'ക്ലാസ്സ്'}</h4>
-                                <div class="class-exam-tag">${cls.term || cls.examName || 'വാർഷിക പരീക്ഷ'} ${cls.skimvbRegNo ? `(Reg: ${cls.skimvbRegNo})` : ''}</div>
+                                <div class="class-org-name">${cls.madrasaName || ''}</div>
+                                <h4 class="class-name-title">${cls.className || 'ക്ലാസ്'}</h4>
+                                <div class="class-exam-tag">${cls.examName || 'പരീക്ഷ'}</div>
 
                                 <div class="class-metrics">
                                     <div class="metric-item">
@@ -170,19 +164,14 @@ class DashboardView {
         const modalContainer = document.getElementById('modal-container');
         const isEdit = !!classData;
 
-        // Default topics if creating new (SKIMVB standard 8 subjects)
-        const skimvbDefaultTopics = [
-            { id: 'top_1', name: 'ഖുർആൻ (Quran)', maxMarks: 50 },
-            { id: 'top_2', name: 'തജ്‌വീദ് (Tajweed)', maxMarks: 50 },
-            { id: 'top_3', name: 'ഫിഖ്ഹ് (Fiqh)', maxMarks: 50 },
-            { id: 'top_4', name: 'അഖീദ (Aqeedah)', maxMarks: 50 },
-            { id: 'top_5', name: 'താരീഖ് (Tareekh)', maxMarks: 50 },
-            { id: 'top_6', name: 'അഖ്‌ലാഖ് (Akhlaq)', maxMarks: 50 },
-            { id: 'top_7', name: 'ലിസാൻ / ദുറൂസ് (Lisan)', maxMarks: 50 },
-            { id: 'top_8', name: 'തദ്രീബ് / ദിക്ർ (Thadreeb)', maxMarks: 50 }
+        // Default topics if creating new with standard subjects
+        const defaultTopics = isEdit ? classData.topics : [
+            { id: 'top_1', name: 'FIQH (الفقه)', maxMarks: 100 },
+            { id: 'top_2', name: "LISANUL QUR'AN (لسان القرآن)", maxMarks: 100 },
+            { id: 'top_3', name: 'DUROOSUL IHSAN (دروس الإحسان)', maxMarks: 100 },
+            { id: 'top_4', name: 'THAREEKH (التّاريخ)', maxMarks: 100 },
+            { id: 'top_5', name: "QUR'AN, HIFZ (القرآن والحفظ)", maxMarks: 100 }
         ];
-
-        const defaultTopics = isEdit ? (classData.topics || skimvbDefaultTopics.slice(0, 4)) : skimvbDefaultTopics;
 
         modalContainer.innerHTML = `
             <div class="modal-backdrop">
@@ -193,66 +182,20 @@ class DashboardView {
                     </div>
                     <form id="class-form">
                         <div class="modal-body">
-                            <!-- Institution & SKIMVB Details -->
                             <div class="form-row">
                                 <div class="form-group flex-2">
-                                    <label class="form-label">മദ്റസ പേര് *</label>
+                                    <label class="form-label">മദ്രസ / സ്കൂൾ പേര് *</label>
                                     <input 
                                         type="text" 
                                         id="modal-madrasa" 
                                         class="form-control" 
-                                        placeholder="ഉദാ: ബദ്റുദ്ദീൻ മദ്റസ" 
-                                        value="${isEdit ? (classData.madrasaName || '') : 'ബദ്റുദ്ദീൻ മദ്റസ'}" 
+                                        placeholder="പേര്" 
+                                        value="${isEdit ? (classData.madrasaName || '') : ''}" 
                                         required
                                     >
                                 </div>
                                 <div class="form-group flex-1">
-                                    <label class="form-label">സ്ഥലം (Place)</label>
-                                    <input 
-                                        type="text" 
-                                        id="modal-place" 
-                                        class="form-control" 
-                                        placeholder="ഉദാ: കോഴിക്കോട്" 
-                                        value="${isEdit ? (classData.place || '') : ''}"
-                                    >
-                                </div>
-                                <div class="form-group flex-1">
-                                    <label class="form-label">SKIMVB REG.NO</label>
-                                    <input 
-                                        type="text" 
-                                        id="modal-skimvb" 
-                                        class="form-control" 
-                                        placeholder="ഉദാ: 1900" 
-                                        value="${isEdit ? (classData.skimvbRegNo || '') : ''}"
-                                    >
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group flex-1">
-                                    <label class="form-label">ക്ലാസ്സ് (CLASS) *</label>
-                                    <input 
-                                        type="text" 
-                                        id="modal-classname" 
-                                        class="form-control" 
-                                        placeholder="ഉദാ: ക്ലാസ്സ് 5" 
-                                        value="${isEdit ? (classData.className || '') : 'ക്ലാസ്സ് 5'}" 
-                                        required
-                                    >
-                                </div>
-                                <div class="form-group flex-1">
-                                    <label class="form-label">പരീക്ഷാ ടേം (TERM) *</label>
-                                    <input 
-                                        type="text" 
-                                        id="modal-term" 
-                                        class="form-control" 
-                                        placeholder="ഉദാ: വാർഷിക പരീക്ഷ / ഒന്നാം ടേം" 
-                                        value="${isEdit ? (classData.term || classData.examName || '') : 'വാർഷിക പരീക്ഷ'}" 
-                                        required
-                                    >
-                                </div>
-                                <div class="form-group flex-1">
-                                    <label class="form-label">വർഷം (YEAR)</label>
+                                    <label class="form-label">വർഷം</label>
                                     <input 
                                         type="text" 
                                         id="modal-year" 
@@ -261,7 +204,32 @@ class DashboardView {
                                         value="${isEdit ? (classData.academicYear || '') : '2025-2026'}"
                                     >
                                 </div>
-                                <div class="form-group" style="max-width: 90px;">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group flex-1">
+                                    <label class="form-label">ക്ലാസ്സ് *</label>
+                                    <input 
+                                        type="text" 
+                                        id="modal-classname" 
+                                        class="form-control" 
+                                        placeholder="ക്ലാസ്സ്" 
+                                        value="${isEdit ? (classData.className || '') : ''}" 
+                                        required
+                                    >
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label class="form-label">പരീക്ഷ *</label>
+                                    <input 
+                                        type="text" 
+                                        id="modal-examname" 
+                                        class="form-control" 
+                                        placeholder="പരീക്ഷ" 
+                                        value="${isEdit ? (classData.examName || '') : 'അർദ്ധവാർഷിക പരീക്ഷ'}" 
+                                        required
+                                    >
+                                </div>
+                                <div class="form-group flex-1">
                                     <label class="form-label">പാസ്സ് %</label>
                                     <input 
                                         type="number" 
@@ -275,14 +243,9 @@ class DashboardView {
                             </div>
 
                             <div class="topics-builder-section">
-                                <div class="section-sub-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
-                                    <h5 class="builder-title">വിഷയങ്ങൾ (SUBJECTS)</h5>
-                                    <div>
-                                        <button type="button" class="btn btn-outline btn-xs" id="btn-preset-skimvb" title="സമസ്തയുടെ സാധാരണ 8 വിഷയങ്ങൾ ലോഡ് ചെയ്യുക">
-                                            സമസ്ത 8 വിഷയങ്ങൾ
-                                        </button>
-                                        <button type="button" class="btn btn-outline btn-xs" id="btn-add-topic-row">+ വിഷയം ചേർക്കുക</button>
-                                    </div>
+                                <div class="section-sub-header">
+                                    <h5 class="builder-title">വിഷയങ്ങൾ</h5>
+                                    <button type="button" class="btn btn-outline btn-sm" id="btn-add-topic-row">വിഷയം ചേർക്കുക</button>
                                 </div>
 
                                 <div class="topic-rows-container" id="topic-rows-container">
@@ -302,7 +265,7 @@ class DashboardView {
                                                 value="${top.maxMarks || 50}" 
                                                 min="1" 
                                                 max="1000" 
-                                                style="max-width: 100px;" 
+                                                style="max-width: 110px;" 
                                                 required
                                             >
                                             <button type="button" class="btn-icon btn-remove-topic" title="നീക്കം ചെയ്യുക">&times;</button>
@@ -322,10 +285,10 @@ class DashboardView {
             </div>
         `;
 
-        this._bindModalEvents(isEdit, classData, skimvbDefaultTopics);
+        this._bindModalEvents(isEdit, classData);
     }
 
-    _bindModalEvents(isEdit, classData, skimvbDefaultTopics) {
+    _bindModalEvents(isEdit, classData) {
         const closeModal = () => {
             const container = document.getElementById('modal-container');
             if (container) container.innerHTML = '';
@@ -337,25 +300,7 @@ class DashboardView {
         if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
 
         const addTopicBtn = document.getElementById('btn-add-topic-row');
-        const presetBtn = document.getElementById('btn-preset-skimvb');
         const topicsContainer = document.getElementById('topic-rows-container');
-
-        const attachRowRemover = (row) => {
-            const remBtn = row.querySelector('.btn-remove-topic');
-            if (remBtn) {
-                remBtn.addEventListener('click', () => {
-                    if (topicsContainer.children.length > 1) {
-                        row.remove();
-                    } else {
-                        alert('കുറഞ്ഞത് ഒരു വിഷയമെങ്കിലും ആവശ്യമാണ്.');
-                    }
-                });
-            }
-        };
-
-        if (topicsContainer) {
-            topicsContainer.querySelectorAll('.topic-input-row').forEach(attachRowRemover);
-        }
 
         if (addTopicBtn && topicsContainer) {
             addTopicBtn.addEventListener('click', () => {
@@ -375,40 +320,23 @@ class DashboardView {
                         value="50" 
                         min="1" 
                         max="1000" 
-                        style="max-width: 100px;" 
+                        style="max-width: 110px;" 
                         required
                     >
                     <button type="button" class="btn-icon btn-remove-topic" title="നീക്കം ചെയ്യുക">&times;</button>
                 `;
                 topicsContainer.appendChild(newRow);
-                attachRowRemover(newRow);
+                newRow.querySelector('.btn-remove-topic').addEventListener('click', () => newRow.remove());
             });
-        }
 
-        if (presetBtn && topicsContainer) {
-            presetBtn.addEventListener('click', () => {
-                topicsContainer.innerHTML = '';
-                skimvbDefaultTopics.forEach((t, i) => {
-                    const row = document.createElement('div');
-                    row.className = 'topic-input-row';
-                    row.innerHTML = `
-                        <input 
-                            type="text" 
-                            class="form-control topic-name-input" 
-                            value="${t.name}" 
-                            required
-                        >
-                        <input 
-                            type="number" 
-                            class="form-control topic-max-input" 
-                            value="${t.maxMarks}" 
-                            style="max-width: 100px;" 
-                            required
-                        >
-                        <button type="button" class="btn-icon btn-remove-topic" title="നീക്കം ചെയ്യുക">&times;</button>
-                    `;
-                    topicsContainer.appendChild(row);
-                    attachRowRemover(row);
+            topicsContainer.querySelectorAll('.btn-remove-topic').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const row = e.target.closest('.topic-input-row');
+                    if (topicsContainer.children.length > 1) {
+                        row.remove();
+                    } else {
+                        alert('കുറഞ്ഞത് ഒരു വിഷയമെങ്കിലും ആവശ്യമാണ്.');
+                    }
                 });
             });
         }
@@ -419,10 +347,8 @@ class DashboardView {
                 e.preventDefault();
 
                 const madrasaName = document.getElementById('modal-madrasa').value.trim();
-                const place = document.getElementById('modal-place').value.trim();
-                const skimvbRegNo = document.getElementById('modal-skimvb').value.trim();
                 const className = document.getElementById('modal-classname').value.trim();
-                const term = document.getElementById('modal-term').value.trim();
+                const examName = document.getElementById('modal-examname').value.trim();
                 const academicYear = document.getElementById('modal-year').value.trim();
                 const passPercentage = Number(document.getElementById('modal-passpct').value) || 36;
 
@@ -445,11 +371,8 @@ class DashboardView {
                 const payload = {
                     ...(isEdit ? classData : {}),
                     madrasaName,
-                    place,
-                    skimvbRegNo,
                     className,
-                    examName: term,
-                    term,
+                    examName,
                     academicYear,
                     passPercentage,
                     topics
@@ -459,250 +382,6 @@ class DashboardView {
                 closeModal();
             });
         }
-    }
-
-    /**
-     * Supabase Cloud Connection & Sync Modal
-     */
-    showSupabaseModal() {
-        const modalContainer = document.getElementById('modal-container');
-        const config = window.supabaseModel ? window.supabaseModel.getConfig() : {};
-        const isConnected = !!(config && config.url && config.anonKey);
-
-        modalContainer.innerHTML = `
-            <div class="modal-backdrop">
-                <div class="modal-box modal-lg">
-                    <div class="modal-header">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <span style="font-size:1.3rem;">⚡</span>
-                            <h3 class="modal-title">Supabase ക്ലൗഡ് കണക്ഷൻ</h3>
-                        </div>
-                        <button class="btn-close" id="btn-close-sb-modal">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="cloud-banner ${isConnected ? 'banner-connected' : 'banner-pending'}">
-                            <div class="banner-status-icon">${isConnected ? '🟢' : '🟡'}</div>
-                            <div>
-                                <strong>${isConnected ? 'Supabase പ്രോജക്റ്റ് സജീവമാണ്' : 'Supabase കണക്റ്റ് ചെയ്യുക'}</strong>
-                                <p class="font-sm text-muted" style="margin:2px 0 0 0;">
-                                    ${isConnected 
-                                        ? 'വിദ്യാർത്ഥികളുടെ മാർക്കുകൾ നിങ്ങളുടെ Supabase ക്ലൗഡ് ഡാറ്റാബേസിലേക്ക് സ്വയം സിങ്ക് ആകുന്നു.' 
-                                        : 'നിങ്ങളുടെ Supabase പ്രോജക്റ്റിലെ URL-ഉം Anon Key-യും നൽകി 150+ കുട്ടികളുടെ വിവരങ്ങൾ ക്ലൗഡിൽ സൂക്ഷിക്കുക.'}
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Credentials Inputs -->
-                        <div class="form-group mt-3">
-                            <label class="form-label font-bold">Supabase Project URL</label>
-                            <input 
-                                type="text" 
-                                id="sb-input-url" 
-                                class="form-control font-mono" 
-                                placeholder="https://xyzcompany.supabase.co" 
-                                value="${config.url || ''}"
-                            >
-                            <span class="font-xs text-muted">Supabase Dashboard -> Project Settings -> API -> Project URL</span>
-                        </div>
-
-                        <div class="form-group mt-3">
-                            <label class="form-label font-bold">Supabase Anon Public API Key</label>
-                            <input 
-                                type="password" 
-                                id="sb-input-key" 
-                                class="form-control font-mono" 
-                                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." 
-                                value="${config.anonKey || ''}"
-                            >
-                            <span class="font-xs text-muted">Supabase Dashboard -> Project Settings -> API -> Project API Keys (anon public)</span>
-                        </div>
-
-                        <div id="sb-test-result" style="display:none; margin-top:12px;" class="alert-box"></div>
-
-                        <!-- Action Buttons -->
-                        <div class="cloud-actions-row mt-4">
-                            <button type="button" class="btn btn-outline" id="btn-sb-test">
-                                കണക്ഷൻ പരിശോധിക്കുക (Test)
-                            </button>
-                            <button type="button" class="btn btn-primary" id="btn-sb-save">
-                                സേവ് ചെയ്യുക
-                            </button>
-                        </div>
-
-                        <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #e2e8f0;">
-
-                        <!-- Data Sync Actions -->
-                        <h5 class="font-bold mb-2">ക്ലൗഡ് ഡാറ്റാ സിങ്ക് (Cloud Sync)</h5>
-                        <div class="grid-2-col gap-2">
-                            <div class="sync-action-card">
-                                <h6>ലോക്കൽ ഡാറ്റ ക്ലൗഡിലേക്ക് കയറ്റുക (Push)</h6>
-                                <p class="font-xs text-muted">ഈ കമ്പ്യൂട്ടറിലെ എല്ലാ ക്ലാസുകളും 150+ കുട്ടികളുടെ മാർക്കുകളും Supabase-ലേക്ക് കയറ്റുന്നു.</p>
-                                <button type="button" class="btn btn-outline btn-sm btn-block mt-2" id="btn-sb-push-all">
-                                    ക്ലൗഡിലേക്ക് കയറ്റുക (Push All)
-                                </button>
-                            </div>
-                            <div class="sync-action-card">
-                                <h6>ക്ലൗഡിൽ നിന്ന് ഡൗൺലോഡ് ചെയ്യുക (Pull)</h6>
-                                <p class="font-xs text-muted">മറ്റൊരു ഫോണിൽ നിന്നോ സിസ്റ്റത്തിൽ നിന്നോ നൽകിയ വിവരങ്ങൾ ഇങ്ങോട്ട് ലഭ്യമാക്കുന്നു.</p>
-                                <button type="button" class="btn btn-outline btn-sm btn-block mt-2" id="btn-sb-pull-all">
-                                    ക്ലൗഡിൽ നിന്ന് ഡൗൺലോഡ് (Pull All)
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- SQL Setup Accordion -->
-                        <div class="sql-guide-box mt-3">
-                            <details>
-                                <summary class="font-bold cursor-pointer">
-                                    📋 Supabase SQL Schema (ആദ്യമായി ഉപയോഗിക്കുമ്പോൾ റൺ ചെയ്യേണ്ടത്)
-                                </summary>
-                                <p class="font-xs text-muted mt-2">
-                                    നിങ്ങളുടെ Supabase Dashboard തുറന്ന് <strong>SQL Editor -> New Query</strong> ക്ലിക്ക് ചെയ്ത് താഴെയുള്ള കോഡ് പേസ്റ്റ് ചെയ്ത് <strong>Run</strong> അടിക്കുക:
-                                </p>
-                                <div style="position:relative;">
-                                    <textarea readonly class="form-control font-mono font-xs" id="sb-sql-code" rows="8" style="background:#0f172a; color:#38bdf8;">-- Marksheet Helper Supabase Tables
-CREATE TABLE IF NOT EXISTS public.classes (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL DEFAULT 'default_user',
-    madrasa_name TEXT,
-    place TEXT,
-    skimvb_reg_no TEXT,
-    class_name TEXT NOT NULL,
-    exam_name TEXT,
-    term TEXT,
-    academic_year TEXT,
-    pass_percentage NUMERIC DEFAULT 36,
-    topics JSONB DEFAULT '[]'::jsonb,
-    students JSONB DEFAULT '[]'::jsonb,
-    marks JSONB DEFAULT '{}'::jsonb,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS public.madrasa_students (
-    id TEXT PRIMARY KEY,
-    class_id TEXT NOT NULL REFERENCES public.classes(id) ON DELETE CASCADE,
-    roll_no TEXT,
-    name TEXT NOT NULL,
-    gender TEXT DEFAULT 'boy',
-    attendance TEXT,
-    total_scored NUMERIC DEFAULT 0,
-    total_max NUMERIC DEFAULT 0,
-    rank TEXT,
-    status TEXT,
-    marks JSONB DEFAULT '{}'::jsonb,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-ALTER TABLE public.classes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.madrasa_students ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anon classes" ON public.classes FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Anon students" ON public.madrasa_students FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
-</textarea>
-                                    <button type="button" class="btn btn-outline btn-xs" id="btn-copy-sql" style="position:absolute; top:8px; right:8px; background:white;">
-                                        SQL കോപ്പി ചെയ്യുക
-                                    </button>
-                                </div>
-                            </details>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-ghost" id="btn-close-sb-footer">അടയ്ക്കുക</button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        const closeModal = () => { modalContainer.innerHTML = ''; };
-        document.getElementById('btn-close-sb-modal').addEventListener('click', closeModal);
-        document.getElementById('btn-close-sb-footer').addEventListener('click', closeModal);
-
-        const urlInput = document.getElementById('sb-input-url');
-        const keyInput = document.getElementById('sb-input-key');
-        const resultBox = document.getElementById('sb-test-result');
-
-        const showResult = (msg, isSuccess = true) => {
-            resultBox.style.display = 'block';
-            resultBox.className = `alert-box ${isSuccess ? 'alert-success' : 'alert-danger'}`;
-            resultBox.innerHTML = msg;
-        };
-
-        // Test connection
-        document.getElementById('btn-sb-test').addEventListener('click', async () => {
-            const url = urlInput.value.trim();
-            const key = keyInput.value.trim();
-            if (!url || !key) {
-                showResult('Supabase URL-ഉം Anon Key-യും നൽകുക.', false);
-                return;
-            }
-
-            showResult('ബന്ധിപ്പിക്കുന്നു... ദയവായി കാത്തിരിക്കുക.', true);
-            window.supabaseModel.saveConfig(url, key);
-
-            try {
-                const res = await window.supabaseModel.testConnection();
-                showResult(`✅ ${res.message}`, true);
-            } catch (err) {
-                showResult(`❌ ${err.message}`, false);
-            }
-        });
-
-        // Save credentials
-        document.getElementById('btn-sb-save').addEventListener('click', () => {
-            const url = urlInput.value.trim();
-            const key = keyInput.value.trim();
-            window.supabaseModel.saveConfig(url, key);
-            showResult('Supabase കോൺഫിഗറേഷൻ സേവ് ചെയ്തു! ഇനി തത്സമയ സിങ്ക് പ്രവർത്തനക്ഷമമാണ്.', true);
-            setTimeout(() => {
-                closeModal();
-                const session = window.storageModel.getSession();
-                window.dashboardView.render(window.storageModel.getClasses(), session);
-            }, 900);
-        });
-
-        // Push All
-        document.getElementById('btn-sb-push-all').addEventListener('click', async () => {
-            const session = window.storageModel.getSession();
-            const classes = window.storageModel.getClasses();
-            showResult('ക്ലൗഡിലേക്ക് അപ്‌ലോഡ് ചെയ്യുന്നു...', true);
-            try {
-                const res = await window.supabaseModel.pushAllClasses(classes, session?.userId || 'default_user');
-                showResult(`✅ വിജയകരമായി ${res.count} ക്ലാസുകളും വിദ്യാർത്ഥികളുടെ മാർക്കുകളും Supabase-ലേക്ക് സിങ്ക് ചെയ്തു!`, true);
-            } catch (err) {
-                showResult(`❌ പിഴവ്: ${err.message}`, false);
-            }
-        });
-
-        // Pull All
-        document.getElementById('btn-sb-pull-all').addEventListener('click', async () => {
-            const session = window.storageModel.getSession();
-            showResult('ക്ലൗഡിൽ നിന്ന് ലഭ്യമാക്കുന്നു...', true);
-            try {
-                const cloudClasses = await window.supabaseModel.pullClasses(session?.userId || null);
-                if (cloudClasses.length === 0) {
-                    showResult('Supabase ക്ലൗഡിൽ ക്ലാസുകളൊന്നും കണ്ടെത്തിയില്ല.', false);
-                } else {
-                    window.storageModel.mergeCloudClasses(cloudClasses);
-                    showResult(`✅ ${cloudClasses.length} ക്ലാസുകൾ ക്ലൗഡിൽ നിന്ന് വിജയകരമായി റീസ്റ്റോർ ചെയ്തു!`, true);
-                    setTimeout(() => {
-                        closeModal();
-                        window.dashboardView.render(window.storageModel.getClasses(), session);
-                    }, 1000);
-                }
-            } catch (err) {
-                showResult(`❌ പിഴവ്: ${err.message}`, false);
-            }
-        });
-
-        // Copy SQL
-        document.getElementById('btn-copy-sql').addEventListener('click', () => {
-            const sqlText = document.getElementById('sb-sql-code').value;
-            navigator.clipboard.writeText(sqlText).then(() => {
-                alert('Supabase SQL Schema ക്ലിപ്പ്ബോർഡിലേക്ക് കോപ്പി ചെയ്തു!\n\nഇനി Supabase Dashboard -> SQL Editor-ൽ പേസ്റ്റ് ചെയ്ത് RUN ചെയ്യുക.');
-            });
-        });
     }
 
     showBackupModal() {
@@ -718,15 +397,13 @@ CREATE POLICY "Anon students" ON public.madrasa_students FOR ALL TO anon, authen
                         <div class="backup-actions">
                             <div class="backup-card">
                                 <h5>ബാക്കപ്പ് ഡൗൺലോഡ്</h5>
-                                <p class="font-xs text-muted">നിങ്ങളുടെ സിസ്റ്റത്തിലേക്ക് ഒരു ബാക്കപ്പ് ഫയൽ (.json) ആയി ഡൗൺലോഡ് ചെയ്യുക.</p>
-                                <button class="btn btn-primary btn-block mt-2" id="btn-download-backup">ഡൗൺലോഡ്</button>
+                                <button class="btn btn-primary" id="btn-download-backup">ഡൗൺലോഡ്</button>
                             </div>
 
-                            <div class="backup-card mt-3">
+                            <div class="backup-card">
                                 <h5>ബാക്കപ്പ് റീസ്റ്റോർ</h5>
-                                <p class="font-xs text-muted">മുമ്പ് സേവ് ചെയ്ത JSON ബാക്കപ്പ് ഫയൽ തിരഞ്ഞെടുക്കുക.</p>
                                 <input type="file" id="file-restore" accept=".json" style="display:none;">
-                                <button class="btn btn-outline btn-block mt-2" id="btn-trigger-restore">ഫയൽ തിരഞ്ഞെടുക്കുക</button>
+                                <button class="btn btn-outline" id="btn-trigger-restore">ഫയൽ തിരഞ്ഞെടുക്കുക</button>
                             </div>
                         </div>
                     </div>
@@ -787,10 +464,10 @@ CREATE POLICY "Anon students" ON public.madrasa_students FOR ALL TO anon, authen
             backupBtn.addEventListener('click', () => this.showBackupModal());
         }
 
-        const sbBtn = document.getElementById('btn-supabase-modal');
-        const cardSb = document.getElementById('card-storage-status');
-        if (sbBtn) sbBtn.addEventListener('click', () => this.showSupabaseModal());
-        if (cardSb) cardSb.addEventListener('click', () => this.showSupabaseModal());
+        const manageTeachersBtn = document.getElementById('btn-manage-teachers');
+        if (manageTeachersBtn) {
+            manageTeachersBtn.addEventListener('click', () => this.showTeachersModal());
+        }
 
         document.querySelectorAll('.btn-open-class').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -814,6 +491,125 @@ CREATE POLICY "Anon students" ON public.madrasa_students FOR ALL TO anon, authen
                     window.classController.deleteClass(classId);
                 }
             });
+        });
+    }
+
+    async showTeachersModal() {
+        const modalContainer = document.getElementById('modal-container');
+        modalContainer.innerHTML = `
+            <div class="modal-backdrop">
+                <div class="modal-box modal-lg">
+                    <div class="modal-header">
+                        <h3 class="modal-title">അധ്യാപകരെ ക്രമീകരിക്കുക (Teacher Permissions)</h3>
+                        <button class="btn-close" id="btn-close-teachers">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                            <p style="font-size:0.88rem; color:#4b5563; margin:0;">
+                                ഓരോ അധ്യാപകനും അനുവാദമുള്ള ക്ലാസുകൾ (1 - 12) ഇവിടെ സജ്ജീകരിക്കാം.
+                            </p>
+                            <button class="btn btn-primary btn-sm" id="btn-add-new-teacher">+ പുതിയ അധ്യാപകൻ</button>
+                        </div>
+                        <div id="teachers-list-container">
+                            <p style="text-align:center; padding:20px; color:#6b7280;">ഡാറ്റ ലോഡ് ചെയ്യുന്നു...</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" id="btn-cancel-teachers">അടയ്ക്കുക</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const closeModal = () => { modalContainer.innerHTML = ''; };
+        document.getElementById('btn-close-teachers').addEventListener('click', closeModal);
+        document.getElementById('btn-cancel-teachers').addEventListener('click', closeModal);
+
+        const listContainer = document.getElementById('teachers-list-container');
+        const loadTeachers = async () => {
+            try {
+                const teachers = await window.supabaseService.getTeachers();
+                if (!teachers || teachers.length === 0) {
+                    listContainer.innerHTML = '<p style="text-align:center; padding:15px;">അധ്യാപകരെ കണ്ടെത്തിയില്ല.</p>';
+                    return;
+                }
+
+                let html = `
+                    <table class="table" style="width:100%; font-size:0.88rem;">
+                        <thead>
+                            <tr style="border-bottom:1.5px solid #e5e7eb; text-align:left;">
+                                <th style="padding:8px;">പേര്</th>
+                                <th style="padding:8px;">യൂസർ ഐഡി</th>
+                                <th style="padding:8px;">റോൾ</th>
+                                <th style="padding:8px;">അനുവദിച്ച ക്ലാസുകൾ</th>
+                                <th style="padding:8px; text-align:right;">നടപടി</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                teachers.forEach(t => {
+                    const classesStr = (t.assigned_classes || []).sort((a,b)=>a-b).join(', ') || 'None';
+                    html += `
+                        <tr style="border-bottom:1px solid #f3f4f6;">
+                            <td style="padding:8px; font-weight:600;">${t.full_name || t.username}</td>
+                            <td style="padding:8px; font-family:monospace;">${t.username}</td>
+                            <td style="padding:8px;"><span class="${t.role === 'admin' ? 'badge-admin' : 'badge-teacher'}">${t.role}</span></td>
+                            <td style="padding:8px; color:#156d3b; font-weight:700;">${classesStr}</td>
+                            <td style="padding:8px; text-align:right;">
+                                ${t.username !== 'admin' ? `
+                                    <button class="btn btn-ghost btn-sm btn-delete-t" data-id="${t.id}" style="color:#dc2626;">ഡിലീറ്റ്</button>
+                                ` : '<span style="font-size:0.75rem; color:#9ca3af;">Protected</span>'}
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                listContainer.innerHTML = html;
+
+                listContainer.querySelectorAll('.btn-delete-t').forEach(b => {
+                    b.addEventListener('click', async (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        if (confirm('ഈ അധ്യാപകന്റെ അക്കൗണ്ട് നീക്കം ചെയ്യണോ?')) {
+                            try {
+                                await window.supabaseService.deleteTeacher(id);
+                                loadTeachers();
+                            } catch (err) {
+                                alert(err.message);
+                            }
+                        }
+                    });
+                });
+            } catch (err) {
+                listContainer.innerHTML = `<p style="color:#dc2626; padding:10px;">പിഴവ്: ${err.message}</p>`;
+            }
+        };
+
+        loadTeachers();
+
+        document.getElementById('btn-add-new-teacher').addEventListener('click', () => {
+            const username = prompt('അധ്യാപകന്റെ യൂസർ ഐഡി (Username):');
+            if (!username) return;
+            const fullName = prompt('അധ്യാപകന്റെ പൂർണ്ണ പേര് (Full Name):') || username;
+            const password = prompt('പാസ്‌വേഡ് (Password):') || '123456';
+            const classesPrompt = prompt('അനുവദിച്ച ക്ലാസുകൾ കോമ ഇട്ടു നൽകുക (ഉദാ: 1, 2, 5, 12):', '1, 2, 3');
+            
+            const assigned = (classesPrompt || '')
+                .split(',')
+                .map(s => parseInt(s.trim(), 10))
+                .filter(n => !isNaN(n) && n >= 1 && n <= 12);
+
+            window.supabaseService.saveTeacher({
+                username: username,
+                full_name: fullName,
+                password: password,
+                role: 'teacher',
+                assigned_classes: assigned
+            }).then(() => {
+                alert('അധ്യാപകനെ വിജയകരമായി ചേർത്തു!');
+                loadTeachers();
+            }).catch(err => alert(err.message));
         });
     }
 }
