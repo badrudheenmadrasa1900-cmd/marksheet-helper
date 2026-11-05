@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.py" },
-    { "source": "/result", "destination": "/result.html" },
-    { "source": "/results", "destination": "/result.html" },
-    { "source": "/", "destination": "/index.html" }
+  "routes": [
+    { "src": "/static/(.*)", "dest": "/static/$1" },
+    { "src": "/result", "dest": "/result.html" },
+    { "src": "/results", "dest": "/result.html" },
+    { "src": "/api/(.*)", "dest": "/api/index.py" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

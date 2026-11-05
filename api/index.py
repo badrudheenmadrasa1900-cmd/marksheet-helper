@@ -2,9 +2,27 @@ import os
 import json
 import urllib.request
 import urllib.error
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
-app = Flask(__name__)
+# Template folder and static folder configuration for serverless Flask
+app = Flask(__name__, template_folder='../templates', static_folder='../static')
+
+@app.route('/')
+def home():
+    try:
+        return render_template('index.html')
+    except Exception:
+        with open(os.path.join(os.path.dirname(__file__), '../index.html'), 'r', encoding='utf-8') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+@app.route('/result')
+@app.route('/results')
+def result_page():
+    try:
+        return render_template('result.html')
+    except Exception:
+        with open(os.path.join(os.path.dirname(__file__), '../result.html'), 'r', encoding='utf-8') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 @app.route('/api/status')
 def status():
