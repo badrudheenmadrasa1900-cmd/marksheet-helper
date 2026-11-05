@@ -13,15 +13,16 @@ class AuthView {
             <div class="auth-wrapper">
                 <div class="auth-card">
                     <div class="auth-header">
-                        <div class="auth-brand-badge">Marksheet Helper</div>
-                        <h1 class="auth-title">മാർക്ക്ഷീറ്റ് മാനേജർ</h1>
+                        <div class="auth-brand-badge">Badrudheen Madrasa</div>
+                        <h1 class="auth-title">Staff Portal</h1>
+                        <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">Sign in to manage classes and mark sheets</p>
                     </div>
 
                     ${errorMsg ? `<div class="alert alert-danger" role="alert">${errorMsg}</div>` : ''}
 
                     <div class="auth-tabs">
-                        <button class="auth-tab ${!isRegister ? 'active' : ''}" id="tab-login-btn">ലോഗിൻ</button>
-                        <button class="auth-tab ${isRegister ? 'active' : ''}" id="tab-register-btn">രജിസ്റ്റർ</button>
+                        <button class="auth-tab ${!isRegister ? 'active' : ''}" id="tab-login-btn">Sign In</button>
+                        <button class="auth-tab ${isRegister ? 'active' : ''}" id="tab-register-btn">Register</button>
                     </div>
 
                     ${!isRegister ? this._renderLoginForm() : this._renderRegisterForm()}
@@ -36,27 +37,27 @@ class AuthView {
         return `
             <form id="login-form" class="auth-form" autocomplete="off">
                 <div class="form-group">
-                    <label class="form-label" for="login-userid">യൂസർ ഐഡി</label>
+                    <label class="form-label" for="login-userid">User ID / Username</label>
                     <input 
                         type="text" 
                         id="login-userid" 
                         class="form-control" 
-                        placeholder="യൂസർ ഐഡി" 
+                        placeholder="Enter username (e.g. admin)" 
                         required 
                         autofocus
                     >
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="login-password">പാസ്‌വേഡ്</label>
+                    <label class="form-label" for="login-password">Password</label>
                     <input 
                         type="password" 
                         id="login-password" 
                         class="form-control" 
-                        placeholder="പാസ്‌വേഡ്" 
+                        placeholder="Enter password" 
                         required
                     >
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">ലോഗിൻ</button>
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
             </form>
         `;
     }
@@ -65,37 +66,37 @@ class AuthView {
         return `
             <form id="register-form" class="auth-form" autocomplete="off">
                 <div class="form-group">
-                    <label class="form-label" for="reg-fullname">പൂർണ്ണ നാമം</label>
+                    <label class="form-label" for="reg-fullname">Full Name</label>
                     <input 
                         type="text" 
                         id="reg-fullname" 
                         class="form-control" 
-                        placeholder="പേര്" 
+                        placeholder="Full Name" 
                         required 
                         autofocus
                     >
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="reg-userid">യൂസർ ഐഡി</label>
+                    <label class="form-label" for="reg-userid">Choose Username</label>
                     <input 
                         type="text" 
                         id="reg-userid" 
                         class="form-control" 
-                        placeholder="യൂസർ ഐഡി" 
+                        placeholder="Username" 
                         required
                     >
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="reg-password">പാസ്‌വേഡ്</label>
+                    <label class="form-label" for="reg-password">Create Password</label>
                     <input 
                         type="password" 
                         id="reg-password" 
                         class="form-control" 
-                        placeholder="പാസ്‌വേഡ്" 
+                        placeholder="Password" 
                         required
                     >
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">രജിസ്റ്റർ</button>
+                <button type="submit" class="btn btn-primary btn-block">Register Account</button>
             </form>
         `;
     }

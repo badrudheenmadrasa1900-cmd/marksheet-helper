@@ -24,10 +24,10 @@ class DashboardView {
             <div class="app-layout">
                 <header class="navbar">
                     <div class="nav-brand">
-                        <span class="nav-logo-badge">MH</span>
+                        <span class="nav-logo-badge">BM</span>
                         <div class="nav-titles">
-                            <span class="nav-title">Marksheet Helper</span>
-                            <span class="nav-tagline">മാർക്ക്ഷീറ്റ് സഹായി</span>
+                            <span class="nav-title">Badrudheen Madrasa</span>
+                            <span class="nav-tagline">Staff & Teacher Portal</span>
                         </div>
                     </div>
                     <div class="nav-actions">
@@ -35,19 +35,19 @@ class DashboardView {
                             <span class="user-avatar">${(user.fullName || 'T')[0].toUpperCase()}</span>
                             <span class="user-name">${user.fullName || user.userId} ${user.role === 'admin' ? '<span class="badge-admin">Admin</span>' : '<span class="badge-teacher">Teacher</span>'}</span>
                         </div>
-                        <a href="/result" target="_blank" class="btn btn-outline btn-sm" title="പബ്ലിക് റിസൾട്ട് പോർട്ടൽ കാണുക">
-                            പബ്ലിക് റിസൾട്ട് ↗
+                        <a href="/" target="_blank" class="btn btn-outline btn-sm" title="View Public Result Portal">
+                            Public Portal ↗
                         </a>
                         ${user.role === 'admin' ? `
-                            <button class="btn btn-outline btn-sm" id="btn-manage-teachers" title="അധ്യാപകരെ ക്രമീകരിക്കുക">
-                                അധ്യാപകർ (Teachers)
+                            <button class="btn btn-outline btn-sm" id="btn-manage-teachers" title="Manage Teachers">
+                                Teachers
                             </button>
                         ` : ''}
-                        <button class="btn btn-outline btn-sm" id="btn-backup" title="ഡാറ്റ ബാക്കപ്പ്">
-                            ബാക്കപ്പ്
+                        <button class="btn btn-outline btn-sm" id="btn-backup" title="Backup Data">
+                            Backup
                         </button>
-                        <button class="btn btn-ghost btn-sm" id="btn-logout" title="പുറത്തിറങ്ങുക">
-                            ലോഗ് ഔട്ട്
+                        <button class="btn btn-ghost btn-sm" id="btn-logout" title="Sign Out">
+                            Sign Out
                         </button>
                     </div>
                 </header>
@@ -55,11 +55,11 @@ class DashboardView {
                 <main class="main-content">
                     <div class="dashboard-hero">
                         <div class="hero-left">
-                            <h2 class="hero-title">സ്വാഗതം, ${user.fullName || 'അധ്യാപകരെ'}</h2>
+                            <h2 class="hero-title">Welcome, ${user.fullName || 'Teacher'}</h2>
                         </div>
                         <div class="hero-right">
                             <button class="btn btn-primary" id="btn-add-class">
-                                പുതിയ ക്ലാസ്
+                                + New Class
                             </button>
                         </div>
                     </div>
@@ -67,23 +67,23 @@ class DashboardView {
                     <!-- Summary Stats Bar -->
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-label">ആകെ ക്ലാസുകൾ</div>
+                            <div class="stat-label">Total Classes</div>
                             <div class="stat-value">${classes.length}</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">ആകെ വിദ്യാർത്ഥികൾ</div>
+                            <div class="stat-label">Total Students</div>
                             <div class="stat-value">${totalStudents}</div>
-                            <div class="stat-sub">${totalBoys} ആൺ • ${totalGirls} പെൺ</div>
+                            <div class="stat-sub">${totalBoys} Boys • ${totalGirls} Girls</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">സ്റ്റോറേജ്</div>
-                            <div class="stat-value text-success">ലോക്കൽ</div>
+                            <div class="stat-label">Database</div>
+                            <div class="stat-value text-success">Connected</div>
                         </div>
                     </div>
 
                     <!-- Classes Section -->
                     <div class="section-header">
-                        <h3 class="section-title">ക്ലാസുകൾ (${classes.length})</h3>
+                        <h3 class="section-title">Assigned Classes (${classes.length})</h3>
                     </div>
 
                     ${classes.length === 0 ? this._renderEmptyState() : this._renderClassGrid(classes)}
@@ -100,10 +100,11 @@ class DashboardView {
     _renderEmptyState() {
         return `
             <div class="empty-state">
-                <h4 class="empty-title">ക്ലാസുകളൊന്നും ചേർത്തിട്ടില്ല</h4>
-                <div style="margin-top: 1rem;">
+                <h4 class="empty-title">No Classes Added Yet</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Click the button below to add your first class.</p>
+                <div style="margin-top: 1.25rem;">
                     <button class="btn btn-primary" id="btn-empty-add-class">
-                        ആദ്യ ക്ലാസ് ചേർക്കുക
+                        + Add First Class
                     </button>
                 </div>
             </div>
@@ -124,33 +125,33 @@ class DashboardView {
                             <div class="class-card-header">
                                 <span class="class-badge">${cls.academicYear || '2025-26'}</span>
                                 <div class="class-actions-menu">
-                                    <button class="btn btn-outline btn-xs btn-edit-class" title="എഡിറ്റ്" data-id="${cls.id}">എഡിറ്റ്</button>
-                                    <button class="btn btn-ghost btn-xs btn-delete-class text-danger" title="നീക്കം ചെയ്യുക" data-id="${cls.id}">നീക്കം</button>
+                                    <button class="btn btn-outline btn-xs btn-edit-class" title="Edit" data-id="${cls.id}">Edit</button>
+                                    <button class="btn btn-ghost btn-xs btn-delete-class text-danger" title="Delete" data-id="${cls.id}">Delete</button>
                                 </div>
                             </div>
                             <div class="class-card-body">
                                 <div class="class-org-name">${cls.madrasaName || ''}</div>
-                                <h4 class="class-name-title">${cls.className || 'ക്ലാസ്'}</h4>
-                                <div class="class-exam-tag">${cls.examName || 'പരീക്ഷ'}</div>
+                                <h4 class="class-name-title">${cls.className || 'Class'}</h4>
+                                <div class="class-exam-tag">${cls.examName || 'Annual Exam'}</div>
 
                                 <div class="class-metrics">
                                     <div class="metric-item">
                                         <span class="metric-num">${students.length}</span>
-                                        <span class="metric-label">കുട്ടികൾ</span>
+                                        <span class="metric-label">Students</span>
                                     </div>
                                     <div class="metric-item">
                                         <span class="metric-num">${boys} / ${girls}</span>
-                                        <span class="metric-label">ആൺ / പെൺ</span>
+                                        <span class="metric-label">Boys / Girls</span>
                                     </div>
                                     <div class="metric-item">
                                         <span class="metric-num">${topics.length}</span>
-                                        <span class="metric-label">വിഷയങ്ങൾ</span>
+                                        <span class="metric-label">Subjects</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="class-card-footer">
                                 <button class="btn btn-primary btn-block btn-open-class" data-id="${cls.id}">
-                                    മാർക്ക്ഷീറ്റ് തുറക്കുക
+                                    Open Marksheet
                                 </button>
                             </div>
                         </div>
@@ -177,25 +178,25 @@ class DashboardView {
             <div class="modal-backdrop">
                 <div class="modal-box modal-lg">
                     <div class="modal-header">
-                        <h3 class="modal-title">${isEdit ? 'ക്ലാസ് എഡിറ്റ് ചെയ്യുക' : 'പുതിയ ക്ലാസ്'}</h3>
+                        <h3 class="modal-title">${isEdit ? 'Edit Class Details' : 'Create New Class'}</h3>
                         <button class="btn-close" id="btn-close-modal">&times;</button>
                     </div>
                     <form id="class-form">
                         <div class="modal-body">
                             <div class="form-row">
                                 <div class="form-group flex-2">
-                                    <label class="form-label">മദ്രസ / സ്കൂൾ പേര് *</label>
+                                    <label class="form-label">Madrasa / Institute Name *</label>
                                     <input 
                                         type="text" 
                                         id="modal-madrasa" 
                                         class="form-control" 
-                                        placeholder="പേര്" 
-                                        value="${isEdit ? (classData.madrasaName || '') : ''}" 
+                                        placeholder="e.g. BADRUDHEEN MADRASA" 
+                                        value="${isEdit ? (classData.madrasaName || '') : 'BADRUDHEEN MADRASA'}" 
                                         required
                                     >
                                 </div>
                                 <div class="form-group flex-1">
-                                    <label class="form-label">വർഷം</label>
+                                    <label class="form-label">Academic Year</label>
                                     <input 
                                         type="text" 
                                         id="modal-year" 
@@ -208,29 +209,29 @@ class DashboardView {
 
                             <div class="form-row">
                                 <div class="form-group flex-1">
-                                    <label class="form-label">ക്ലാസ്സ് *</label>
+                                    <label class="form-label">Class (e.g. Class 5) *</label>
                                     <input 
                                         type="text" 
                                         id="modal-classname" 
                                         class="form-control" 
-                                        placeholder="ക്ലാസ്സ്" 
-                                        value="${isEdit ? (classData.className || '') : ''}" 
+                                        placeholder="Class 1 - 12" 
+                                        value="${isEdit ? (classData.className || '') : 'Class 5'}" 
                                         required
                                     >
                                 </div>
                                 <div class="form-group flex-1">
-                                    <label class="form-label">പരീക്ഷ *</label>
+                                    <label class="form-label">Examination Name *</label>
                                     <input 
                                         type="text" 
                                         id="modal-examname" 
                                         class="form-control" 
-                                        placeholder="പരീക്ഷ" 
-                                        value="${isEdit ? (classData.examName || '') : 'അർദ്ധവാർഷിക പരീക്ഷ'}" 
+                                        placeholder="Examination Name" 
+                                        value="${isEdit ? (classData.examName || '') : 'Annual Examination 2026'}" 
                                         required
                                     >
                                 </div>
                                 <div class="form-group flex-1">
-                                    <label class="form-label">പാസ്സ് %</label>
+                                    <label class="form-label">Pass Mark %</label>
                                     <input 
                                         type="number" 
                                         id="modal-passpct" 
@@ -244,8 +245,8 @@ class DashboardView {
 
                             <div class="topics-builder-section">
                                 <div class="section-sub-header">
-                                    <h5 class="builder-title">വിഷയങ്ങൾ</h5>
-                                    <button type="button" class="btn btn-outline btn-sm" id="btn-add-topic-row">വിഷയം ചേർക്കുക</button>
+                                    <h5 class="builder-title">Subjects & Maximum Marks</h5>
+                                    <button type="button" class="btn btn-outline btn-sm" id="btn-add-topic-row">+ Add Subject</button>
                                 </div>
 
                                 <div class="topic-rows-container" id="topic-rows-container">
@@ -254,30 +255,30 @@ class DashboardView {
                                             <input 
                                                 type="text" 
                                                 class="form-control topic-name-input" 
-                                                placeholder="വിഷയത്തിന്റെ പേര്" 
+                                                placeholder="Subject Name" 
                                                 value="${top.name || ''}" 
                                                 required
                                             >
                                             <input 
                                                 type="number" 
                                                 class="form-control topic-max-input" 
-                                                placeholder="മാർക്ക്" 
-                                                value="${top.maxMarks || 50}" 
+                                                placeholder="Max Mark" 
+                                                value="${top.maxMarks || 100}" 
                                                 min="1" 
                                                 max="1000" 
                                                 style="max-width: 110px;" 
                                                 required
                                             >
-                                            <button type="button" class="btn-icon btn-remove-topic" title="നീക്കം ചെയ്യുക">&times;</button>
+                                            <button type="button" class="btn-icon btn-remove-topic" title="Remove">&times;</button>
                                         </div>
                                     `).join('')}
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-ghost" id="btn-cancel-modal">റദ്ദാക്കുക</button>
+                            <button type="button" class="btn btn-ghost" id="btn-cancel-modal">Cancel</button>
                             <button type="submit" class="btn btn-primary">
-                                ${isEdit ? 'സേവ് ചെയ്യുക' : 'ക്ലാസ് സൃഷ്ടിക്കുക'}
+                                ${isEdit ? 'Save Changes' : 'Create Class'}
                             </button>
                         </div>
                     </form>

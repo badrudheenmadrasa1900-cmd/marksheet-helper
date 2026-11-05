@@ -519,9 +519,9 @@
         
         <!-- Welcome Card -->
         <div class="welcome-bubble">
-            <div class="bubble-badge">✨ പരീക്ഷാ ഫലം പരിശോധിക്കാം</div>
-            <h2>വിദ്യാർത്ഥി മാർക്ക് ലിസ്റ്റ്</h2>
-            <p>ക്ലാസും രജിസ്റ്റർ നമ്പറും നൽകി നിങ്ങളുടെ റിസൾട്ട് അറിയാം</p>
+            <div class="bubble-badge">Check Your Examination Result</div>
+            <h2>Student Mark Sheet</h2>
+            <p>Select your class and enter your Register Number</p>
         </div>
 
         <!-- Search Sheet -->
@@ -531,44 +531,44 @@
             <form id="result-query-form" onsubmit="handleResultSearch(event)">
                 <div class="field-group">
                     <label class="field-label" for="class-select">
-                        <span>ക്ലാസ്സ് (Class)</span>
-                        <span class="label-sub">1 മുതൽ 12 വരെ</span>
+                        <span>Class</span>
+                        <span class="label-sub">Class 1 to 12</span>
                     </label>
                     <select id="class-select" class="touch-select" required>
-                        <option value="" disabled selected>ക്ലാസ്സ് തിരഞ്ഞെടുക്കുക</option>
-                        <option value="1">Class 1 (ഒന്നാം ക്ലാസ്സ്)</option>
-                        <option value="2">Class 2 (രണ്ടാം ക്ലാസ്സ്)</option>
-                        <option value="3">Class 3 (മൂന്നാം ക്ലാസ്സ്)</option>
-                        <option value="4">Class 4 (നാലാം ക്ലാസ്സ്)</option>
-                        <option value="5">Class 5 (അഞ്ചാം ക്ലാസ്സ്)</option>
-                        <option value="6">Class 6 (ആറാം ക്ലാസ്സ്)</option>
-                        <option value="7">Class 7 (ഏഴാം ക്ലാസ്സ്)</option>
-                        <option value="8">Class 8 (എട്ടാം ക്ലാസ്സ്)</option>
-                        <option value="9">Class 9 (ഒൻപതാം ക്ലാസ്സ്)</option>
-                        <option value="10">Class 10 (പത്താം ക്ലാസ്സ്)</option>
-                        <option value="11">Class 11 (പ്ലസ് വൺ)</option>
-                        <option value="12">Class 12 (പ്ലസ് ടു)</option>
+                        <option value="" disabled selected>Select Your Class</option>
+                        <option value="1">Class 1</option>
+                        <option value="2">Class 2</option>
+                        <option value="3">Class 3</option>
+                        <option value="4">Class 4</option>
+                        <option value="5">Class 5</option>
+                        <option value="6">Class 6</option>
+                        <option value="7">Class 7</option>
+                        <option value="8">Class 8</option>
+                        <option value="9">Class 9</option>
+                        <option value="10">Class 10</option>
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
                     </select>
                 </div>
 
                 <div class="field-group">
                     <label class="field-label" for="reg-no-input">
-                        <span>രജിസ്റ്റർ നമ്പർ (Register No)</span>
-                        <span class="label-sub">ഉദാ: 35, 101</span>
+                        <span>Register Number</span>
+                        <span class="label-sub">e.g. 35, 101</span>
                     </label>
                     <input 
                         type="number" 
                         inputmode="numeric" 
                         id="reg-no-input" 
                         class="touch-input" 
-                        placeholder="നമ്പർ ഇവിടെ ടൈപ്പ് ചെയ്യുക" 
+                        placeholder="Enter Register Number" 
                         required 
                         autocomplete="off"
                     >
                 </div>
 
                 <button type="submit" id="submit-btn" class="btn-check-result">
-                    <span>ഫലം കാണുക (Check Result)</span>
+                    <span>Check Result</span>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="m9 18 6-6-6-6"/>
                     </svg>
@@ -603,12 +603,12 @@
             const regNo = document.getElementById('reg-no-input').value.trim();
 
             if (!selectedClass || !regNo) {
-                showError('ദയവായി ക്ലാസ്സും രജിസ്റ്റർ നമ്പറും നൽകുക.');
+                showError('Please select your class and enter your register number.');
                 return;
             }
 
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span>റിസൾട്ട് എടുക്കുന്നു...</span>';
+            submitBtn.innerHTML = '<span>Loading result...</span>';
 
             try {
                 const queryUrl = `${SUPABASE_URL}students?class_number=eq.${encodeURIComponent(selectedClass)}&register_no=eq.${encodeURIComponent(regNo)}&select=*`;
@@ -620,23 +620,23 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('റിസൾട്ട് ലഭ്യമാക്കുന്നതിൽ തടസ്സം നേരിട്ടു.');
+                    throw new Error('Failed to retrieve result.');
                 }
 
                 const students = await response.json();
 
                 if (!students || students.length === 0) {
-                    showError(`ക്ലാസ്സ് ${selectedClass}-ൽ രജിസ്റ്റർ നമ്പർ '${regNo}' ഉള്ള ഫലം കണ്ടെത്തിയില്ല. ദയവായി നമ്പർ പരിശോധിക്കുക.`);
+                    showError(`No result found for Class ${selectedClass} with Register Number '${regNo}'. Please check your number.`);
                     return;
                 }
 
                 renderStudentCard(students[0]);
             } catch (err) {
                 console.error(err);
-                showError('കണക്ഷൻ തകരാർ: ഇന്റർനെറ്റ് കണക്ഷൻ പരിശോധിക്കുക.');
+                showError('Connection error: Please check your internet connection and try again.');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>ഫലം കാണുക (Check Result)</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>';
+                submitBtn.innerHTML = '<span>Check Result</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>';
             }
         }
 
@@ -663,7 +663,7 @@
 
             let itemsHtml = '';
             marksList.forEach(m => {
-                const title = m.subject || m.title || 'വിഷയം';
+                const title = m.subject || m.title || 'Subject';
                 const ar = m.arabic || '';
                 const score = (m.mark !== undefined && m.mark !== null && m.mark !== '') ? m.mark : '-';
                 const isItemPass = Number(score) >= 36;
@@ -696,8 +696,8 @@
                         ` : ''}
 
                         <div class="chips-row">
-                            <span class="chip">ക്ലാസ്സ്: ${escapeHtml(String(student.class_number))}</span>
-                            <span class="chip">Reg No: ${escapeHtml(String(student.register_no))}</span>
+                            <span class="chip">Class : ${escapeHtml(String(student.class_number))}</span>
+                            <span class="chip">Reg. No : ${escapeHtml(String(student.register_no))}</span>
                         </div>
                     </div>
 
@@ -707,7 +707,7 @@
 
                     <div class="total-box">
                         <div class="total-left">
-                            <span class="total-label">Grand Total (ആകെ മാർക്ക്)</span>
+                            <span class="total-label">Grand Total</span>
                             <span class="total-ar">المجموع الكلي</span>
                         </div>
                         <div class="total-value">${escapeHtml(String(student.grand_total || 0))}</div>

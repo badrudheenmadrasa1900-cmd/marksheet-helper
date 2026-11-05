@@ -28,8 +28,8 @@ class MarksheetView {
                 <!-- Top Breadcrumb & Navbar -->
                 <header class="navbar marksheet-navbar">
                     <div class="nav-left">
-                        <button class="btn btn-ghost btn-sm" id="btn-back-dashboard" title="ക്ലാസുകൾ">
-                            ← <span class="hide-mobile">ക്ലാസുകൾ</span>
+                        <button class="btn btn-ghost btn-sm" id="btn-back-dashboard" title="Classes">
+                            ← <span class="hide-mobile">Classes</span>
                         </button>
                         <div class="nav-class-info">
                             <span class="nav-madrasa-sub">${cls.madrasaName || ''}</span>
@@ -38,34 +38,34 @@ class MarksheetView {
                     </div>
                     <div class="nav-actions">
                         <div class="autosave-badge hide-mobile" id="autosave-status">
-                            <span class="save-dot"></span> സേവ് ആയി
+                            <span class="save-dot"></span> Saved
                         </div>
 
                         <!-- 1-Click Excel Import -->
-                        <button class="btn btn-outline btn-sm btn-action-excel" id="btn-import-excel" title="Excel ഇംപോർട്ട്">
-                            <span class="action-btn-text">Excel ഇംപോർട്ട്</span>
+                        <button class="btn btn-outline btn-sm btn-action-excel" id="btn-import-excel" title="Import Excel">
+                            <span class="action-btn-text">Import Excel</span>
                         </button>
 
                         <!-- Gemini Flash AI Photo Scan -->
-                        <button class="btn btn-outline btn-sm btn-action-ai" id="btn-scan-gemini" title="AI സ്കാൻ">
-                            <span class="action-btn-text">AI സ്കാൻ</span>
+                        <button class="btn btn-outline btn-sm btn-action-ai" id="btn-scan-gemini" title="AI Scan">
+                            <span class="action-btn-text">AI Scan</span>
                         </button>
 
                         <!-- Supabase Cloud Sync -->
-                        <button class="btn btn-outline btn-sm" id="btn-sync-cloud" title="Supabase Cloud-ലേക്ക് പബ്ലിക് റിസൾട്ട് സിങ്ക് ചെയ്യുക" style="color:#156d3b; border-color:#156d3b; font-weight:700;">
-                            ☁️ റിസൾട്ട് സിങ്ക്
+                        <button class="btn btn-outline btn-sm" id="btn-sync-cloud" title="Sync result with Supabase Cloud" style="color:#0d5c31; border-color:#0d5c31; font-weight:700;">
+                            ☁️ Sync Result
                         </button>
 
                         <!-- Print Button -->
-                        <button class="btn btn-primary btn-sm btn-print" id="btn-print-nav" title="പ്രിന്റ് ചെയ്യുക">
-                            പ്രിന്റ്
+                        <button class="btn btn-primary btn-sm btn-print" id="btn-print-nav" title="Print Marksheet">
+                            Print
                         </button>
 
                         <!-- Export dropdown / buttons -->
-                        <button class="btn btn-outline btn-sm hide-mobile" id="btn-export-excel" title="Excel ഡൗൺലോഡ്">
+                        <button class="btn btn-outline btn-sm hide-mobile" id="btn-export-excel" title="Export Excel">
                             Excel
                         </button>
-                        <button class="btn btn-outline btn-sm hide-mobile" id="btn-export-pdf" title="PDF ഡൗൺലോഡ്">
+                        <button class="btn btn-outline btn-sm hide-mobile" id="btn-export-pdf" title="Export PDF">
                             PDF
                         </button>
                     </div>
@@ -78,16 +78,16 @@ class MarksheetView {
                             <!-- Sheets Tabs -->
                             <div class="sheet-tabs scrollable-tabs">
                                 <button class="sheet-tab ${this.activeTab === 'boys' ? 'active' : ''}" data-tab="boys">
-                                    ആൺകുട്ടികൾ <span class="tab-badge">${boys.length}</span>
+                                    Boys <span class="tab-badge">${boys.length}</span>
                                 </button>
                                 <button class="sheet-tab ${this.activeTab === 'girls' ? 'active' : ''}" data-tab="girls">
-                                    പെൺകുട്ടികൾ <span class="tab-badge">${girls.length}</span>
+                                    Girls <span class="tab-badge">${girls.length}</span>
                                 </button>
                                 <button class="sheet-tab ${this.activeTab === 'all' ? 'active' : ''}" data-tab="all">
-                                    എല്ലാവരും <span class="tab-badge">${students.length}</span>
+                                    All Students <span class="tab-badge">${students.length}</span>
                                 </button>
                                 <button class="sheet-tab ${this.activeTab === 'analytics' ? 'active' : ''}" data-tab="analytics">
-                                    റിസൾട്ട്
+                                    Overview
                                 </button>
                             </div>
                         </div>
@@ -95,22 +95,22 @@ class MarksheetView {
                         <div class="toolbar-right">
                             <!-- View Switcher -->
                             <div class="view-mode-toggle" id="view-mode-group">
-                                <button type="button" class="btn-toggle ${this.viewMode === 'table' ? 'active' : ''}" id="btn-mode-table" title="പട്ടിക">
-                                    <span class="toggle-text">പട്ടിക</span>
+                                <button type="button" class="btn-toggle ${this.viewMode === 'table' ? 'active' : ''}" id="btn-mode-table" title="Table View">
+                                    <span class="toggle-text">Table</span>
                                 </button>
-                                <button type="button" class="btn-toggle ${this.viewMode === 'cards' ? 'active' : ''}" id="btn-mode-cards" title="കാർഡുകൾ">
-                                    <span class="toggle-text">കാർഡുകൾ</span>
+                                <button type="button" class="btn-toggle ${this.viewMode === 'cards' ? 'active' : ''}" id="btn-mode-cards" title="Cards View">
+                                    <span class="toggle-text">Cards</span>
                                 </button>
                             </div>
 
                             <button class="btn btn-outline btn-sm" id="btn-manage-topics">
-                                വിഷയങ്ങൾ (${topics.length})
+                                Subjects (${topics.length})
                             </button>
                             <button class="btn btn-outline btn-sm btn-print" id="btn-print-toolbar">
-                                പ്രിന്റ്
+                                Print
                             </button>
                             <button class="btn btn-primary btn-sm" id="btn-add-student">
-                                പുതിയ വിദ്യാർത്ഥി
+                                + New Student
                             </button>
                         </div>
                     </div>
@@ -127,20 +127,20 @@ class MarksheetView {
 
                 <!-- Mobile Floating / Bottom Action Bar -->
                 <nav class="mobile-bottom-bar show-mobile-only">
-                    <button class="mobile-bar-btn" id="m-btn-print" title="പ്രിന്റ്">
-                        <span class="m-label font-bold">പ്രിന്റ്</span>
+                    <button class="mobile-bar-btn" id="m-btn-print" title="Print">
+                        <span class="m-label font-bold">Print</span>
                     </button>
-                    <button class="mobile-bar-btn" id="m-btn-excel" title="Excel ഇംപോർട്ട്">
+                    <button class="mobile-bar-btn" id="m-btn-excel" title="Excel Import">
                         <span class="m-label">Excel</span>
                     </button>
-                    <button class="mobile-bar-btn" id="m-btn-ai" title="AI സ്കാൻ">
-                        <span class="m-label">AI സ്കാൻ</span>
+                    <button class="mobile-bar-btn" id="m-btn-ai" title="AI Scan">
+                        <span class="m-label">AI Scan</span>
                     </button>
-                    <button class="mobile-bar-btn active-highlight" id="m-btn-add-student" title="വിദ്യാർത്ഥിയെ ചേർക്കുക">
-                        <span class="m-label">+ കുട്ടി</span>
+                    <button class="mobile-bar-btn active-highlight" id="m-btn-add-student" title="Add Student">
+                        <span class="m-label">+ Student</span>
                     </button>
-                    <button class="mobile-bar-btn" id="m-btn-toggle-view" title="കാഴ്ച്ച മാറ്റുക">
-                        <span class="m-label">${this.viewMode === 'cards' ? 'പട്ടിക' : 'കാർഡ്'}</span>
+                    <button class="mobile-bar-btn" id="m-btn-toggle-view" title="Toggle View">
+                        <span class="m-label">${this.viewMode === 'cards' ? 'Table' : 'Cards'}</span>
                     </button>
                     <button class="mobile-bar-btn" id="m-btn-pdf" title="PDF">
                         <span class="m-label">PDF</span>
@@ -1029,7 +1029,7 @@ class MarksheetView {
             <div class="modal-backdrop" id="add-student-modal-backdrop">
                 <div class="modal-box mobile-sheet modal-lg">
                     <div class="modal-header">
-                        <h3 class="modal-title">വിദ്യാർത്ഥിയെ ചേർക്കുക (Student Registration)</h3>
+                        <h3 class="modal-title">Add Student Registration</h3>
                         <button class="modal-close" id="btn-close-st-modal">&times;</button>
                     </div>
                     <form id="add-student-form">
@@ -1040,43 +1040,43 @@ class MarksheetView {
                                     <input type="text" id="modal-roll" class="form-control" value="${nextRoll}" required>
                                 </div>
                                 <div class="form-group flex-1">
-                                    <label class="form-label">വിദ്യാർത്ഥിയുടെ പേര് (English) *</label>
-                                    <input type="text" id="modal-name" class="form-control" placeholder="Student Name (e.g. SARA JAZEELA)" required autofocus>
+                                    <label class="form-label">Student Full Name *</label>
+                                    <input type="text" id="modal-name" class="form-control" placeholder="e.g. SARA JAZEELA" required autofocus>
                                 </div>
                                 <div class="form-group flex-1">
-                                    <label class="form-label">പേര് (Arabic)</label>
+                                    <label class="form-label">Name (Arabic)</label>
                                     <input type="text" id="modal-name-ar" class="form-control" placeholder="الاسم بالعربية (e.g. جميلة)" dir="rtl">
                                 </div>
                             </div>
 
                             <div class="form-row mt-2">
                                 <div class="form-group flex-1">
-                                    <label class="form-label">പിതാവ് / രക്ഷിതാവ് (Parent Name)</label>
-                                    <input type="text" id="modal-parent" class="form-control" placeholder="D/o / S/o (e.g. ABDUL LATHEEF)">
+                                    <label class="form-label">Parent / Guardian Name</label>
+                                    <input type="text" id="modal-parent" class="form-control" placeholder="D/o or S/o (e.g. ABDUL LATHEEF)">
                                 </div>
                                 <div class="form-group flex-1">
-                                    <label class="form-label">രക്ഷിതാവ് (Arabic)</label>
+                                    <label class="form-label">Parent (Arabic)</label>
                                     <input type="text" id="modal-parent-ar" class="form-control" placeholder="اسم الوالد (e.g. عبد اللطيف)" dir="rtl">
                                 </div>
                             </div>
 
                             <div class="form-group mt-2">
-                                <label class="form-label">ലിംഗം</label>
+                                <label class="form-label">Gender</label>
                                 <div class="radio-group">
                                     <label class="radio-label">
                                         <input type="radio" name="st-gender" value="boy" ${this.activeTab !== 'girls' ? 'checked' : ''}>
-                                        <span>ആൺകുട്ടി (Boy)</span>
+                                        <span>Boy</span>
                                     </label>
                                     <label class="radio-label">
                                         <input type="radio" name="st-gender" value="girl" ${this.activeTab === 'girls' ? 'checked' : ''}>
-                                        <span>പെൺകുട്ടി (Girl)</span>
+                                        <span>Girl</span>
                                     </label>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-ghost" id="btn-cancel-st">റദ്ദാക്കുക</button>
-                            <button type="submit" class="btn btn-primary">ചേർക്കുക</button>
+                            <button type="button" class="btn btn-ghost" id="btn-cancel-st">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add Student</button>
                         </div>
                     </form>
                 </div>
