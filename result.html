@@ -3,19 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#156d3b">
-    <title>BADRUDHEEN MADRASA - PUBLIC EXAMINATION RESULT 2026</title>
+    <meta name="theme-color" content="#0d5c31">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Badrudheen Madrasa - Student Result Portal 2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-green: #156d3b;
-            --header-dark: #0f4f2a;
-            --accent-green: #1b8a4b;
-            --bg-light: #eaf5ee;
-            --card-border: #a3d9b8;
-            --text-main: #1f2937;
+            /* 60-30-10 Color System & Kid-friendly Trust Palette */
+            --bg-page: #f2f7f4;
+            --bg-card: #ffffff;
+            --text-title: #0f2d1d;
+            --text-body: #2d4a3b;
+            --text-muted: #648272;
+            
+            --brand-green: #0d5c31;
+            --brand-green-light: #158043;
+            --brand-tint: rgba(13, 92, 49, 0.08);
+            --gold-accent: #f59e0b;
+            --gold-light: #fef3c7;
+            
+            --badge-pass: #059669;
+            --badge-pass-bg: #ecfdf5;
+            --badge-dist: #047857;
+            --badge-fail: #e11d48;
+            --badge-fail-bg: #ffe4e6;
+            
+            /* Apple & Material Design Shadows */
+            --shadow-soft: 0 4px 20px -2px rgba(13, 92, 49, 0.07);
+            --shadow-card: 0 10px 30px -5px rgba(13, 92, 49, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+            --shadow-btn: 0 8px 20px -4px rgba(13, 92, 49, 0.35);
         }
 
         * {
@@ -26,484 +45,558 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(180deg, #e7f2ec 0%, #f4f8f5 100%);
+            color: var(--text-body);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
+            line-height: 1.5;
         }
 
-        /* Top Banner */
-        .board-header {
-            background: linear-gradient(180deg, #166e3b 0%, #11572e 100%);
+        /* Top Friendly App Bar (Apple/Android Status-safe) */
+        .top-navbar {
+            padding: calc(env(safe-area-inset-top, 16px) + 12px) 20px 16px;
+            background: linear-gradient(135deg, #0c4d29 0%, #116838 100%);
             color: #ffffff;
-            text-align: center;
-            padding: 18px 14px 16px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 20px rgba(12, 77, 41, 0.2);
+            position: relative;
+            z-index: 10;
         }
 
-        .header-content {
-            max-width: 900px;
+        .nav-inner {
+            max-width: 580px;
             margin: 0 auto;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 16px;
-            flex-wrap: wrap;
         }
 
-        .board-emblem {
-            width: 72px;
-            height: 72px;
-            background: white;
-            border-radius: 50%;
-            padding: 5px;
+        .madrasa-logo {
+            width: 58px;
+            height: 58px;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
+            border: 2px solid rgba(255, 255, 255, 0.9);
         }
 
-        .board-emblem svg {
+        .madrasa-logo svg {
             width: 100%;
             height: 100%;
         }
 
-        .board-titles {
-            text-align: center;
-        }
-
-        .arabic-header {
-            font-family: 'Amiri', serif;
-            font-size: 1.45rem;
-            color: #ffd54f;
-            line-height: 1.35;
-            font-weight: 700;
-        }
-
-        .board-main-title {
-            font-size: 1.35rem;
-            font-weight: 800;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            margin: 3px 0;
-            line-height: 1.25;
-            color: #ffffff;
-        }
-
-        .board-sub-address {
-            font-size: 0.86rem;
-            opacity: 0.95;
-            font-weight: 500;
-            color: #d1fae5;
-        }
-
-        /* Nav links bar - Purely for student results, no admin/teacher links */
-        .nav-subbar {
-            background-color: #0d4624;
-            color: #ffffff;
-            padding: 9px 12px;
-            display: flex;
-            justify-content: center;
-            gap: 28px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-
-        .nav-subbar a {
-            color: #e2f1e8;
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .nav-subbar a:hover, .nav-subbar a.active {
-            color: #ffeb3b;
-            text-decoration: underline;
-        }
-
-        /* Main Container */
-        .page-body {
+        .header-text {
             flex: 1;
-            max-width: 650px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 24px 16px 40px;
         }
 
-        .page-title {
-            text-align: center;
+        .arabic-title {
+            font-family: 'Amiri', serif;
+            font-size: 1.35rem;
+            color: #fde68a;
+            font-weight: 700;
+            line-height: 1.2;
+            direction: rtl;
+            text-align: left;
+        }
+
+        .app-title {
             font-size: 1.25rem;
             font-weight: 800;
-            letter-spacing: 0.5px;
-            color: #0b3d1f;
-            text-transform: uppercase;
+            letter-spacing: -0.3px;
+            color: #ffffff;
+        }
+
+        .app-subtitle {
+            font-size: 0.78rem;
+            color: #a7f3d0;
+            font-weight: 600;
+        }
+
+        /* Screen Wrapper */
+        .content-container {
+            max-width: 580px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 18px 48px;
+            flex: 1;
+        }
+
+        /* Kid-Friendly Greeting Header */
+        .welcome-bubble {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 22px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .bubble-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            background: #dcfce7;
+            color: #065f46;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-bubble h2 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-title);
+            margin-bottom: 4px;
+        }
+
+        .welcome-bubble p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Search Card (iPhone/Android Minimal Sheet) */
+        .search-sheet {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 26px 22px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid #e0ede5;
+        }
+
+        .field-group {
             margin-bottom: 20px;
         }
 
-        /* Result Search Card */
-        .search-card {
-            background: #ffffff;
-            border: 2px solid var(--card-border);
-            border-radius: 14px;
-            padding: 24px 20px;
-            box-shadow: 0 4px 14px rgba(22, 110, 59, 0.08);
-            margin-bottom: 24px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.88rem;
+        .field-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.92rem;
             font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 6px;
+            color: var(--text-title);
+            margin-bottom: 8px;
         }
 
-        .form-control {
+        .field-label .label-sub {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* Apple Style Large Select & Inputs (Min 52px height for children & thumbs) */
+        .touch-input, .touch-select {
             width: 100%;
-            padding: 10px 14px;
-            font-size: 0.95rem;
-            border: 1.5px solid #bcdac6;
-            border-radius: 8px;
-            background-color: #ffffff;
+            height: 54px;
+            border-radius: 18px;
+            border: 2px solid #e5eee8;
+            background: #f8faf9;
+            padding: 0 18px;
+            font-size: 1.05rem;
+            font-family: inherit;
+            font-weight: 600;
+            color: var(--text-title);
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: all 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
         }
 
-        .form-control:focus {
-            border-color: var(--primary-green);
-            box-shadow: 0 0 0 3px rgba(22, 110, 59, 0.15);
+        .touch-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%230d5c31' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            padding-right: 46px;
         }
 
-        .btn-submit {
+        .touch-input:focus, .touch-select:focus {
+            border-color: var(--brand-green);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(13, 92, 49, 0.12);
+        }
+
+        /* Big Thumb-Friendly Primary Button */
+        .btn-check-result {
             width: 100%;
-            max-width: 200px;
-            display: block;
-            margin: 22px auto 6px;
-            padding: 11px 24px;
-            background-color: var(--primary-green);
+            height: 56px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #0d5c31 0%, #137740 100%);
             color: #ffffff;
             border: none;
-            border-radius: 25px;
-            font-size: 0.98rem;
-            font-weight: 700;
+            font-size: 1.1rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            box-shadow: 0 3px 8px rgba(22, 110, 59, 0.3);
-        }
-
-        .btn-submit:hover {
-            background-color: #0f542c;
-        }
-
-        .btn-submit:active {
-            transform: scale(0.98);
-        }
-
-        /* Result Display Card */
-        .result-view-card {
-            background: #ffffff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-            border: 1px solid #c8e6d3;
+            box-shadow: var(--shadow-btn);
+            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
             margin-top: 10px;
-            animation: fadeIn 0.3s ease-in-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+        .btn-check-result:active {
+            transform: scale(0.97);
+            box-shadow: 0 4px 12px rgba(13, 92, 49, 0.25);
+        }
+
+        /* Result Display Card (Exciting, Aesthetic & Celebratory) */
+        .result-sheet {
+            margin-top: 28px;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid #dcf0e4;
+            overflow: hidden;
+            animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(18px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .student-header-box {
-            background: #d4eddb;
-            padding: 18px 14px;
+        /* Student Hero Section */
+        .student-profile {
+            background: linear-gradient(180deg, #e9f5ed 0%, #ffffff 100%);
+            padding: 24px 20px 20px;
             text-align: center;
-            border-bottom: 1px solid #b8dfc4;
+            position: relative;
+            border-bottom: 1px solid #eef6f1;
         }
 
-        .student-name {
-            font-size: 1.25rem;
+        .avatar-circle {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d5c31 0%, #208e4f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.8rem;
             font-weight: 800;
-            color: #0e4422;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            box-shadow: 0 8px 18px rgba(13, 92, 49, 0.22);
+            border: 3px solid #ffffff;
         }
 
-        .arabic-name {
-            font-family: 'Amiri', serif;
+        .student-title {
             font-size: 1.35rem;
-            font-weight: 700;
-            color: #13552b;
-            margin: 2px 0 4px;
+            font-weight: 800;
+            color: var(--text-title);
+            letter-spacing: -0.2px;
         }
 
-        .parent-info {
+        .arabic-name-lg {
+            font-family: 'Amiri', serif;
+            font-size: 1.4rem;
+            color: #106637;
+            font-weight: 700;
+            margin: 2px 0 6px;
+        }
+
+        .parent-tag {
             font-size: 0.88rem;
             font-weight: 600;
-            color: #374151;
-            margin-bottom: 2px;
+            color: var(--text-muted);
         }
 
-        .madrasa-info {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #0b3d1f;
-            margin-top: 6px;
-            padding-top: 6px;
-            border-top: 1px dashed #a5d3b3;
-            text-transform: uppercase;
-        }
-
-        .meta-pills {
+        .chips-row {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            margin-top: 12px;
+            gap: 8px;
+            margin-top: 14px;
         }
 
-        .pill-badge {
-            background-color: var(--primary-green);
-            color: white;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 6px 20px;
-            border-radius: 20px;
-            box-shadow: 0 2px 5px rgba(22, 110, 59, 0.25);
-        }
-
-        /* Subjects Marks Table */
-        .marks-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .marks-table th {
-            background-color: #f1f8f4;
-            color: #0b3d1f;
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 10px 14px;
-            text-align: left;
-            border-bottom: 1.5px solid #c2e2ce;
-            text-transform: uppercase;
-        }
-
-        .marks-table th.text-center {
-            text-align: center;
-        }
-
-        .marks-table th.text-right {
-            text-align: right;
-        }
-
-        .marks-table td {
-            padding: 12px 14px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-bottom: 1px solid #e5ede8;
-            color: #1f2937;
-        }
-
-        .marks-table tr:nth-child(even) td {
-            background-color: #fafdfb;
-        }
-
-        .sub-arabic {
-            font-family: 'Amiri', serif;
-            font-size: 1.15rem;
-            color: #0e4422;
-            text-align: right;
-            direction: rtl;
-        }
-
-        .sub-score {
-            font-weight: 800;
-            text-align: center;
-            font-size: 1rem;
-        }
-
-        .total-row td {
-            background-color: #0d4624 !important;
-            color: #ffffff !important;
-            font-size: 1rem;
-            font-weight: 800;
-            padding: 12px 14px;
-        }
-
-        .status-banner {
-            padding: 14px;
-            text-align: center;
-            color: #ffffff;
-            font-size: 1.15rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .status-distinction {
-            background: linear-gradient(135deg, #107c41, #0b532c);
-        }
-
-        .status-first-class, .status-pass {
-            background: linear-gradient(135deg, #15803d, #166534);
-        }
-
-        .status-fail {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-        }
-
-        /* Message feedback */
-        .alert-box {
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 0.92rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-            text-align: center;
-            display: none;
-        }
-
-        .alert-error {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #f87171;
-            display: block;
-        }
-
-        /* Footer */
-        .page-footer {
-            text-align: center;
-            padding: 18px 16px;
+        .chip {
+            padding: 6px 16px;
+            border-radius: 30px;
             font-size: 0.82rem;
-            color: #4b5563;
-            margin-top: auto;
-            border-top: 1px solid #d1fae5;
+            font-weight: 700;
+            background: #ffffff;
+            color: var(--brand-green);
+            border: 1.5px solid #c9e4d4;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Subjects Marks List (Clean Cards instead of cramped table) */
+        .subjects-list {
+            padding: 16px 20px;
+        }
+
+        .subject-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            background: #fbfdfc;
+            border-radius: 18px;
+            margin-bottom: 10px;
+            border: 1px solid #edf4f0;
+            transition: transform 0.15s ease;
+        }
+
+        .subject-item:hover {
+            transform: translateX(3px);
+            background: #f6fbf8;
+        }
+
+        .subject-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .sub-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-title);
+        }
+
+        .sub-ar {
+            font-family: 'Amiri', serif;
+            font-size: 1.05rem;
+            color: #158043;
+            font-weight: 700;
+        }
+
+        .sub-badge {
+            font-size: 1.15rem;
+            font-weight: 800;
+            padding: 6px 16px;
+            border-radius: 14px;
+            min-width: 60px;
+            text-align: center;
+            font-family: 'Plus Jakarta Sans', monospace;
+        }
+
+        .score-good {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        .score-low {
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fecdd3;
+        }
+
+        /* Grand Total Summary Box */
+        .total-box {
+            margin: 12px 20px 20px;
+            padding: 18px 20px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #0d5c31 0%, #084022 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 8px 20px rgba(13, 92, 49, 0.25);
+        }
+
+        .total-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .total-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #a7f3d0;
+            font-weight: 700;
+        }
+
+        .total-ar {
+            font-family: 'Amiri', serif;
+            font-size: 1.1rem;
+            color: #fde68a;
+        }
+
+        .total-value {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+        }
+
+        /* Big Vibrant Status Banner */
+        .final-status-pill {
+            text-align: center;
+            padding: 16px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .status-celebrate {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+
+        .status-alert {
+            background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+        }
+
+        /* Error Notification Pill */
+        .notify-pill {
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notify-error {
+            background: #ffe4e6;
+            color: #9f1239;
+            border: 1px solid #fecdd3;
+            display: flex;
+        }
+
+        /* Clean Footer */
+        .app-footer {
+            text-align: center;
+            padding: 24px 16px calc(env(safe-area-inset-bottom, 16px) + 12px);
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
         }
 
         @media (max-width: 480px) {
-            .board-main-title {
-                font-size: 1.15rem;
-            }
-            .arabic-header {
-                font-size: 1.3rem;
-            }
-            .meta-pills {
-                flex-direction: column;
-                gap: 8px;
-                align-items: center;
-            }
-            .pill-badge {
-                width: 100%;
-                max-width: 220px;
-                text-align: center;
-            }
+            .app-title { font-size: 1.12rem; }
+            .arabic-title { font-size: 1.25rem; }
+            .search-sheet { padding: 20px 16px; border-radius: 24px; }
+            .touch-input, .touch-select { height: 50px; font-size: 0.98rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header styled specifically for BADRUDHEEN MADRASA -->
-    <header class="board-header">
-        <div class="header-content">
-            <div class="board-emblem">
-                <!-- Mosque / Crescent Emblem SVG -->
+    <!-- Apple / Android Status Header -->
+    <header class="top-navbar">
+        <div class="nav-inner">
+            <div class="madrasa-logo">
                 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="50" cy="50" r="45" fill="#eaf5ee" stroke="#156d3b" stroke-width="3"/>
-                    <path d="M50 18L32 36H68L50 18Z" fill="#156d3b"/>
-                    <rect x="34" y="36" width="32" height="34" rx="2" fill="#156d3b"/>
+                    <circle cx="50" cy="50" r="45" fill="#f0fdf4" stroke="#0d5c31" stroke-width="3"/>
+                    <path d="M50 18L30 36H70L50 18Z" fill="#0d5c31"/>
+                    <rect x="34" y="36" width="32" height="34" rx="3" fill="#0d5c31"/>
                     <path d="M44 70V54C44 50.7 46.7 48 50 48C53.3 48 56 50.7 56 54V70H44Z" fill="#ffffff"/>
-                    <path d="M22 40L28 45V70H22V40Z" fill="#156d3b"/>
-                    <path d="M78 40L72 45V70H78V40Z" fill="#156d3b"/>
-                    <circle cx="50" cy="14" r="3" fill="#ffd54f"/>
+                    <circle cx="50" cy="14" r="3" fill="#f59e0b"/>
                 </svg>
             </div>
-            <div class="board-titles">
-                <div class="arabic-header">مدرسة بدر الدين الإسلامية</div>
-                <h1 class="board-main-title">BADRUDHEEN MADRASA</h1>
-                <p class="board-sub-address">Islamic Education Centre • Examination Board</p>
+            <div class="header-text">
+                <div class="arabic-title">مدرسة بدر الدين الإسلامية</div>
+                <h1 class="app-title">BADRUDHEEN MADRASA</h1>
+                <p class="app-subtitle">Examination Result Portal 2026</p>
             </div>
         </div>
     </header>
 
-    <!-- Sub Menu Navigation (Only Student / Individual Result, NO admin or teacher links) -->
-    <nav class="nav-subbar">
-        <a href="/" class="active">Individual Result (വ്യക്തിഗത ഫലം)</a>
-    </nav>
+    <!-- App Body Content -->
+    <main class="content-container">
+        
+        <!-- Welcome Card -->
+        <div class="welcome-bubble">
+            <div class="bubble-badge">✨ പരീക്ഷാ ഫലം പരിശോധിക്കാം</div>
+            <h2>വിദ്യാർത്ഥി മാർക്ക് ലിസ്റ്റ്</h2>
+            <p>ക്ലാസും രജിസ്റ്റർ നമ്പറും നൽകി നിങ്ങളുടെ റിസൾട്ട് അറിയാം</p>
+        </div>
 
-    <!-- Main Container -->
-    <main class="page-body">
-        <h2 class="page-title">EXAMINATION RESULT 2026</h2>
+        <!-- Search Sheet -->
+        <section class="search-sheet">
+            <div id="notify-box" class="notify-pill"></div>
 
-        <!-- Search Form -->
-        <section class="search-card">
-            <div id="error-box" class="alert-box"></div>
-            
             <form id="result-query-form" onsubmit="handleResultSearch(event)">
-                <div class="form-group">
-                    <label for="syllabus-select">Syllabus</label>
-                    <select id="syllabus-select" class="form-control">
-                        <option value="GENERAL" selected>GENERAL</option>
-                        <option value="SPECIAL">SPECIAL</option>
+                <div class="field-group">
+                    <label class="field-label" for="class-select">
+                        <span>ക്ലാസ്സ് (Class)</span>
+                        <span class="label-sub">1 മുതൽ 12 വരെ</span>
+                    </label>
+                    <select id="class-select" class="touch-select" required>
+                        <option value="" disabled selected>ക്ലാസ്സ് തിരഞ്ഞെടുക്കുക</option>
+                        <option value="1">Class 1 (ഒന്നാം ക്ലാസ്സ്)</option>
+                        <option value="2">Class 2 (രണ്ടാം ക്ലാസ്സ്)</option>
+                        <option value="3">Class 3 (മൂന്നാം ക്ലാസ്സ്)</option>
+                        <option value="4">Class 4 (നാലാം ക്ലാസ്സ്)</option>
+                        <option value="5">Class 5 (അഞ്ചാം ക്ലാസ്സ്)</option>
+                        <option value="6">Class 6 (ആറാം ക്ലാസ്സ്)</option>
+                        <option value="7">Class 7 (ഏഴാം ക്ലാസ്സ്)</option>
+                        <option value="8">Class 8 (എട്ടാം ക്ലാസ്സ്)</option>
+                        <option value="9">Class 9 (ഒൻപതാം ക്ലാസ്സ്)</option>
+                        <option value="10">Class 10 (പത്താം ക്ലാസ്സ്)</option>
+                        <option value="11">Class 11 (പ്ലസ് വൺ)</option>
+                        <option value="12">Class 12 (പ്ലസ് ടു)</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="class-select">Class (ക്ലാസ്സ് 1 - 12)</label>
-                    <select id="class-select" class="form-control" required>
-                        <option value="" disabled selected>Select Class</option>
-                        <option value="1">Class 1</option>
-                        <option value="2">Class 2</option>
-                        <option value="3">Class 3</option>
-                        <option value="4">Class 4</option>
-                        <option value="5">Class 5</option>
-                        <option value="6">Class 6</option>
-                        <option value="7">Class 7</option>
-                        <option value="8">Class 8</option>
-                        <option value="9">Class 9</option>
-                        <option value="10">Class 10</option>
-                        <option value="11">Class 11</option>
-                        <option value="12">Class 12</option>
-                    </select>
+                <div class="field-group">
+                    <label class="field-label" for="reg-no-input">
+                        <span>രജിസ്റ്റർ നമ്പർ (Register No)</span>
+                        <span class="label-sub">ഉദാ: 35, 101</span>
+                    </label>
+                    <input 
+                        type="number" 
+                        inputmode="numeric" 
+                        id="reg-no-input" 
+                        class="touch-input" 
+                        placeholder="നമ്പർ ഇവിടെ ടൈപ്പ് ചെയ്യുക" 
+                        required 
+                        autocomplete="off"
+                    >
                 </div>
 
-                <div class="form-group">
-                    <label for="reg-no-input">Register Number (രജിസ്റ്റർ നമ്പർ)</label>
-                    <input type="text" id="reg-no-input" class="form-control" placeholder="Enter Register Number (e.g. 35, 101)" required autocomplete="off">
-                </div>
-
-                <button type="submit" id="submit-btn" class="btn-submit">Submit</button>
+                <button type="submit" id="submit-btn" class="btn-check-result">
+                    <span>ഫലം കാണുക (Check Result)</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </button>
             </form>
         </section>
 
-        <!-- Result Details Card Container -->
+        <!-- Dynamic Result Card -->
         <div id="result-container" style="display: none;"></div>
+
     </main>
 
-    <footer class="page-footer">
-        <p>© 2026 Badrudheen Madrasa | Examination Result Portal</p>
+    <footer class="app-footer">
+        <p>© 2026 Badrudheen Madrasa • All Rights Reserved</p>
     </footer>
 
-    <!-- Script to query Supabase & render result -->
+    <!-- Supabase Query & Clean Render Script -->
     <script>
         const SUPABASE_URL = "https://wbwghcrvcwwdbayqrivz.supabase.co/rest/v1/";
         const SUPABASE_KEY = "sb_publishable_CLg__H7hzI-W9eeIib6lnQ_bTd1Y19Q";
 
         async function handleResultSearch(event) {
             event.preventDefault();
-            const errorBox = document.getElementById('error-box');
+            const notifyBox = document.getElementById('notify-box');
             const resultContainer = document.getElementById('result-container');
             const submitBtn = document.getElementById('submit-btn');
-            
-            errorBox.style.display = 'none';
+
+            notifyBox.style.display = 'none';
             resultContainer.style.display = 'none';
 
             const selectedClass = document.getElementById('class-select').value;
@@ -515,10 +608,9 @@
             }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Checking...';
+            submitBtn.innerHTML = '<span>റിസൾട്ട് എടുക്കുന്നു...</span>';
 
             try {
-                // Query students from Supabase
                 const queryUrl = `${SUPABASE_URL}students?class_number=eq.${encodeURIComponent(selectedClass)}&register_no=eq.${encodeURIComponent(regNo)}&select=*`;
                 const response = await fetch(queryUrl, {
                     headers: {
@@ -528,36 +620,36 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('റിസൾട്ട് ഡാറ്റ ലഭ്യമാക്കുന്നതിൽ തകരാർ.');
+                    throw new Error('റിസൾട്ട് ലഭ്യമാക്കുന്നതിൽ തടസ്സം നേരിട്ടു.');
                 }
 
                 const students = await response.json();
 
                 if (!students || students.length === 0) {
-                    showError(`ക്ലാസ്സ് ${selectedClass}-ൽ രജിസ്റ്റർ നമ്പർ '${regNo}' ഉള്ള വിദ്യാർത്ഥിയുടെ ഫലം കണ്ടെത്തിയില്ല.`);
+                    showError(`ക്ലാസ്സ് ${selectedClass}-ൽ രജിസ്റ്റർ നമ്പർ '${regNo}' ഉള്ള ഫലം കണ്ടെത്തിയില്ല. ദയവായി നമ്പർ പരിശോധിക്കുക.`);
                     return;
                 }
 
-                renderResultCard(students[0]);
+                renderStudentCard(students[0]);
             } catch (err) {
                 console.error(err);
-                showError('കണക്ഷൻ തകരാർ: ദയവായി അല്പം കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.');
+                showError('കണക്ഷൻ തകരാർ: ഇന്റർനെറ്റ് കണക്ഷൻ പരിശോധിക്കുക.');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit';
+                submitBtn.innerHTML = '<span>ഫലം കാണുക (Check Result)</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>';
             }
         }
 
         function showError(msg) {
-            const errorBox = document.getElementById('error-box');
-            errorBox.textContent = msg;
-            errorBox.className = 'alert-box alert-error';
-            errorBox.style.display = 'block';
+            const notifyBox = document.getElementById('notify-box');
+            notifyBox.textContent = msg;
+            notifyBox.className = 'notify-pill notify-error';
+            notifyBox.style.display = 'flex';
         }
 
-        function renderResultCard(student) {
+        function renderStudentCard(student) {
             const container = document.getElementById('result-container');
-            
+
             let marksList = [];
             try {
                 marksList = typeof student.marks === 'string' ? JSON.parse(student.marks) : (student.marks || []);
@@ -565,79 +657,71 @@
                 marksList = [];
             }
 
-            let statusClass = 'status-pass';
+            const initial = (student.name || 'S').trim()[0].toUpperCase();
             const statusUpper = (student.status || 'PASS').toUpperCase();
-            if (statusUpper.includes('DISTINCTION')) {
-                statusClass = 'status-distinction';
-            } else if (statusUpper.includes('FAIL') || statusUpper.includes('തോറ്റു')) {
-                statusClass = 'status-fail';
-            }
+            const isPassed = !statusUpper.includes('FAIL') && !statusUpper.includes('തോറ്റു');
 
-            let rowsHtml = '';
+            let itemsHtml = '';
             marksList.forEach(m => {
-                const subTitle = m.subject || m.title || 'SUBJECT';
-                const subArabic = m.arabic || '';
+                const title = m.subject || m.title || 'വിഷയം';
+                const ar = m.arabic || '';
                 const score = (m.mark !== undefined && m.mark !== null && m.mark !== '') ? m.mark : '-';
-                
-                rowsHtml += `
-                    <tr>
-                        <td>${escapeHtml(subTitle)}</td>
-                        <td class="sub-score">${escapeHtml(String(score))}</td>
-                        <td class="sub-arabic">${escapeHtml(subArabic)}</td>
-                    </tr>
+                const isItemPass = Number(score) >= 36;
+
+                itemsHtml += `
+                    <div class="subject-item">
+                        <div class="subject-left">
+                            <span class="sub-name">${escapeHtml(title)}</span>
+                            ${ar ? `<span class="sub-ar">${escapeHtml(ar)}</span>` : ''}
+                        </div>
+                        <div class="sub-badge ${isItemPass ? 'score-good' : 'score-low'}">
+                            ${escapeHtml(String(score))}
+                        </div>
+                    </div>
                 `;
             });
 
             const html = `
-                <div class="result-view-card">
-                    <div class="student-header-box">
-                        <div class="student-name">${escapeHtml(student.name || 'STUDENT NAME')}</div>
-                        ${student.name_arabic ? `<div class="arabic-name">${escapeHtml(student.name_arabic)}</div>` : ''}
+                <div class="result-sheet">
+                    <div class="student-profile">
+                        <div class="avatar-circle">${initial}</div>
+                        <h3 class="student-title">${escapeHtml(student.name || 'STUDENT')}</h3>
+                        ${student.name_arabic ? `<div class="arabic-name-lg">${escapeHtml(student.name_arabic)}</div>` : ''}
                         
                         ${student.parent_name ? `
-                            <div class="parent-info">
+                            <div class="parent-tag">
                                 D/o / S/o ${escapeHtml(student.parent_name)}
-                                ${student.parent_name_arabic ? `<span style="font-family: 'Amiri', serif; margin-left: 6px;">(${escapeHtml(student.parent_name_arabic)})</span>` : ''}
+                                ${student.parent_name_arabic ? ` • ${escapeHtml(student.parent_name_arabic)}` : ''}
                             </div>
                         ` : ''}
 
-                        <div class="madrasa-info">
-                            BADRUDHEEN MADRASA
-                        </div>
-
-                        <div class="meta-pills">
-                            <span class="pill-badge">Class : ${escapeHtml(String(student.class_number))}</span>
-                            <span class="pill-badge">Reg. No : ${escapeHtml(String(student.register_no))}</span>
+                        <div class="chips-row">
+                            <span class="chip">ക്ലാസ്സ്: ${escapeHtml(String(student.class_number))}</span>
+                            <span class="chip">Reg No: ${escapeHtml(String(student.register_no))}</span>
                         </div>
                     </div>
 
-                    <table class="marks-table">
-                        <thead>
-                            <tr>
-                                <th>Subject</th>
-                                <th class="text-center">Mark</th>
-                                <th class="text-right">المادة</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${rowsHtml}
-                            <tr class="total-row">
-                                <td>Grand Total</td>
-                                <td class="text-center">${escapeHtml(String(student.grand_total || 0))}</td>
-                                <td class="text-right">المجموع</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="subjects-list">
+                        ${itemsHtml}
+                    </div>
 
-                    <div class="status-banner ${statusClass}">
-                        ${escapeHtml(student.status || 'PASS')}
+                    <div class="total-box">
+                        <div class="total-left">
+                            <span class="total-label">Grand Total (ആകെ മാർക്ക്)</span>
+                            <span class="total-ar">المجموع الكلي</span>
+                        </div>
+                        <div class="total-value">${escapeHtml(String(student.grand_total || 0))}</div>
+                    </div>
+
+                    <div class="final-status-pill ${isPassed ? 'status-celebrate' : 'status-alert'}">
+                        <span>${isPassed ? '🎉 ' : '⚠️ '}${escapeHtml(student.status || 'PASS')}</span>
                     </div>
                 </div>
             `;
 
             container.innerHTML = html;
             container.style.display = 'block';
-            container.scrollIntoView({ behavior: 'smooth' });
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function escapeHtml(text) {
