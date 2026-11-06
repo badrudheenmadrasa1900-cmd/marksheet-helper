@@ -41,7 +41,7 @@ class AuthController {
                     return;
                 } catch (cloudErr) {
                     // If cloud login specifically rejected credentials, throw it
-                    if (cloudErr.message.includes('Incorrect password') || cloudErr.message.includes('Username') || cloudErr.message.includes('തെറ്റായ പാസ്‌വേഡ്')) {
+                    if (cloudErr.message.includes('Incorrect password') || cloudErr.message.includes('Username')) {
                         throw cloudErr;
                     }
                     console.warn('Supabase cloud login fallback to local:', cloudErr);

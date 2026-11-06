@@ -203,9 +203,52 @@ class SupabaseService {
     }
 
     /**
-     * Batch Sync entire class of students to Supabase
+     * Fetch all submitted results for Admin Review (by class or all)
      */
-    async syncClassToSupabase(cls) {
+    async getStudentsForAdmin(classNumber = null) {
+        let url = `${this.url}students?order=class_number.asc,register_no.asc&select=*`;
+        if (classNumber) {
+            url = `${this.url}students?class_number=eq.${classNumber}&order=register_no.asc&select=*`;
+        }
+        const res = await fetch(url, { headers: this.headers });
+        if (!res.ok) throw new Error('Could not fetch student results from Cloud.');
+        return await res.json();
+    }
+
+    /**
+     * Admin Action: Verify and Publish student results to Public Portal
+     * Sets syllabus to 'PUBLISHED' or 'PENDING_VERIFICATION'
+     */
+    async setPublishStatus(registerNo, isPublished = true) {
+        const url = `${this.url}students?register_no=eq.${encodeURIComponent(registerNo)}`;
+        const statusValue = isPublished ? 'GENERAL' : 'PENDING_APPROVAL';
+        const res = await fetch(url, {
+            method: 'PATCH',
+            headers: this.headers,
+            body: JSON.stringify({ syllabus: statusValue })
+        });
+        if (!res.ok) throw new Error('Could not update publication status.');
+        return true;
+    }
+
+    /**
+     * Admin Action: Publish All students of a specific class
+     */
+    async publishEntireClass(classNumber) {
+        const url = `${this.url}students?class_number=eq.${encodeURIComponent(classNumber)}`;
+        const res = await fetch(url, {
+            method: 'PATCH',
+            headers: this.headers,
+            body: JSON.stringify({ syllabus: 'GENERAL' })
+        });
+        if (!res.ok) throw new Error('Could not publish class results.');
+        return true;
+    }
+
+    /**
+     * Batch Sync entire class of students to Supabase (Submitted by teacher or admin)
+     */
+    async syncClassToSupabase(cls, isAutoPublished = false) {
         if (!cls || !cls.students || cls.students.length === 0) return { count: 0 };
         
         const classNumber = parseInt((cls.className || '').replace(/\D/g, '') || '1', 10);
@@ -240,10 +283,10 @@ class SupabaseService {
                 name_arabic: student.arabicName || '',
                 parent_name: student.parentName || '',
                 parent_name_arabic: student.parentArabicName || '',
-                madrasa_name: cls.madrasaName || 'MUHYADHEEN, MITHABAIL',
+                madrasa_name: cls.madrasaName || 'BADRUDHEEN MADRASA',
                 madrasa_code: cls.madrasaCode || '6120',
                 class_number: classNumber,
-                syllabus: 'GENERAL',
+                syllabus: isAutoPublished ? 'GENERAL' : 'PENDING_APPROVAL',
                 marks: studentMarks
             });
             syncedCount++;

@@ -607,10 +607,17 @@
                 return;
             }
 
+            // Offline check
+            if (!navigator.onLine) {
+                showError('No Internet Connection. Please check your network and try again.');
+                return;
+            }
+
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span>Loading result...</span>';
 
             try {
+                // Only return verified & published results (syllabus != PENDING_APPROVAL)
                 const queryUrl = `${SUPABASE_URL}students?class_number=eq.${encodeURIComponent(selectedClass)}&register_no=eq.${encodeURIComponent(regNo)}&select=*`;
                 const response = await fetch(queryUrl, {
                     headers: {
@@ -630,10 +637,20 @@
                     return;
                 }
 
-                renderStudentCard(students[0]);
+                const student = students[0];
+                if (student.syllabus === 'PENDING_APPROVAL') {
+                    showError(`Results for Class ${selectedClass} have been submitted by the teacher and are currently pending Headmaster/Admin verification. Please check back soon.`);
+                    return;
+                }
+
+                renderStudentCard(student);
             } catch (err) {
                 console.error(err);
-                showError('Connection error: Please check your internet connection and try again.');
+                if (!navigator.onLine || err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+                    showError('Network Connection Lost. Please check your internet connection and try again.');
+                } else {
+                    showError('Connection error: Please check your internet connection and try again.');
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<span>Check Result</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>';

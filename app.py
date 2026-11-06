@@ -26,6 +26,10 @@ def admin_portal():
     """Renders the admin and teacher marksheet management portal."""
     return render_template('index.html')
 
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('404.html'), 404
+
 @app.route('/api/status')
 def status():
     """Health check and application metadata endpoint."""

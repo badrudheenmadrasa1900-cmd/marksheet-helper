@@ -27,6 +27,16 @@ class ClassController {
 
     saveClass(classData) {
         try {
+            const session = window.storageModel.getSession();
+            // Verification: Only Admin or authorized teachers can create/modify classes
+            if (session && session.role !== 'admin') {
+                const clsNum = parseInt((classData.className || '').replace(/\D/g, ''), 10);
+                if (!isNaN(clsNum) && (!session.assignedClasses || !session.assignedClasses.includes(clsNum))) {
+                    alert(`Permission Denied: You are only authorized to manage Class: ${(session.assignedClasses || []).join(', ')}. Please contact Admin/Headmaster.`);
+                    return;
+                }
+            }
+
             const saved = window.storageModel.saveClass(classData);
             // Open the created/updated class directly or refresh dashboard
             if (saved && saved.id) {

@@ -39,6 +39,9 @@ class DashboardView {
                             Public Portal ↗
                         </a>
                         ${user.role === 'admin' ? `
+                            <button class="btn btn-primary btn-sm" id="btn-verify-results" title="Review & Publish Results" style="background:#0d5c31;">
+                                ✓ Verify & Publish Results
+                            </button>
                             <button class="btn btn-outline btn-sm" id="btn-manage-teachers" title="Manage Teachers">
                                 Teachers
                             </button>
@@ -470,6 +473,11 @@ class DashboardView {
             manageTeachersBtn.addEventListener('click', () => this.showTeachersModal());
         }
 
+        const verifyResultsBtn = document.getElementById('btn-verify-results');
+        if (verifyResultsBtn) {
+            verifyResultsBtn.addEventListener('click', () => this.showVerificationModal());
+        }
+
         document.querySelectorAll('.btn-open-class').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const classId = e.currentTarget.getAttribute('data-id');
@@ -611,6 +619,161 @@ class DashboardView {
                 alert('Teacher added successfully!');
                 loadTeachers();
             }).catch(err => alert(err.message));
+        });
+    }
+
+    async showVerificationModal() {
+        const modalContainer = document.getElementById('modal-container');
+        modalContainer.innerHTML = `
+            <div class="modal-backdrop">
+                <div class="modal-box modal-lg" style="max-width: 900px;">
+                    <div class="modal-header">
+                        <div>
+                            <h3 class="modal-title">Admin Result Verification & Publishing Control</h3>
+                            <p style="font-size:0.84rem; color:#4b5563; margin-top:2px;">
+                                Review teacher-submitted mark sheets. Verify student scores before publishing them to the public result portal.
+                            </p>
+                        </div>
+                        <button class="btn-close" id="btn-close-verify">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <label style="font-size:0.88rem; font-weight:700;">Filter Class:</label>
+                                <select id="verify-class-filter" class="form-control" style="max-width:160px; min-height:40px; font-size:0.88rem;">
+                                    <option value="">All Classes</option>
+                                    <option value="1">Class 1</option>
+                                    <option value="2">Class 2</option>
+                                    <option value="3">Class 3</option>
+                                    <option value="4">Class 4</option>
+                                    <option value="5">Class 5</option>
+                                    <option value="6">Class 6</option>
+                                    <option value="7">Class 7</option>
+                                    <option value="8">Class 8</option>
+                                    <option value="9">Class 9</option>
+                                    <option value="10">Class 10</option>
+                                    <option value="11">Class 11</option>
+                                    <option value="12">Class 12</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary btn-sm" id="btn-publish-all-filtered">
+                                ✓ Publish All in Current Filter
+                            </button>
+                        </div>
+
+                        <div id="verify-list-container" style="max-height: 480px; overflow-y: auto;">
+                            <p style="text-align:center; padding:24px; color:#6b7280;">Loading submitted results from cloud...</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" id="btn-cancel-verify">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const closeModal = () => { modalContainer.innerHTML = ''; };
+        document.getElementById('btn-close-verify').addEventListener('click', closeModal);
+        document.getElementById('btn-cancel-verify').addEventListener('click', closeModal);
+
+        const listContainer = document.getElementById('verify-list-container');
+        const filterSelect = document.getElementById('verify-class-filter');
+
+        const loadVerificationData = async () => {
+            const classNum = filterSelect.value ? parseInt(filterSelect.value, 10) : null;
+            listContainer.innerHTML = '<p style="text-align:center; padding:20px; color:#6b7280;">Loading...</p>';
+
+            try {
+                const students = await window.supabaseService.getStudentsForAdmin(classNum);
+                if (!students || students.length === 0) {
+                    listContainer.innerHTML = '<p style="text-align:center; padding:24px; color:#6b7280;">No submitted student marksheets found for this class.</p>';
+                    return;
+                }
+
+                let html = `
+                    <table class="table" style="width:100%; font-size:0.86rem; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background:#f9fafb; border-bottom:2px solid #e5e7eb; text-align:left;">
+                                <th style="padding:10px 8px;">Class</th>
+                                <th style="padding:10px 8px;">Reg No</th>
+                                <th style="padding:10px 8px;">Student Name</th>
+                                <th style="padding:10px 8px;">Total Score</th>
+                                <th style="padding:10px 8px;">Status</th>
+                                <th style="padding:10px 8px;">Public Status</th>
+                                <th style="padding:10px 8px; text-align:right;">Admin Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                students.forEach(st => {
+                    const isPublished = st.syllabus !== 'PENDING_APPROVAL';
+                    html += `
+                        <tr style="border-bottom:1px solid #f3f4f6;">
+                            <td style="padding:10px 8px; font-weight:700;">Class ${st.class_number}</td>
+                            <td style="padding:10px 8px; font-family:monospace; font-weight:700;">${st.register_no}</td>
+                            <td style="padding:10px 8px; font-weight:600;">${st.name}</td>
+                            <td style="padding:10px 8px; font-weight:800; color:#0d5c31;">${st.grand_total}</td>
+                            <td style="padding:10px 8px;"><span class="badge ${st.status === 'FAIL' ? 'status-fail' : 'status-pass'}">${st.status || 'PASS'}</span></td>
+                            <td style="padding:10px 8px;">
+                                ${isPublished 
+                                    ? '<span style="color:#059669; font-weight:700; background:#ecfdf5; padding:3px 8px; border-radius:12px;">Live / Published</span>' 
+                                    : '<span style="color:#d97706; font-weight:700; background:#fef3c7; padding:3px 8px; border-radius:12px;">Pending Verification</span>'}
+                            </td>
+                            <td style="padding:10px 8px; text-align:right;">
+                                <button class="btn btn-sm ${isPublished ? 'btn-outline' : 'btn-primary'} btn-toggle-publish" 
+                                    data-reg="${st.register_no}" 
+                                    data-current="${isPublished}">
+                                    ${isPublished ? 'Unpublish' : '✓ Verify & Publish'}
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                listContainer.innerHTML = html;
+
+                listContainer.querySelectorAll('.btn-toggle-publish').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const reg = e.target.getAttribute('data-reg');
+                        const current = e.target.getAttribute('data-current') === 'true';
+                        e.target.disabled = true;
+                        e.target.textContent = 'Updating...';
+
+                        try {
+                            await window.supabaseService.setPublishStatus(reg, !current);
+                            loadVerificationData();
+                        } catch (err) {
+                            alert(err.message);
+                        }
+                    });
+                });
+
+            } catch (err) {
+                listContainer.innerHTML = `<p style="color:#dc2626; padding:12px;">Error loading cloud data: ${err.message}</p>`;
+            }
+        };
+
+        filterSelect.addEventListener('change', loadVerificationData);
+        loadVerificationData();
+
+        document.getElementById('btn-publish-all-filtered').addEventListener('click', async () => {
+            const classNum = filterSelect.value ? parseInt(filterSelect.value, 10) : null;
+            if (!classNum) {
+                alert('Please select a specific class in the filter dropdown to publish all students.');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to verify and publish all students of Class ${classNum} to the live public portal?`)) {
+                try {
+                    await window.supabaseService.publishEntireClass(classNum);
+                    alert(`Class ${classNum} results verified and published live!`);
+                    loadVerificationData();
+                } catch (err) {
+                    alert('Error publishing class: ' + err.message);
+                }
+            }
         });
     }
 }

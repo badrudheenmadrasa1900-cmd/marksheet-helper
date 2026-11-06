@@ -29,6 +29,14 @@ def admin_page():
         with open(os.path.join(os.path.dirname(__file__), '../admin.html'), 'r', encoding='utf-8') as f:
             return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
 
+@app.errorhandler(404)
+def not_found(e):
+    try:
+        return render_template('404.html'), 404
+    except Exception:
+        with open(os.path.join(os.path.dirname(__file__), '../404.html'), 'r', encoding='utf-8') as f:
+            return f.read(), 404, {'Content-Type': 'text/html; charset=utf-8'}
+
 @app.route('/api/status')
 def status():
     return jsonify({

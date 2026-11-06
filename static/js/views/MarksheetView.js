@@ -1300,12 +1300,24 @@ class MarksheetView {
                     return;
                 }
 
+                if (!navigator.onLine) {
+                    alert('Network Connection Lost. Please check your internet connection before syncing.');
+                    return;
+                }
+
+                const session = window.storageModel.getSession();
+                const isAdmin = session && session.role === 'admin';
+
                 syncBtn.disabled = true;
-                syncBtn.innerHTML = '⏳ Syncing...';
+                syncBtn.innerHTML = '⏳ Submitting...';
 
                 try {
-                    const res = await window.supabaseService.syncClassToSupabase(this.currentClass);
-                    alert(`Success! ${res.count} students synced to Supabase Cloud.`);
+                    const res = await window.supabaseService.syncClassToSupabase(this.currentClass, isAdmin);
+                    if (isAdmin) {
+                        alert(`Success! ${res.count} student marksheets verified and published directly to the Public Result Portal.`);
+                    } else {
+                        alert(`Mark list submitted successfully (${res.count} students).\nIt has been sent to the Headmaster / Admin for verification before public publishing.`);
+                    }
                 } catch (err) {
                     alert('Sync Error: ' + err.message);
                 } finally {
