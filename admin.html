@@ -517,11 +517,31 @@
         }
 
         .btn-close-modal {
-            background: none;
-            border: none;
-            font-size: 1.6rem;
-            color: #6b7280;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            font-size: 1.3rem;
+            color: #64748b;
             cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .btn-close-modal:hover {
+            background: #fee2e2;
+            color: #dc2626;
+            border-color: #fca5a5;
+            transform: scale(1.05);
+        }
+
+        .btn-close-modal:active {
+            transform: scale(0.95);
         }
 
         .form-row {
@@ -793,6 +813,16 @@
                 </div>
 
                 <div class="form-row">
+                    <label for="new-t-email">Teacher Email (For Password Reset Link)</label>
+                    <input type="email" id="new-t-email" class="form-control-modal" placeholder="e.g. teacher@gmail.com">
+                </div>
+
+                <div class="form-row">
+                    <label for="new-t-phone">Teacher Phone Number (For SMS OTP Verification)</label>
+                    <input type="tel" id="new-t-phone" class="form-control-modal" placeholder="e.g. 9876543210">
+                </div>
+
+                <div class="form-row">
                     <label for="new-t-pass">Login Password *</label>
                     <input type="password" id="new-t-pass" class="form-control-modal" placeholder="Set a secure password" required>
                 </div>
@@ -997,10 +1027,19 @@
 
                 let html = '';
                 teachers.forEach(t => {
+                    const parsed = window.supabaseService.parseTeacherProfile ? window.supabaseService.parseTeacherProfile(t) : { displayName: t.full_name || t.username, email: '', phone: '' };
+                    const contactDetails = [];
+                    if (parsed.email) contactDetails.push(`✉ ${parsed.email}`);
+                    if (parsed.phone) contactDetails.push(`📞 ${parsed.phone}`);
+                    const contactStr = contactDetails.length > 0 ? `<div style="font-size:0.75rem; color:#6b7280; margin-top:2px;">${contactDetails.join(' • ')}</div>` : '';
+
                     const classesStr = (t.assigned_classes || []).sort((a,b)=>a-b).map(c => `Class ${c}`).join(', ') || 'No Classes Assigned';
                     html += `
                         <tr>
-                            <td><strong>${escapeHtml(t.full_name || t.username)}</strong></td>
+                            <td>
+                                <strong>${escapeHtml(parsed.displayName || t.username)}</strong>
+                                ${contactStr}
+                            </td>
                             <td style="font-family: monospace; color: #0d5c31; font-weight: 700;">${escapeHtml(t.username)}</td>
                             <td><span class="class-badge" style="background:#eaf5ee;">${classesStr}</span></td>
                             <td><span class="status-pill live">Active Teacher</span></td>
@@ -1032,6 +1071,8 @@
             const btn = document.getElementById('btn-save-teacher');
             const name = document.getElementById('new-t-name').value.trim();
             const user = document.getElementById('new-t-user').value.trim();
+            const email = document.getElementById('new-t-email') ? document.getElementById('new-t-email').value.trim() : '';
+            const phone = document.getElementById('new-t-phone') ? document.getElementById('new-t-phone').value.trim() : '';
             const pass = document.getElementById('new-t-pass').value;
             const classesInput = document.getElementById('new-t-classes').value.trim();
 
@@ -1048,6 +1089,8 @@
                     username: user,
                     password: pass,
                     full_name: name,
+                    email: email,
+                    phone: phone,
                     role: 'teacher',
                     assigned_classes: assigned
                 });

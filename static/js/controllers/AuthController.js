@@ -56,9 +56,24 @@ class AuthController {
         }
     }
 
-    async handleRegister(userId, fullName, password) {
+    async handleRegister(userId, fullName, password, phone = '') {
         try {
             await window.storageModel.register(userId, fullName, password);
+            // If supabase connected, save profile with phone/email metadata too
+            if (window.supabaseService) {
+                try {
+                    await window.supabaseService.saveTeacher({
+                        username: userId,
+                        full_name: fullName,
+                        password: password,
+                        role: 'teacher',
+                        phone: phone,
+                        assigned_classes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+                    });
+                } catch (cloudErr) {
+                    console.warn('Could not register in cloud profiles:', cloudErr);
+                }
+            }
             window.classController.showDashboard();
         } catch (err) {
             this.showRegister(err.message);

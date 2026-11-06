@@ -19,14 +19,22 @@ def home():
             return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 @app.route('/admin')
+def admin_page():
+    """Exclusive Headmaster & Management Central Control Room."""
+    try:
+        return render_template('admin.html')
+    except Exception:
+        with open(os.path.join(os.path.dirname(__file__), '../admin/index.html'), 'r', encoding='utf-8') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+
 @app.route('/teacher')
 @app.route('/staff')
-def admin_page():
-    """Hidden staff & admin mark management portal."""
+def teacher_page():
+    """Teachers & Staff Marksheet Portal."""
     try:
         return render_template('index.html')
     except Exception:
-        with open(os.path.join(os.path.dirname(__file__), '../admin.html'), 'r', encoding='utf-8') as f:
+        with open(os.path.join(os.path.dirname(__file__), '../teacher/index.html'), 'r', encoding='utf-8') as f:
             return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
 
 @app.errorhandler(404)

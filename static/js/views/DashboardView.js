@@ -598,28 +598,117 @@ class DashboardView {
         loadTeachers();
 
         document.getElementById('btn-add-new-teacher').addEventListener('click', () => {
-            const username = prompt('Teacher Username (e.g. teacher1):');
-            if (!username) return;
-            const fullName = prompt('Teacher Full Name:') || username;
-            const password = prompt('Password:') || '123456';
-            const classesPrompt = prompt('Assigned classes separated by commas (e.g. 1, 2, 5, 12):', '1, 2, 3');
-            
-            const assigned = (classesPrompt || '')
+            this.showCustomAddTeacherModal(() => loadTeachers());
+        });
+    }
+
+    /**
+     * Custom Teacher Creation Modal (No browser prompts)
+     */
+    showCustomAddTeacherModal(onSuccess) {
+        const modalContainer = document.getElementById('modal-container');
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'modal-backdrop';
+        modalDiv.id = 'custom-teacher-create-modal';
+        modalDiv.innerHTML = `
+            <div class="modal-box" style="max-width: 480px;">
+                <div class="modal-header">
+                    <div>
+                        <h3 class="modal-title">Add New Teacher Account</h3>
+                        <p style="font-size:0.82rem; color:var(--text-muted); margin-top:2px;">
+                            Enter teacher credentials, contact info for password recovery, and permitted classes.
+                        </p>
+                    </div>
+                    <button class="btn-close" id="btn-close-teacher-create" title="Close dialog">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-create-teacher-custom">
+                        <div class="form-group">
+                            <label class="form-label" for="t-cust-name">Teacher Full Name *</label>
+                            <input type="text" id="t-cust-name" class="form-control" placeholder="e.g. Usthad Ibrahim" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="t-cust-user">Teacher Username (Unique ID) *</label>
+                            <input type="text" id="t-cust-user" class="form-control" placeholder="e.g. teacher_class4" required autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="t-cust-email">Email Address (Optional - For Password Reset Link)</label>
+                            <input type="email" id="t-cust-email" class="form-control" placeholder="e.g. teacher@gmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="t-cust-phone">Phone Number (Optional - For SMS OTP Recovery)</label>
+                            <input type="tel" id="t-cust-phone" class="form-control" placeholder="e.g. 9876543210">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="t-cust-pass">Initial Password *</label>
+                            <input type="password" id="t-cust-pass" class="form-control" placeholder="Initial password (e.g. 123456)" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="t-cust-classes">Permitted Classes (Comma separated) *</label>
+                            <input type="text" id="t-cust-classes" class="form-control" placeholder="e.g. 1, 2, 5" value="1, 2, 3" required>
+                            <small style="color:var(--text-muted); font-size:0.78rem;">Teacher can only view and manage these class marks.</small>
+                        </div>
+                        <div id="t-cust-error" class="alert alert-danger" style="display:none; margin-top:10px;"></div>
+                        <div class="modal-footer" style="padding: 1rem 0 0 0; margin-top: 1rem;">
+                            <button type="button" class="btn btn-outline" id="btn-cancel-teacher-create">Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="btn-submit-teacher-create">Save Teacher Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalDiv);
+
+        const closeModal = () => {
+            if (modalDiv && modalDiv.parentNode) modalDiv.parentNode.removeChild(modalDiv);
+        };
+
+        modalDiv.querySelector('#btn-close-teacher-create').addEventListener('click', closeModal);
+        modalDiv.querySelector('#btn-cancel-teacher-create').addEventListener('click', closeModal);
+        modalDiv.addEventListener('click', (e) => {
+            if (e.target === modalDiv) closeModal();
+        });
+
+        modalDiv.querySelector('#form-create-teacher-custom').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = modalDiv.querySelector('#btn-submit-teacher-create');
+            const errDiv = modalDiv.querySelector('#t-cust-error');
+            const username = modalDiv.querySelector('#t-cust-user').value.trim();
+            const fullName = modalDiv.querySelector('#t-cust-name').value.trim();
+            const email = modalDiv.querySelector('#t-cust-email').value.trim();
+            const phone = modalDiv.querySelector('#t-cust-phone').value.trim();
+            const password = modalDiv.querySelector('#t-cust-pass').value;
+            const classesStr = modalDiv.querySelector('#t-cust-classes').value.trim();
+
+            const assigned = classesStr
                 .split(',')
                 .map(s => parseInt(s.trim(), 10))
                 .filter(n => !isNaN(n) && n >= 1 && n <= 12);
 
-            window.supabaseService.saveTeacher({
-                username: username,
-                full_name: fullName,
-                password: password,
-                role: 'teacher',
-                assigned_classes: assigned
-            }).then(() => {
-                alert('Teacher added successfully!');
-                loadTeachers();
-            }).catch(err => alert(err.message));
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            errDiv.style.display = 'none';
+
+            try {
+                await window.supabaseService.saveTeacher({
+                    username: username,
+                    full_name: fullName,
+                    email: email,
+                    phone: phone,
+                    password: password,
+                    role: 'teacher',
+                    assigned_classes: assigned
+                });
+                closeModal();
+                if (onSuccess) onSuccess();
+            } catch (err) {
+                errDiv.textContent = err.message || 'Failed to save teacher';
+                errDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Save Teacher Account';
+            }
         });
+    }
     }
 
     async showVerificationModal() {

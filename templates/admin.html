@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a3622">
+    <title>Badrudheen Madrasa - Central Admin Control Room</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --admin-dark: #072718;
+            --admin-emerald: #0d5c31;
+            --admin-accent: #158043;
+            --gold-accent: #f59e0b;
+            --bg-body: #f1f6f3;
+            --surface: #ffffff;
+            --border-subtle: #dbe7df;
+            --text-main: #0c2317;
+            --text-muted: #526e60;
+            --shadow-card: 0 10px 30px -5px rgba(7, 39, 24, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+            --shadow-btn: 0 6px 18px rgba(13, 92, 49, 0.28);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Admin Command Header */
+        .admin-header {
+            background: linear-gradient(135deg, #072718 0%, #0d5c31 100%);
+            color: #ffffff;
+            padding: calc(env(safe-area-inset-top, 14px) + 12px) 24px 18px;
+            box-shadow: 0 4px 20px rgba(7, 39, 24, 0.25);
+            border-bottom: 2px solid rgba(245, 158, 11, 0.25);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .badge-cr {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid #f59e0b;
+            color: #ffd54f;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .header-titles h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.2px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-titles p {
+            font-size: 0.82rem;
+            color: #a7f3d0;
+            font-weight: 600;
+        }
+
+        .admin-user-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .admin-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f59e0b;
+            color: #072718;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+        }
+
+        .btn-header-action {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            padding: 7px 14px;
+            border-radius: 12px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.18s ease;
+        }
+
+        .btn-header-action:hover {
+            background: #ffffff;
+            color: #072718;
+        }
+
+        /* Container & Tabs */
+        .admin-main {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 20px 48px;
+            flex: 1;
+        }
+
+        /* Nav Pills for Control Room */
+        .control-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e1ece5;
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .control-tab {
+            padding: 10px 20px;
+            border-radius: 14px;
+            border: none;
+            background: #ffffff;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .control-tab.active {
+            background: var(--admin-emerald);
+            color: #ffffff;
+            box-shadow: var(--shadow-btn);
+        }
+
+        .tab-count {
+            background: rgba(255, 255, 255, 0.25);
+            color: inherit;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.76rem;
+            font-weight: 800;
+        }
+
+        .control-tab:not(.active) .tab-count {
+            background: #f1f6f3;
+            color: var(--admin-emerald);
+        }
+
+        /* Metric Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-box {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metric-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .metric-val {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--admin-dark);
+        }
+
+        .metric-hint {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--admin-accent);
+        }
+
+        /* Content Sections */
+        .control-section {
+            display: none;
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 26px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-subtle);
+            animation: fadeIn 0.25s ease;
+        }
+
+        .control-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .section-bar h2 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--admin-dark);
+        }
+
+        .btn-action-primary {
+            background: linear-gradient(135deg, #0d5c31 0%, #158043 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow-btn);
+            transition: all 0.18s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action-primary:active {
+            transform: scale(0.97);
+        }
+
+        .btn-action-outline {
+            background: #ffffff;
+            color: var(--admin-emerald);
+            border: 1.5px solid #c9e4d4;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .btn-action-outline:hover {
+            background: #f1f8f4;
+        }
+
+        /* Modern Data Table */
+        .data-table-wrapper {
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid #eef5f1;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .admin-table th {
+            background: #f6faf7;
+            color: var(--admin-dark);
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 16px;
+            border-bottom: 2px solid #e0eee6;
+        }
+
+        .admin-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f6f2;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .admin-table tr:hover td {
+            background: #fbfdfc;
+        }
+
+        /* Status Pills */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .status-pill.live {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        .status-pill.pending {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+
+        /* Class Tag in Table */
+        .class-badge {
+            background: #eef7f2;
+            color: #0d5c31;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.82rem;
+            border: 1px solid #c9e4d4;
+        }
+
+        /* Separate Dedicated Admin Login Overlay */
+        .admin-login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, #0f4426 0%, #041a0f 100%);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .admin-login-box {
+            background: #ffffff;
+            max-width: 420px;
+            width: 100%;
+            border-radius: 28px;
+            padding: 36px 28px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(245, 158, 11, 0.3);
+            text-align: center;
+            animation: zoomIn 0.28s ease;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.94); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .admin-login-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, #072718 0%, #0d5c31 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffd54f;
+            box-shadow: 0 8px 20px rgba(7, 39, 24, 0.35);
+        }
+
+        .admin-login-box h2 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #072718;
+            margin-bottom: 4px;
+        }
+
+        .admin-login-box p {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .login-input {
+            width: 100%;
+            height: 52px;
+            border-radius: 16px;
+            border: 1.5px solid #d0e2d7;
+            background: #f8faf9;
+            padding: 0 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #072718;
+            margin-bottom: 14px;
+            outline: none;
+            transition: all 0.18s ease;
+        }
+
+        .login-input:focus {
+            border-color: #0d5c31;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(13, 92, 49, 0.12);
+        }
+
+        .btn-admin-login {
+            width: 100%;
+            height: 52px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #072718 0%, #0d5c31 100%);
+            color: #ffffff;
+            border: none;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: var(--shadow-btn);
+            transition: transform 0.15s ease;
+        }
+
+        .btn-admin-login:active {
+            transform: scale(0.97);
+        }
+
+        .login-error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        /* Modal Styles */
+        .modal-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(4, 26, 15, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            max-width: 540px;
+            width: 100%;
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            border: 1px solid #dcebe1;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-header-row h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #072718;
+        }
+
+        .btn-close-modal {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            font-size: 1.3rem;
+            color: #64748b;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .btn-close-modal:hover {
+            background: #fee2e2;
+            color: #dc2626;
+            border-color: #fca5a5;
+            transform: scale(1.05);
+        }
+
+        .btn-close-modal:active {
+            transform: scale(0.95);
+        }
+
+        .form-row {
+            margin-bottom: 14px;
+        }
+
+        .form-row label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #072718;
+            margin-bottom: 6px;
+        }
+
+        .form-control-modal {
+            width: 100%;
+            height: 48px;
+            border-radius: 14px;
+            border: 1.5px solid #d2e4d9;
+            padding: 0 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .form-control-modal:focus {
+            border-color: #0d5c31;
+            box-shadow: 0 0 0 4px rgba(13, 92, 49, 0.12);
+        }
+
+        .modal-footer-btns {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 22px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dedicated Separate Admin Login Overlay (Only opens with Admin Credentials) -->
+    <div id="admin-login-screen" class="admin-login-overlay">
+        <div class="admin-login-box">
+            <div class="admin-login-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+            </div>
+            <h2>Admin Control Room</h2>
+            <p>Badrudheen Madrasa • Headmaster Access Only</p>
+            
+            <div id="admin-error" class="login-error"></div>
+
+            <form id="admin-login-form" onsubmit="handleAdminLogin(event)">
+                <input type="text" id="admin-user-input" class="login-input" placeholder="Admin Username (e.g. admin)" required autofocus>
+                <input type="password" id="admin-pass-input" class="login-input" placeholder="Admin Password" required>
+                <button type="submit" id="btn-admin-submit" class="btn-admin-login">Unlock Control Room</button>
+            </form>
+
+            <p style="margin-top: 18px; font-size: 0.78rem; color: #8fa79b;">
+                Teachers must sign in via the <a href="/teacher" style="color: #0d5c31; font-weight: 700; text-decoration: none;">Teacher Portal</a>.
+            </p>
+        </div>
+    </div>
+
+    <!-- Central Control Room Header -->
+    <header class="admin-header">
+        <div class="header-content header-inner">
+            <div class="brand-block">
+                <div class="header-titles">
+                    <h1>
+                        <span>Badrudheen Madrasa</span>
+                        <span class="badge-cr">Admin Control Room</span>
+                    </h1>
+                    <p>Central Examination Verification, Teacher Management & Class Authorization</p>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="admin-user-pill">
+                    <div class="admin-avatar" id="avatar-initial">A</div>
+                    <span id="admin-display-name" style="font-weight: 700; font-size: 0.88rem;">Head Master</span>
+                </div>
+                <a href="/" target="_blank" class="btn-header-action" title="View Student Portal">Public Result ↗</a>
+                <button onclick="handleAdminLogout()" class="btn-header-action" style="background: rgba(225, 29, 72, 0.25); border-color: rgba(225, 29, 72, 0.4);">Sign Out</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Control Room Content -->
+    <main class="admin-main">
+        
+        <!-- Metrics Row -->
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <span class="metric-title">Pending Verifications</span>
+                <span class="metric-val" id="metric-pending" style="color: #d97706;">0</span>
+                <span class="metric-hint">Awaiting Admin Approval</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-title">Live Published Marksheets</span>
+                <span class="metric-val" id="metric-live" style="color: #059669;">0</span>
+                <span class="metric-hint">Visible to Public</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-title">Active Teachers</span>
+                <span class="metric-val" id="metric-teachers">0</span>
+                <span class="metric-hint">Authorized Staff Members</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-title">Managed Classes</span>
+                <span class="metric-val" id="metric-classes">12</span>
+                <span class="metric-hint">Classes 1 to 12</span>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="control-tabs">
+            <button class="control-tab active" data-target="section-verification" onclick="switchTab('section-verification', this)">
+                <span>✓ Marksheet Verification & Approval</span>
+                <span class="tab-count" id="count-pending-badge">0</span>
+            </button>
+            <button class="control-tab" data-target="section-teachers" onclick="switchTab('section-teachers', this)">
+                <span>👥 Teachers & Class Permissions</span>
+                <span class="tab-count" id="count-teachers-badge">0</span>
+            </button>
+            <button class="control-tab" data-target="section-classes" onclick="switchTab('section-classes', this)">
+                <span>🏫 Master Classes & Curriculum</span>
+                <span class="tab-count">12</span>
+            </button>
+        </div>
+
+        <!-- 1. Marksheet Verification & Approval Section -->
+        <section id="section-verification" class="control-section active">
+            <div class="section-bar">
+                <div>
+                    <h2>Submitted Marksheets Review</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+                        Teacher submissions remain private until approved here. Once verified, results go live on the public portal.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <select id="filter-class-select" class="form-control-modal" style="width: auto; height: 42px; font-size: 0.85rem;" onchange="loadSubmittedResults()">
+                        <option value="">All Classes (1 to 12)</option>
+                        <option value="1">Class 1</option>
+                        <option value="2">Class 2</option>
+                        <option value="3">Class 3</option>
+                        <option value="4">Class 4</option>
+                        <option value="5">Class 5</option>
+                        <option value="6">Class 6</option>
+                        <option value="7">Class 7</option>
+                        <option value="8">Class 8</option>
+                        <option value="9">Class 9</option>
+                        <option value="10">Class 10</option>
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
+                    </select>
+                    <button class="btn-action-primary" onclick="publishAllFiltered()">
+                        ✓ Approve & Publish All in Class
+                    </button>
+                </div>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Reg No</th>
+                            <th>Student Name</th>
+                            <th>Grand Total</th>
+                            <th>Exam Status</th>
+                            <th>Public Visibility</th>
+                            <th style="text-align: right;">Admin Control</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body">
+                        <tr><td colspan="7" style="text-align: center; padding: 28px; color: #6b7280;">Loading cloud records...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 2. Teachers & Permissions Section -->
+        <section id="section-teachers" class="control-section">
+            <div class="section-bar">
+                <div>
+                    <h2>Authorized Teachers & Class Assignments</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+                        Create individual IDs and passwords for teachers. Each teacher can only manage their permitted classes.
+                    </p>
+                </div>
+                <button class="btn-action-primary" onclick="openAddTeacherModal()">
+                    + Add New Teacher
+                </button>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Teacher Name</th>
+                            <th>Assigned Username</th>
+                            <th>Assigned Classes</th>
+                            <th>System Role</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teachers-table-body">
+                        <tr><td colspan="5" style="text-align: center; padding: 28px; color: #6b7280;">Loading teachers list...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 3. Master Classes & Curriculum Section -->
+        <section id="section-classes" class="control-section">
+            <div class="section-bar">
+                <div>
+                    <h2>Master Classes & Subjects Setup</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+                        Authorized standard classes (1 to 12) and official Samastha syllabus topics.
+                    </p>
+                </div>
+            </div>
+
+            <div class="data-table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Standard</th>
+                            <th>Syllabus</th>
+                            <th>Core Subjects</th>
+                            <th>Passing Threshold</th>
+                            <th>Authorization</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Class 1 - 4</strong></td><td>Primary Islamic Studies</td><td>Quran, Fiqh, Thareekh, Thajveed</td><td>36% per subject</td><td><span class="status-pill live">Admin Controlled</span></td></tr>
+                        <tr><td><strong>Class 5</strong></td><td>Public Examination (Board)</td><td>Fiqh, Lisanul Quran, Duroosul Ihsan, Thareekh, Quran/Hifz</td><td>36% per subject</td><td><span class="status-pill live">Board Verified</span></td></tr>
+                        <tr><td><strong>Class 6 - 9</strong></td><td>Secondary Islamic Studies</td><td>Fiqh, Thafseer, Lisanul Quran, Aqeeda, Thajveed</td><td>36% per subject</td><td><span class="status-pill live">Admin Controlled</span></td></tr>
+                        <tr><td><strong>Class 10</strong></td><td>Senior Secondary Board</td><td>Fiqh, Thafseer, Lisanul Quran, Duroosul Ihsan</td><td>36% per subject</td><td><span class="status-pill live">Board Verified</span></td></tr>
+                        <tr><td><strong>Class 11 - 12</strong></td><td>Higher Secondary Examination</td><td>Fiqh, Thafseer, Lisanul Quran, Duroosul Ihsan</td><td>36% per subject</td><td><span class="status-pill live">Board Verified</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal: Add New Teacher with Dedicated ID & Password -->
+    <div id="add-teacher-modal" class="modal-bg" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header-row">
+                <h3>Add New Teacher Account</h3>
+                <button class="btn-close-modal" onclick="closeTeacherModal()">&times;</button>
+            </div>
+            
+            <form id="new-teacher-form" onsubmit="handleCreateTeacher(event)">
+                <div class="form-row">
+                    <label for="new-t-name">Teacher Full Name *</label>
+                    <input type="text" id="new-t-name" class="form-control-modal" placeholder="e.g. Usthad Abdurahman" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="new-t-user">Login Username (Unique ID) *</label>
+                    <input type="text" id="new-t-user" class="form-control-modal" placeholder="e.g. teacher_class5" required autocomplete="off">
+                </div>
+
+                <div class="form-row">
+                    <label for="new-t-email">Teacher Email (For Password Reset Link)</label>
+                    <input type="email" id="new-t-email" class="form-control-modal" placeholder="e.g. teacher@gmail.com">
+                </div>
+
+                <div class="form-row">
+                    <label for="new-t-phone">Teacher Phone Number (For SMS OTP Verification)</label>
+                    <input type="tel" id="new-t-phone" class="form-control-modal" placeholder="e.g. 9876543210">
+                </div>
+
+                <div class="form-row">
+                    <label for="new-t-pass">Login Password *</label>
+                    <input type="password" id="new-t-pass" class="form-control-modal" placeholder="Set a secure password" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="new-t-classes">Permitted Classes (Comma separated) *</label>
+                    <input type="text" id="new-t-classes" class="form-control-modal" placeholder="e.g. 1, 2, 5" required>
+                    <small style="color: var(--text-muted); font-size: 0.78rem;">Teacher will only be permitted to view and manage these class numbers.</small>
+                </div>
+
+                <div class="modal-footer-btns">
+                    <button type="button" class="btn-action-outline" onclick="closeTeacherModal()">Cancel</button>
+                    <button type="submit" id="btn-save-teacher" class="btn-action-primary">Create Teacher Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="/static/js/models/SupabaseService.js"></script>
+    <script>
+        const ADMIN_SESSION_KEY = "bm_admin_control_session";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAdminSession();
+        });
+
+        function checkAdminSession() {
+            try {
+                const sessionRaw = sessionStorage.getItem(ADMIN_SESSION_KEY) || localStorage.getItem(ADMIN_SESSION_KEY);
+                if (sessionRaw) {
+                    const session = JSON.parse(sessionRaw);
+                    if (session && session.role === 'admin') {
+                        document.getElementById('admin-login-screen').style.display = 'none';
+                        document.getElementById('admin-display-name').textContent = session.fullName || 'Head Master';
+                        document.getElementById('avatar-initial').textContent = (session.fullName || 'A')[0].toUpperCase();
+                        loadControlRoomData();
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn(e);
+            }
+            document.getElementById('admin-login-screen').style.display = 'flex';
+        }
+
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+            const errBox = document.getElementById('admin-error');
+            const submitBtn = document.getElementById('btn-admin-submit');
+            errBox.style.display = 'none';
+
+            const user = document.getElementById('admin-user-input').value.trim();
+            const pass = document.getElementById('admin-pass-input').value;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Authenticating...';
+
+            try {
+                const profile = await window.supabaseService.login(user, pass);
+                if (profile.role !== 'admin') {
+                    throw new Error('Access Denied: This portal is reserved exclusively for the Madrasa Headmaster / Administrator.');
+                }
+
+                sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(profile));
+                localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(profile));
+
+                document.getElementById('admin-login-screen').style.display = 'none';
+                document.getElementById('admin-display-name').textContent = profile.fullName;
+                document.getElementById('avatar-initial').textContent = profile.fullName[0].toUpperCase();
+                loadControlRoomData();
+            } catch (err) {
+                errBox.textContent = err.message;
+                errBox.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Unlock Control Room';
+            }
+        }
+
+        function handleAdminLogout() {
+            if (confirm('Are you sure you want to lock the Admin Control Room and sign out?')) {
+                sessionStorage.removeItem(ADMIN_SESSION_KEY);
+                localStorage.removeItem(ADMIN_SESSION_KEY);
+                window.location.reload();
+            }
+        }
+
+        function switchTab(targetId, btn) {
+            document.querySelectorAll('.control-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.control-tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(targetId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        async function loadControlRoomData() {
+            loadSubmittedResults();
+            loadTeachersList();
+        }
+
+        async function loadSubmittedResults() {
+            const tableBody = document.getElementById('results-table-body');
+            const filterClass = document.getElementById('filter-class-select').value;
+            const classNum = filterClass ? parseInt(filterClass, 10) : null;
+
+            tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 24px; color: #6b7280;">Loading cloud marksheets...</td></tr>';
+
+            try {
+                const students = await window.supabaseService.getStudentsForAdmin(classNum);
+                
+                let pendingCount = 0;
+                let liveCount = 0;
+
+                if (!students || students.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 28px; color: #6b7280;">No student records found in cloud database.</td></tr>';
+                    document.getElementById('metric-pending').textContent = '0';
+                    document.getElementById('metric-live').textContent = '0';
+                    document.getElementById('count-pending-badge').textContent = '0';
+                    return;
+                }
+
+                let html = '';
+                students.forEach(st => {
+                    const isPublished = st.syllabus !== 'PENDING_APPROVAL';
+                    if (isPublished) liveCount++; else pendingCount++;
+
+                    html += `
+                        <tr>
+                            <td><span class="class-badge">Class ${st.class_number}</span></td>
+                            <td style="font-family: monospace; font-weight: 800; color: #072718;">${st.register_no}</td>
+                            <td>
+                                <div>${escapeHtml(st.name)}</div>
+                                ${st.name_arabic ? `<div style="font-family: 'Amiri', serif; color: #0d5c31; font-size: 0.95rem;">${escapeHtml(st.name_arabic)}</div>` : ''}
+                            </td>
+                            <td><strong style="color: #0d5c31; font-size: 1.05rem;">${st.grand_total}</strong></td>
+                            <td><span class="status-pill ${st.status === 'FAIL' ? 'pending' : 'live'}">${escapeHtml(st.status || 'PASS')}</span></td>
+                            <td>
+                                <span class="status-pill ${isPublished ? 'live' : 'pending'}">
+                                    ${isPublished ? '● Live on Portal' : '⏳ Pending Approval'}
+                                </span>
+                            </td>
+                            <td style="text-align: right;">
+                                <button class="${isPublished ? 'btn-action-outline' : 'btn-action-primary'}" style="font-size: 0.78rem; padding: 6px 12px;" 
+                                    onclick="toggleSinglePublish('${st.register_no}', ${isPublished})">
+                                    ${isPublished ? 'Unpublish' : '✓ Approve & Publish'}
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tableBody.innerHTML = html;
+                document.getElementById('metric-pending').textContent = pendingCount;
+                document.getElementById('metric-live').textContent = liveCount;
+                document.getElementById('count-pending-badge').textContent = pendingCount;
+            } catch (err) {
+                tableBody.innerHTML = `<tr><td colspan="7" style="color: #dc2626; padding: 20px; text-align: center;">Error loading results: ${err.message}</td></tr>`;
+            }
+        }
+
+        async function toggleSinglePublish(regNo, currentPublished) {
+            try {
+                await window.supabaseService.setPublishStatus(regNo, !currentPublished);
+                loadSubmittedResults();
+            } catch (err) {
+                alert('Could not update status: ' + err.message);
+            }
+        }
+
+        async function publishAllFiltered() {
+            const filterClass = document.getElementById('filter-class-select').value;
+            if (!filterClass) {
+                alert('Please select a specific class in the dropdown to publish all students.');
+                return;
+            }
+
+            if (confirm(`Approve and publish ALL verified results for Class ${filterClass} to the public portal?`)) {
+                try {
+                    await window.supabaseService.publishEntireClass(parseInt(filterClass, 10));
+                    alert(`Class ${filterClass} results are now LIVE on the public portal.`);
+                    loadSubmittedResults();
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                }
+            }
+        }
+
+        async function loadTeachersList() {
+            const tableBody = document.getElementById('teachers-table-body');
+            try {
+                const profiles = await window.supabaseService.getTeachers();
+                const teachers = (profiles || []).filter(p => p.role === 'teacher');
+                
+                document.getElementById('metric-teachers').textContent = teachers.length;
+                document.getElementById('count-teachers-badge').textContent = teachers.length;
+
+                if (teachers.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 28px; color: #6b7280;">No teachers registered yet. Click "+ Add New Teacher" above.</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                teachers.forEach(t => {
+                    const parsed = window.supabaseService.parseTeacherProfile ? window.supabaseService.parseTeacherProfile(t) : { displayName: t.full_name || t.username, email: '', phone: '' };
+                    const contactDetails = [];
+                    if (parsed.email) contactDetails.push(`✉ ${parsed.email}`);
+                    if (parsed.phone) contactDetails.push(`📞 ${parsed.phone}`);
+                    const contactStr = contactDetails.length > 0 ? `<div style="font-size:0.75rem; color:#6b7280; margin-top:2px;">${contactDetails.join(' • ')}</div>` : '';
+
+                    const classesStr = (t.assigned_classes || []).sort((a,b)=>a-b).map(c => `Class ${c}`).join(', ') || 'No Classes Assigned';
+                    html += `
+                        <tr>
+                            <td>
+                                <strong>${escapeHtml(parsed.displayName || t.username)}</strong>
+                                ${contactStr}
+                            </td>
+                            <td style="font-family: monospace; color: #0d5c31; font-weight: 700;">${escapeHtml(t.username)}</td>
+                            <td><span class="class-badge" style="background:#eaf5ee;">${classesStr}</span></td>
+                            <td><span class="status-pill live">Active Teacher</span></td>
+                            <td style="text-align: right;">
+                                <button class="btn-action-outline" style="color: #dc2626; border-color: #fecdd3; font-size: 0.78rem;" onclick="deleteTeacherAccount('${t.id}', '${escapeHtml(t.username)}')">
+                                    Delete Account
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tableBody.innerHTML = html;
+            } catch (err) {
+                tableBody.innerHTML = `<tr><td colspan="5" style="color: #dc2626; padding: 18px; text-align: center;">Error loading teachers: ${err.message}</td></tr>`;
+            }
+        }
+
+        function openAddTeacherModal() {
+            document.getElementById('add-teacher-modal').style.display = 'flex';
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('add-teacher-modal').style.display = 'none';
+        }
+
+        async function handleCreateTeacher(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btn-save-teacher');
+            const name = document.getElementById('new-t-name').value.trim();
+            const user = document.getElementById('new-t-user').value.trim();
+            const email = document.getElementById('new-t-email') ? document.getElementById('new-t-email').value.trim() : '';
+            const phone = document.getElementById('new-t-phone') ? document.getElementById('new-t-phone').value.trim() : '';
+            const pass = document.getElementById('new-t-pass').value;
+            const classesInput = document.getElementById('new-t-classes').value.trim();
+
+            const assigned = classesInput
+                .split(',')
+                .map(s => parseInt(s.trim(), 10))
+                .filter(n => !isNaN(n) && n >= 1 && n <= 12);
+
+            btn.disabled = true;
+            btn.textContent = 'Creating Account...';
+
+            try {
+                await window.supabaseService.saveTeacher({
+                    username: user,
+                    password: pass,
+                    full_name: name,
+                    email: email,
+                    phone: phone,
+                    role: 'teacher',
+                    assigned_classes: assigned
+                });
+
+                alert(`Teacher Account Created Successfully!\nUsername: ${user}\nPermitted Classes: ${assigned.join(', ')}`);
+                closeTeacherModal();
+                document.getElementById('new-teacher-form').reset();
+                loadTeachersList();
+            } catch (err) {
+                alert('Failed to create teacher: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create Teacher Account';
+            }
+        }
+
+        async function deleteTeacherAccount(id, username) {
+            if (confirm(`Are you sure you want to delete the teacher account "${username}"? They will lose access immediately.`)) {
+                try {
+                    await window.supabaseService.deleteTeacher(id);
+                    loadTeachersList();
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                }
+            }
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(text || '').replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>

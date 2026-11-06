@@ -71,13 +71,30 @@ class SupabaseService {
 
     /**
      * Create or update a teacher profile (Admin only)
+     * Stores email & phone safely inside full_name metadata tag to avoid schema cache conflicts:
+     * e.g., "Usthad Ali [email:ali@gmail.com,phone:9876543210]"
      */
     async saveTeacher(teacherData) {
         const cleanUser = teacherData.username.trim().toLowerCase();
+        
+        let formattedName = teacherData.full_name || cleanUser;
+        const metaParts = [];
+        if (teacherData.email && teacherData.email.trim()) {
+            metaParts.push(`email:${teacherData.email.trim().toLowerCase()}`);
+        }
+        if (teacherData.phone && teacherData.phone.trim()) {
+            metaParts.push(`phone:${teacherData.phone.trim()}`);
+        }
+        if (metaParts.length > 0) {
+            // Strip any previous meta tag
+            const baseName = formattedName.replace(/\s*\[.*\]\s*$/, '').trim();
+            formattedName = `${baseName} [${metaParts.join(',')}]`;
+        }
+
         const payload = {
             username: cleanUser,
             password: teacherData.password,
-            full_name: teacherData.full_name,
+            full_name: formattedName,
             role: teacherData.role || 'teacher',
             assigned_classes: teacherData.assigned_classes || []
         };
@@ -101,6 +118,79 @@ class SupabaseService {
             throw new Error('Could not save teacher: ' + err);
         }
         return await res.json();
+    }
+
+    /**
+     * Parse teacher metadata (name, email, phone)
+     */
+    parseTeacherProfile(rawProfile) {
+        const rawFullName = rawProfile.full_name || rawProfile.username || '';
+        let baseName = rawFullName;
+        let email = '';
+        let phone = '';
+
+        const match = rawFullName.match(/^(.*?)\s*\[(.*?)\]$/);
+        if (match) {
+            baseName = match[1].trim();
+            const tags = match[2].split(',');
+            tags.forEach(tag => {
+                const [k, v] = tag.split(':');
+                if (k === 'email') email = v.trim();
+                if (k === 'phone') phone = v.trim();
+            });
+        }
+
+        return {
+            id: rawProfile.id,
+            username: rawProfile.username,
+            displayName: baseName,
+            fullName: rawFullName,
+            email: email,
+            phone: phone,
+            role: rawProfile.role || 'teacher',
+            assignedClasses: rawProfile.assigned_classes || []
+        };
+    }
+
+    /**
+     * Find teacher by username, email, or phone for password recovery
+     */
+    async findTeacherForReset(identifier) {
+        const query = identifier.trim().toLowerCase();
+        // Fetch profiles
+        const url = `${this.url}profiles?select=*`;
+        const res = await fetch(url, { headers: this.headers });
+        if (!res.ok) throw new Error('Database connection failed.');
+
+        const profiles = await res.json();
+        for (const p of profiles) {
+            const parsed = this.parseTeacherProfile(p);
+            if (
+                p.username.toLowerCase() === query ||
+                (parsed.email && parsed.email.toLowerCase() === query) ||
+                (parsed.phone && parsed.phone.replace(/[^0-9]/g, '') === query.replace(/[^0-9]/g, ''))
+            ) {
+                return { profile: p, parsed: parsed };
+            }
+        }
+        throw new Error('No registered teacher account matches this username, email, or phone number.');
+    }
+
+    /**
+     * Update teacher password
+     */
+    async updatePassword(profileId, newPassword) {
+        const url = `${this.url}profiles?id=eq.${profileId}`;
+        const res = await fetch(url, {
+            method: 'PATCH',
+            headers: this.headers,
+            body: JSON.stringify({ password: newPassword })
+        });
+        if (!res.ok) {
+            const err = await res.text();
+            throw new Error('Failed to update password: ' + err);
+        }
+        return true;
     }
 
     /**
