@@ -1,15 +1,11 @@
 {
   "version": 2,
-  "routes": [
-    { "src": "/static/(.*)", "dest": "/static/$1" },
-    { "src": "/admin", "dest": "/admin.html" },
-    { "src": "/teacher", "dest": "/admin.html" },
-    { "src": "/staff", "dest": "/admin.html" },
-    { "src": "/result", "dest": "/index.html" },
-    { "src": "/results", "dest": "/index.html" },
-    { "src": "/api/(.*)", "dest": "/api/index.py" },
-    { "src": "/", "dest": "/index.html" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "status": 404, "dest": "/404.html" }
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/teacher", "destination": "/admin.html" },
+    { "source": "/staff", "destination": "/admin.html" },
+    { "source": "/result", "destination": "/index.html" },
+    { "source": "/results", "destination": "/index.html" },
+    { "source": "/api/(.*)", "destination": "/api/index.py" }
   ]
 }
