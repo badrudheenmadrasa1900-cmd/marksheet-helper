@@ -9,7 +9,7 @@ class MarksheetController {
     openClass(classId, tab = 'boys') {
         const cls = window.storageModel.getClass(classId);
         if (!cls) {
-            alert('ക്ലാസ് കണ്ടെത്താനായില്ല.');
+            alert('Class not found.');
             window.classController.showDashboard();
             return;
         }
@@ -124,7 +124,7 @@ class MarksheetController {
                 ? st.rollNo.toString().trim() 
                 : (cls.students.length + 1).toString();
             const nameStr = (st.name || '').toString().trim() || `Student ${rollStr}`;
-            const genderStr = (st.gender === 'girl' || st.gender === 'പെൺ') ? 'girl' : 'boy';
+            const genderStr = (st.gender === 'girl' || st.gender === 'girl') ? 'girl' : 'boy';
 
             let existing = cls.students.find(s => s.rollNo.toString().trim() === rollStr);
             if (!existing && nameStr) {
@@ -191,7 +191,7 @@ class MarksheetController {
             const nameStr = (st.name || '').toString().trim();
             if (!nameStr) return;
 
-            const genderStr = (st.gender === 'girl' || st.gender === 'പെൺ') ? 'girl' : 'boy';
+            const genderStr = (st.gender === 'girl' || st.gender === 'girl') ? 'girl' : 'boy';
 
             let existing = cls.students.find(s => s.rollNo.toString().trim() === rollStr);
             if (!existing) {

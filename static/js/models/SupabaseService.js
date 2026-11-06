@@ -37,17 +37,17 @@ class SupabaseService {
         
         const res = await fetch(url, { headers: this.headers });
         if (!res.ok) {
-            throw new Error('ഡാറ്റാബേസ് കണക്ഷൻ പരാജയപ്പെട്ടു.');
+            throw new Error('Database connection failed.');
         }
 
         const data = await res.json();
         if (!data || data.length === 0) {
-            throw new Error('ഉപയോക്തൃ നാമം (User ID) കണ്ടെത്തിയില്ല.');
+            throw new Error('Username (User ID) not found.');
         }
 
         const user = data[0];
         if (user.password !== password) {
-            throw new Error('തെറ്റായ പാസ്‌വേഡ്! ദയവായി വീണ്ടും ശ്രമിക്കുക.');
+            throw new Error('Incorrect password! Please try again.');
         }
 
         return {
@@ -65,7 +65,7 @@ class SupabaseService {
     async getTeachers() {
         const url = `${this.url}profiles?order=created_at.asc&select=*`;
         const res = await fetch(url, { headers: this.headers });
-        if (!res.ok) throw new Error('അധ്യാപകരുടെ വിവരങ്ങൾ ലഭ്യമാക്കാൻ കഴിഞ്ഞില്ല.');
+        if (!res.ok) throw new Error('Could not fetch teachers list.');
         return await res.json();
     }
 
@@ -98,7 +98,7 @@ class SupabaseService {
 
         if (!res.ok) {
             const err = await res.text();
-            throw new Error('ടീച്ചറെ സൂക്ഷിക്കാൻ സാധിച്ചില്ല: ' + err);
+            throw new Error('Could not save teacher: ' + err);
         }
         return await res.json();
     }
@@ -112,7 +112,7 @@ class SupabaseService {
             method: 'DELETE',
             headers: this.headers
         });
-        if (!res.ok) throw new Error('ടീച്ചറെ നീക്കം ചെയ്യാൻ സാധിച്ചില്ല.');
+        if (!res.ok) throw new Error('Could not delete teacher.');
         return true;
     }
 
@@ -197,7 +197,7 @@ class SupabaseService {
         if (!res.ok) {
             const err = await res.text();
             console.error('Supabase save student error:', err);
-            throw new Error('വിദ്യാർത്ഥിയുടെ റിസൾട്ട് Supabase-ലേക്ക് മാറ്റാൻ സാധിച്ചില്ല: ' + err);
+            throw new Error('Could not sync student result to Supabase: ' + err);
         }
         return await res.json();
     }

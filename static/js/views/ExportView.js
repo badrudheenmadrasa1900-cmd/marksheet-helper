@@ -12,7 +12,7 @@ class ExportView {
     exportPDF(cls, activeTab = 'all') {
         const { jsPDF } = window.jspdf || {};
         if (!jsPDF) {
-            alert('PDF ലൈബ്രറി ലോഡ് ചെയ്യാൻ കഴിഞ്ഞില്ല. ദയവായി പേജ് റീഫ്രഷ് ചെയ്യുക അല്ലെങ്കിൽ പ്രിന്റ് ഓപ്ഷൻ ഉപയോഗിക്കുക.');
+            alert('PDF library could not be loaded. Please refresh the page or use Print option.');
             window.print();
             return;
         }
@@ -26,14 +26,14 @@ class ExportView {
         const topics = cls.topics || [];
         const stats = window.marksheetModel.calculateStats(cls);
 
-        let sheetTitle = 'എല്ലാ വിദ്യാർത്ഥികളുടെയും മാർക്ക്ഷീറ്റ് (All Students)';
+        let sheetTitle = 'All Students Marksheet';
         let results = stats.allResults;
 
         if (activeTab === 'boys') {
-            sheetTitle = 'ആൺകുട്ടികളുടെ മാർക്ക്ഷീറ്റ് (Boys Marksheet)';
+            sheetTitle = 'Boys Marksheet';
             results = stats.boysResults;
         } else if (activeTab === 'girls') {
-            sheetTitle = 'പെൺകുട്ടികളുടെ മാർക്ക്ഷീറ്റ് (Girls Marksheet)';
+            sheetTitle = 'Girls Marksheet';
             results = stats.girlsResults;
         }
 
@@ -159,7 +159,7 @@ class ExportView {
     exportExcel(cls, activeTab = 'all') {
         const XLSX = window.XLSX;
         if (!XLSX) {
-            alert('Excel ലൈബ്രറി ലോഡ് ചെയ്യാൻ കഴിഞ്ഞില്ല. ദയവായി പേജ് റീഫ്രഷ് ചെയ്യുക.');
+            alert('Excel library could not be loaded. Please refresh the page.');
             return;
         }
 

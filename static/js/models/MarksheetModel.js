@@ -3,8 +3,8 @@
  * MVC - Model Layer: Marksheet calculations, totals, ranks, and statistics.
  * Simplified per user request: No Grade and No Overall Percentage.
  * Pass / Fail status is determined strictly per topic:
- * If a student fails (or is absent) in 1 or more subjects (<36%), they fail ('തോറ്റു' - Red).
- * If they pass all subjects, they pass ('പാസ്സ്' - Green).
+ * If a student fails (or is absent) in 1 or more subjects (<36%), they fail ('Fail' - Red).
+ * If they pass all subjects, they pass ('Pass' - Green).
  */
 
 class MarksheetModel {
@@ -101,8 +101,8 @@ class MarksheetModel {
 
         // Pass/Fail Logic:
         // Evaluated solely based on whether the student failed in 1 or more subjects.
-        // If a student failed in 1 or more subjects (<36% or Absent), they fail ('തോറ്റു').
-        // If they passed every entered subject, they pass ('പാസ്സ്').
+        // If a student failed in 1 or more subjects (<36% or Absent), they fail ('Fail').
+        // If they passed every entered subject, they pass ('Pass').
         // No overall percentage evaluation.
         const hasFailedTopics = (failedTopicsCount > 0) || hasAbsent;
         const isPassed = hasAnyMark && !hasFailedTopics;

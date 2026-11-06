@@ -311,20 +311,20 @@ class DashboardView {
                     <input 
                         type="text" 
                         class="form-control topic-name-input" 
-                        placeholder="വിഷയത്തിന്റെ പേര്" 
+                        placeholder="Subject Name" 
                         required
                     >
                     <input 
                         type="number" 
                         class="form-control topic-max-input" 
-                        placeholder="മാർക്ക്" 
+                        placeholder="Max Mark" 
                         value="50" 
                         min="1" 
                         max="1000" 
                         style="max-width: 110px;" 
                         required
                     >
-                    <button type="button" class="btn-icon btn-remove-topic" title="നീക്കം ചെയ്യുക">&times;</button>
+                    <button type="button" class="btn-icon btn-remove-topic" title="Remove">&times;</button>
                 `;
                 topicsContainer.appendChild(newRow);
                 newRow.querySelector('.btn-remove-topic').addEventListener('click', () => newRow.remove());
@@ -336,7 +336,7 @@ class DashboardView {
                     if (topicsContainer.children.length > 1) {
                         row.remove();
                     } else {
-                        alert('കുറഞ്ഞത് ഒരു വിഷയമെങ്കിലും ആവശ്യമാണ്.');
+                        alert('At least one subject is required.');
                     }
                 });
             });
@@ -365,7 +365,7 @@ class DashboardView {
                 });
 
                 if (topics.length === 0) {
-                    alert('കുറഞ്ഞത് ഒരു വിഷയമെങ്കിലും ചേർക്കുക.');
+                    alert('Please add at least one subject.');
                     return;
                 }
 
@@ -391,25 +391,25 @@ class DashboardView {
             <div class="modal-backdrop">
                 <div class="modal-box">
                     <div class="modal-header">
-                        <h3 class="modal-title">ഡാറ്റ ബാക്കപ്പ്</h3>
+                        <h3 class="modal-title">Data Backup & Restore</h3>
                         <button class="btn-close" id="btn-close-backup">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div class="backup-actions">
                             <div class="backup-card">
-                                <h5>ബാക്കപ്പ് ഡൗൺലോഡ്</h5>
-                                <button class="btn btn-primary" id="btn-download-backup">ഡൗൺലോഡ്</button>
+                                <h5>Download Backup</h5>
+                                <button class="btn btn-primary" id="btn-download-backup">Download JSON</button>
                             </div>
 
                             <div class="backup-card">
-                                <h5>ബാക്കപ്പ് റീസ്റ്റോർ</h5>
+                                <h5>Restore Backup</h5>
                                 <input type="file" id="file-restore" accept=".json" style="display:none;">
-                                <button class="btn btn-outline" id="btn-trigger-restore">ഫയൽ തിരഞ്ഞെടുക്കുക</button>
+                                <button class="btn btn-outline" id="btn-trigger-restore">Select JSON File</button>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-ghost" id="btn-cancel-backup">അടയ്ക്കുക</button>
+                        <button class="btn btn-ghost" id="btn-cancel-backup">Close</button>
                     </div>
                 </div>
             </div>
@@ -434,11 +434,11 @@ class DashboardView {
             reader.onload = (event) => {
                 try {
                     window.storageModel.importBackup(event.target.result);
-                    alert('ബാക്കപ്പ് റീസ്റ്റോർ ചെയ്തു!');
+                    alert('Backup restored successfully!');
                     closeModal();
                     window.classController.showDashboard();
                 } catch (err) {
-                    alert('പിഴവ് സംഭവിച്ചു: ' + err.message);
+                    alert('Error: ' + err.message);
                 }
             };
             reader.readAsText(file);
@@ -454,7 +454,7 @@ class DashboardView {
         const logoutBtn = document.getElementById('btn-logout');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
-                if (confirm('ലോഗ് ഔട്ട് ചെയ്യണമെന്നുണ്ടോ?')) {
+                if (confirm('Are you sure you want to sign out?')) {
                     window.authController.handleLogout();
                 }
             });
@@ -488,7 +488,7 @@ class DashboardView {
         document.querySelectorAll('.btn-delete-class').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const classId = e.currentTarget.getAttribute('data-id');
-                if (confirm('ഈ ക്ലാസ് നീക്കം ചെയ്യണോ?')) {
+                if (confirm('Are you sure you want to delete this class?')) {
                     window.classController.deleteClass(classId);
                 }
             });
@@ -501,22 +501,22 @@ class DashboardView {
             <div class="modal-backdrop">
                 <div class="modal-box modal-lg">
                     <div class="modal-header">
-                        <h3 class="modal-title">അധ്യാപകരെ ക്രമീകരിക്കുക (Teacher Permissions)</h3>
+                        <h3 class="modal-title">Teacher Permissions & Accounts</h3>
                         <button class="btn-close" id="btn-close-teachers">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
                             <p style="font-size:0.88rem; color:#4b5563; margin:0;">
-                                ഓരോ അധ്യാപകനും അനുവാദമുള്ള ക്ലാസുകൾ (1 - 12) ഇവിടെ സജ്ജീകരിക്കാം.
+                                Configure assigned classes (Class 1 to 12) for each teacher.
                             </p>
-                            <button class="btn btn-primary btn-sm" id="btn-add-new-teacher">+ പുതിയ അധ്യാപകൻ</button>
+                            <button class="btn btn-primary btn-sm" id="btn-add-new-teacher">+ Add Teacher</button>
                         </div>
                         <div id="teachers-list-container">
-                            <p style="text-align:center; padding:20px; color:#6b7280;">ഡാറ്റ ലോഡ് ചെയ്യുന്നു...</p>
+                            <p style="text-align:center; padding:20px; color:#6b7280;">Loading teachers list...</p>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-ghost" id="btn-cancel-teachers">അടയ്ക്കുക</button>
+                        <button class="btn btn-ghost" id="btn-cancel-teachers">Close</button>
                     </div>
                 </div>
             </div>
@@ -531,7 +531,7 @@ class DashboardView {
             try {
                 const teachers = await window.supabaseService.getTeachers();
                 if (!teachers || teachers.length === 0) {
-                    listContainer.innerHTML = '<p style="text-align:center; padding:15px;">അധ്യാപകരെ കണ്ടെത്തിയില്ല.</p>';
+                    listContainer.innerHTML = '<p style="text-align:center; padding:15px;">No teachers found.</p>';
                     return;
                 }
 
@@ -539,11 +539,11 @@ class DashboardView {
                     <table class="table" style="width:100%; font-size:0.88rem;">
                         <thead>
                             <tr style="border-bottom:1.5px solid #e5e7eb; text-align:left;">
-                                <th style="padding:8px;">പേര്</th>
-                                <th style="padding:8px;">യൂസർ ഐഡി</th>
-                                <th style="padding:8px;">റോൾ</th>
-                                <th style="padding:8px;">അനുവദിച്ച ക്ലാസുകൾ</th>
-                                <th style="padding:8px; text-align:right;">നടപടി</th>
+                                <th style="padding:8px;">Name</th>
+                                <th style="padding:8px;">Username</th>
+                                <th style="padding:8px;">Role</th>
+                                <th style="padding:8px;">Assigned Classes</th>
+                                <th style="padding:8px; text-align:right;">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -559,7 +559,7 @@ class DashboardView {
                             <td style="padding:8px; color:#156d3b; font-weight:700;">${classesStr}</td>
                             <td style="padding:8px; text-align:right;">
                                 ${t.username !== 'admin' ? `
-                                    <button class="btn btn-ghost btn-sm btn-delete-t" data-id="${t.id}" style="color:#dc2626;">ഡിലീറ്റ്</button>
+                                    <button class="btn btn-ghost btn-sm btn-delete-t" data-id="${t.id}" style="color:#dc2626;">Delete</button>
                                 ` : '<span style="font-size:0.75rem; color:#9ca3af;">Protected</span>'}
                             </td>
                         </tr>
@@ -572,7 +572,7 @@ class DashboardView {
                 listContainer.querySelectorAll('.btn-delete-t').forEach(b => {
                     b.addEventListener('click', async (e) => {
                         const id = e.target.getAttribute('data-id');
-                        if (confirm('ഈ അധ്യാപകന്റെ അക്കൗണ്ട് നീക്കം ചെയ്യണോ?')) {
+                        if (confirm('Are you sure you want to delete this teacher account?')) {
                             try {
                                 await window.supabaseService.deleteTeacher(id);
                                 loadTeachers();
@@ -583,18 +583,18 @@ class DashboardView {
                     });
                 });
             } catch (err) {
-                listContainer.innerHTML = `<p style="color:#dc2626; padding:10px;">പിഴവ്: ${err.message}</p>`;
+                listContainer.innerHTML = `<p style="color:#dc2626; padding:10px;">Error: ${err.message}</p>`;
             }
         };
 
         loadTeachers();
 
         document.getElementById('btn-add-new-teacher').addEventListener('click', () => {
-            const username = prompt('അധ്യാപകന്റെ യൂസർ ഐഡി (Username):');
+            const username = prompt('Teacher Username (e.g. teacher1):');
             if (!username) return;
-            const fullName = prompt('അധ്യാപകന്റെ പൂർണ്ണ പേര് (Full Name):') || username;
-            const password = prompt('പാസ്‌വേഡ് (Password):') || '123456';
-            const classesPrompt = prompt('അനുവദിച്ച ക്ലാസുകൾ കോമ ഇട്ടു നൽകുക (ഉദാ: 1, 2, 5, 12):', '1, 2, 3');
+            const fullName = prompt('Teacher Full Name:') || username;
+            const password = prompt('Password:') || '123456';
+            const classesPrompt = prompt('Assigned classes separated by commas (e.g. 1, 2, 5, 12):', '1, 2, 3');
             
             const assigned = (classesPrompt || '')
                 .split(',')
@@ -608,7 +608,7 @@ class DashboardView {
                 role: 'teacher',
                 assigned_classes: assigned
             }).then(() => {
-                alert('അധ്യാപകനെ വിജയകരമായി ചേർത്തു!');
+                alert('Teacher added successfully!');
                 loadTeachers();
             }).catch(err => alert(err.message));
         });

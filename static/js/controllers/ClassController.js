@@ -35,7 +35,7 @@ class ClassController {
                 this.showDashboard();
             }
         } catch (err) {
-            alert('ക്ലാസ് സൂക്ഷിക്കുന്നതിൽ പിഴവ് സംഭവിച്ചു: ' + err.message);
+            alert('Error saving class: ' + err.message);
         }
     }
 
@@ -44,7 +44,7 @@ class ClassController {
             window.storageModel.deleteClass(classId);
             this.showDashboard();
         } catch (err) {
-            alert('ക്ലാസ് നീക്കം ചെയ്യുന്നതിൽ പിഴവ്: ' + err.message);
+            alert('Error deleting class: ' + err.message);
         }
     }
 }

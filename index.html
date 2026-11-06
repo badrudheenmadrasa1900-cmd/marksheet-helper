@@ -659,7 +659,7 @@
 
             const initial = (student.name || 'S').trim()[0].toUpperCase();
             const statusUpper = (student.status || 'PASS').toUpperCase();
-            const isPassed = !statusUpper.includes('FAIL') && !statusUpper.includes('തോറ്റു');
+            const isPassed = !statusUpper.includes('FAIL');
 
             let itemsHtml = '';
             marksList.forEach(m => {
