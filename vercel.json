@@ -1,13 +1,6 @@
 {
   "version": 2,
-  "cleanUrls": true,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.py" },
-    { "source": "/admin", "destination": "/admin/index.html" },
-    { "source": "/admin/(.*)", "destination": "/admin/index.html" },
-    { "source": "/teacher", "destination": "/teacher/index.html" },
-    { "source": "/teacher/(.*)", "destination": "/teacher/index.html" },
-    { "source": "/result", "destination": "/result.html" },
-    { "source": "/results", "destination": "/result.html" }
+    { "source": "/(.*)", "destination": "/api/index.py" }
   ]
 }
