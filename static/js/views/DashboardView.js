@@ -33,20 +33,23 @@ class DashboardView {
                     <div class="nav-actions">
                         <div class="user-pill">
                             <span class="user-avatar">${(user.fullName || 'T')[0].toUpperCase()}</span>
-                            <span class="user-name">${user.fullName || user.userId} ${user.role === 'admin' ? '<span class="badge-admin">Admin</span>' : '<span class="badge-teacher">Teacher</span>'}</span>
+                            <span class="user-name">${user.fullName || user.userId}</span>
+                            <span class="${user.role === 'admin' ? 'badge-admin' : 'badge-teacher'}">
+                                ${user.role === 'admin' ? 'ADMIN' : 'TEACHER'}
+                            </span>
                         </div>
-                        <a href="/" target="_blank" class="btn btn-outline btn-sm" title="View Public Result Portal">
+                        <a href="/" target="_blank" class="btn btn-outline btn-sm nav-hide-mobile" title="View Public Result Portal">
                             Public Portal ↗
                         </a>
                         ${user.role === 'admin' ? `
                             <button class="btn btn-primary btn-sm" id="btn-verify-results" title="Review & Publish Results" style="background:#0d5c31;">
-                                ✓ Verify & Publish Results
+                                ✓ Verify & Publish
                             </button>
-                            <button class="btn btn-outline btn-sm" id="btn-manage-teachers" title="Manage Teachers">
+                            <button class="btn btn-outline btn-sm nav-hide-mobile" id="btn-manage-teachers" title="Manage Teachers">
                                 Teachers
                             </button>
                         ` : ''}
-                        <button class="btn btn-outline btn-sm" id="btn-backup" title="Backup Data">
+                        <button class="btn btn-outline btn-sm nav-hide-mobile" id="btn-backup" title="Backup Data">
                             Backup
                         </button>
                         <button class="btn btn-ghost btn-sm" id="btn-logout" title="Sign Out">

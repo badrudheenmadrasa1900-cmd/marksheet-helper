@@ -28,11 +28,11 @@ class MarksheetView {
                 <!-- Top Breadcrumb & Navbar -->
                 <header class="navbar marksheet-navbar">
                     <div class="nav-left">
-                        <button class="btn btn-ghost btn-sm" id="btn-back-dashboard" title="Classes">
+                        <button class="btn btn-ghost btn-sm" id="btn-back-dashboard" title="Back to Classes">
                             ← <span class="hide-mobile">Classes</span>
                         </button>
                         <div class="nav-class-info">
-                            <span class="nav-madrasa-sub">${cls.madrasaName || ''}</span>
+                            <span class="nav-madrasa-sub">${cls.madrasaName || 'BADRUDHEEN MADRASA'}</span>
                             <h3 class="nav-class-main-title">${cls.className} • ${cls.examName}</h3>
                         </div>
                     </div>
@@ -43,22 +43,25 @@ class MarksheetView {
 
                         <!-- 1-Click Excel Import -->
                         <button class="btn btn-outline btn-sm btn-action-excel" id="btn-import-excel" title="Import Excel">
-                            <span class="action-btn-text">Import Excel</span>
+                            <span class="btn-icon-label">📊</span>
+                            <span class="action-btn-text">Excel</span>
                         </button>
 
                         <!-- Gemini Flash AI Photo Scan -->
-                        <button class="btn btn-outline btn-sm btn-action-ai" id="btn-scan-gemini" title="AI Scan">
+                        <button class="btn btn-outline btn-sm btn-action-ai" id="btn-scan-gemini" title="AI Camera Scanner">
+                            <span class="btn-icon-label">📷</span>
                             <span class="action-btn-text">AI Scan</span>
                         </button>
 
                         <!-- Supabase Cloud Sync -->
-                        <button class="btn btn-outline btn-sm" id="btn-sync-cloud" title="Sync result with Supabase Cloud" style="color:#0d5c31; border-color:#0d5c31; font-weight:700;">
-                            ☁️ Sync Result
+                        <button class="btn btn-outline btn-sm" id="btn-sync-cloud" title="Sync result with Supabase Cloud">
+                            <span class="btn-icon-label">☁️</span>
+                            <span class="action-btn-text">Sync</span>
                         </button>
 
                         <!-- Print Button -->
                         <button class="btn btn-primary btn-sm btn-print" id="btn-print-nav" title="Print Marksheet">
-                            Print
+                            🖨️ Print
                         </button>
 
                         <!-- Export dropdown / buttons -->
@@ -106,7 +109,7 @@ class MarksheetView {
                             <button class="btn btn-outline btn-sm" id="btn-manage-topics">
                                 Subjects (${topics.length})
                             </button>
-                            <button class="btn btn-outline btn-sm btn-print" id="btn-print-toolbar">
+                            <button class="btn btn-outline btn-sm btn-print hide-mobile" id="btn-print-toolbar">
                                 Print
                             </button>
                             <button class="btn btn-primary btn-sm" id="btn-add-student">
@@ -414,11 +417,19 @@ class MarksheetView {
         const genderLabel = this.activeTab === 'boys' ? 'Boys' : (this.activeTab === 'girls' ? 'Girls' : 'Students');
         return `
             <div class="empty-state">
-                <h4>No ${genderLabel} Added Yet</h4>
+                <div class="empty-state-icon">👥</div>
+                <h4 class="empty-title">No ${genderLabel} Added Yet</h4>
+                <p class="empty-desc">Add students manually, or import entire class lists using Excel or AI camera scan.</p>
                 <div class="empty-actions-row">
-                    <button class="btn btn-primary btn-sm" id="btn-empty-add-st">+ Add Student</button>
-                    <button class="btn btn-outline btn-sm" id="btn-empty-excel">Upload Excel</button>
-                    <button class="btn btn-outline btn-sm" id="btn-empty-ai">AI Scan</button>
+                    <button class="btn btn-primary" id="btn-empty-add-st">
+                        + Add Student
+                    </button>
+                    <button class="btn btn-outline" id="btn-empty-excel">
+                        📊 Upload Excel
+                    </button>
+                    <button class="btn btn-outline" id="btn-empty-ai">
+                        📷 AI Scan
+                    </button>
                 </div>
             </div>
         `;
