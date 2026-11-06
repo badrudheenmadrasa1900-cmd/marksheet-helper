@@ -712,7 +712,6 @@ class DashboardView {
             }
         });
     }
-    }
 
     async showVerificationModal() {
         const modalContainer = document.getElementById('modal-container');

@@ -1,6 +1,15 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index.py" }
+  "cleanUrls": true,
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.py" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/admin/(.*)", "dest": "/admin.html" },
+    { "src": "/teacher", "dest": "/templates/index.html" },
+    { "src": "/teacher/(.*)", "dest": "/templates/index.html" },
+    { "src": "/result", "dest": "/result.html" },
+    { "src": "/results", "dest": "/result.html" },
+    { "src": "/static/(.*)", "dest": "/static/$1" },
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }
