@@ -461,6 +461,7 @@ class SupabaseService {
         for (const student of cls.students) {
             const studentMarks = [];
             const stMarks = marksMap[student.id] || {};
+            const attVal = (cls.attendance && cls.attendance[student.id] !== undefined) ? cls.attendance[student.id] : '';
 
             topics.forEach(top => {
                 // Find matching standard subject or custom
@@ -480,6 +481,17 @@ class SupabaseService {
                     passMark: passMark
                 });
             });
+
+            // If attendance is present, append as an attendance metric object in marks list
+            if (attVal) {
+                studentMarks.push({
+                    subject: "ATTENDANCE (HAJAR)",
+                    arabic: "ഹാജർ",
+                    mark: attVal,
+                    max: "Att.",
+                    isAttendance: true
+                });
+            }
 
             await this.saveStudentToSupabase({
                 register_no: student.rollNo || student.id,

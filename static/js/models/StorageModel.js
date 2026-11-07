@@ -145,12 +145,66 @@ class StorageModel {
         localStorage.setItem(key, JSON.stringify(data));
     }
 
-    // Get all classes for currently logged-in user
+    // Get all classes for currently logged-in user (with automatic migration for 50 max marks, separated Quran/Hifz, and attendance)
     getClasses() {
         const session = this.getSession();
         if (!session) return [];
         const userData = this._getUserData(session.userId);
-        return userData.classes || [];
+        let classes = userData.classes || [];
+        let modified = false;
+
+        classes = classes.map(cls => {
+            if (!cls || !Array.isArray(cls.topics)) return cls;
+
+            // Check if class has old topics (maxMarks 100 or joined QUR'AN, HIFZ)
+            let topicsChanged = false;
+            let updatedTopics = [];
+
+            cls.topics.forEach(t => {
+                const upperName = (t.name || '').toUpperCase();
+                if (upperName.includes("QUR'AN, HIFZ") || upperName.includes("QURAN, HIFZ") || upperName.includes("القرآن والحفظ")) {
+                    // Split into Quran and Hifz
+                    topicsChanged = true;
+                    updatedTopics.push({
+                        id: t.id || 'top_quran',
+                        name: "QUR'AN (القرآن الكريم)",
+                        maxMarks: 50
+                    });
+                    updatedTopics.push({
+                        id: 'top_hifz_' + (t.id || 'hifz'),
+                        name: "HIFZ (الحفظ)",
+                        maxMarks: 50
+                    });
+                } else {
+                    const currentMax = Number(t.maxMarks);
+                    if (currentMax === 100) {
+                        topicsChanged = true;
+                        updatedTopics.push({
+                            ...t,
+                            maxMarks: 50
+                        });
+                    } else {
+                        updatedTopics.push(t);
+                    }
+                }
+            });
+
+            if (topicsChanged) {
+                modified = true;
+                return {
+                    ...cls,
+                    topics: updatedTopics
+                };
+            }
+            return cls;
+        });
+
+        if (modified) {
+            userData.classes = classes;
+            this._saveUserData(session.userId, userData);
+        }
+
+        return classes;
     }
 
     // Get a specific class by ID
@@ -231,6 +285,27 @@ class StorageModel {
             delete cls.marks[studentId][topicId];
         } else {
             cls.marks[studentId][topicId] = value;
+        }
+
+        cls.updatedAt = new Date().toISOString();
+        this._saveUserData(session.userId, userData);
+        return true;
+    }
+
+    // Fast Attendance / Hajar Update for a student
+    updateStudentAttendance(classId, studentId, attendanceValue) {
+        const session = this.getSession();
+        if (!session) return false;
+
+        const userData = this._getUserData(session.userId);
+        const cls = (userData.classes || []).find(c => c.id === classId);
+        if (!cls) return false;
+
+        if (!cls.attendance) cls.attendance = {};
+        if (attendanceValue === '' || attendanceValue === null || attendanceValue === undefined) {
+            delete cls.attendance[studentId];
+        } else {
+            cls.attendance[studentId] = attendanceValue;
         }
 
         cls.updatedAt = new Date().toISOString();

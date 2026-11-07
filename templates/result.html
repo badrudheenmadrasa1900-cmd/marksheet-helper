@@ -682,7 +682,24 @@
             const isPassed = !statusUpper.includes('FAIL');
 
             let itemsHtml = '';
+            let attendanceBadge = '';
+
             marksList.forEach(m => {
+                if (m.isAttendance || (m.subject && m.subject.toUpperCase().includes('ATTENDANCE'))) {
+                    attendanceBadge = `
+                        <div class="subject-item" style="background: #f0f9ff; border: 1.5px solid #bae6fd;">
+                            <div class="subject-left">
+                                <span class="sub-name" style="color: #0369a1; font-weight: 800;">HAJAR / ATTENDANCE (ഹാജർ)</span>
+                                <span class="sub-ar" style="color: #0284c7;">حضور</span>
+                            </div>
+                            <div class="sub-badge" style="background: #e0f2fe; color: #0284c7; font-weight: 800; border: 1px solid #7dd3fc;">
+                                ${escapeHtml(String(m.mark))}
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
                 const title = m.subject || m.title || 'Subject';
                 const ar = m.arabic || '';
                 const score = (m.mark !== undefined && m.mark !== null && m.mark !== '') ? m.mark : '-';
@@ -705,6 +722,10 @@
                     </div>
                 `;
             });
+
+            if (attendanceBadge) {
+                itemsHtml += attendanceBadge;
+            }
 
             const html = `
                 <div class="result-sheet">

@@ -222,6 +222,12 @@ class MarksheetView {
                                     </th>
                                 `;
                             }).join('')}
+                            <th class="th-topic" style="min-width: 90px; background: #f8fafc;" title="Attendance (ഹാജർ)">
+                                <div class="th-topic-inner">
+                                    <span class="topic-name-header" style="color: #0369a1;">ഹാജർ (Att.)</span>
+                                    <span class="topic-max-badge" style="background:#e0f2fe; color:#0369a1;">Days / %</span>
+                                </div>
+                            </th>
                             <th class="th-calc th-total">Total</th>
                             <th class="th-calc th-rank">Rank</th>
                             <th class="th-calc th-status">Status</th>
@@ -231,6 +237,7 @@ class MarksheetView {
                     <tbody>
                         ${studentsToDisplay.map((st, rowIdx) => {
                             const res = resultMap[st.id] || window.marksheetModel.computeStudentResult(st, topics, cls.marks, cls.passPercentage);
+                            const attVal = (cls.attendance && cls.attendance[st.id] !== undefined) ? cls.attendance[st.id] : '';
                             return `
                                 <tr class="student-row" data-student-id="${st.id}" data-row-idx="${rowIdx}">
                                     <td class="td-roll sticky-col-1">
@@ -270,6 +277,19 @@ class MarksheetView {
                                             </td>
                                         `;
                                     }).join('')}
+                                    <td class="td-mark-input" style="background: #f8fafc;">
+                                        <input 
+                                            type="text" 
+                                            class="attendance-input form-control" 
+                                            value="${attVal}" 
+                                            data-student-id="${st.id}" 
+                                            placeholder="—"
+                                            maxlength="8"
+                                            autocomplete="off"
+                                            title="Attendance / ഹാജർ"
+                                            style="text-align: center; font-weight: 700; color: #0284c7; padding: 4px;"
+                                        >
+                                    </td>
                                     <td class="td-calc td-total font-mono" id="total-${st.id}">
                                         <strong>${res.hasAnyMark ? res.totalScored : '-'}</strong>
                                         <span class="text-muted">/${res.totalMax}</span>
@@ -1510,6 +1530,27 @@ class MarksheetView {
                 const studentId = e.currentTarget.getAttribute('data-id');
                 if (confirm('Are you sure you want to remove this student?')) {
                     window.marksheetController.deleteStudent(this.currentClass.id, studentId);
+                }
+            });
+        });
+
+        // Attendance / Hajar Inputs
+        const attInputs = document.querySelectorAll('.attendance-input');
+        attInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                const studentId = e.target.getAttribute('data-student-id');
+                const val = e.target.value.trim();
+                window.storageModel.updateStudentAttendance(this.currentClass.id, studentId, val);
+                if (!this.currentClass.attendance) this.currentClass.attendance = {};
+                if (val === '') {
+                    delete this.currentClass.attendance[studentId];
+                } else {
+                    this.currentClass.attendance[studentId] = val;
+                }
+                const autoSave = document.getElementById('autosave-status');
+                if (autoSave) {
+                    autoSave.innerHTML = `<span class="save-dot saving"></span> Saving...`;
+                    setTimeout(() => { autoSave.innerHTML = `<span class="save-dot"></span> Saved`; }, 300);
                 }
             });
         });
