@@ -27,15 +27,15 @@ class DashboardView {
                         <span class="nav-logo-badge">BM</span>
                         <div class="nav-titles">
                             <span class="nav-title">Badrudheen Madrasa</span>
-                            <span class="nav-tagline">Staff & Teacher Portal</span>
+                            <span class="nav-tagline">${user.role === 'admin' ? 'Sadar Muallim Command' : 'Usthad Portal'}</span>
                         </div>
                     </div>
                     <div class="nav-actions">
                         <div class="user-pill">
-                            <span class="user-avatar">${(user.fullName || 'T')[0].toUpperCase()}</span>
+                            <span class="user-avatar">${(user.fullName || 'U')[0].toUpperCase()}</span>
                             <span class="user-name">${user.fullName || user.userId}</span>
                             <span class="${user.role === 'admin' ? 'badge-admin' : 'badge-teacher'}">
-                                ${user.role === 'admin' ? 'ADMIN' : 'TEACHER'}
+                                ${user.role === 'admin' ? 'SADAR MUALLIM' : 'USTHAD'}
                             </span>
                         </div>
                         <a href="/" target="_blank" class="btn btn-outline btn-sm nav-hide-mobile" title="View Public Result Portal">
@@ -45,8 +45,8 @@ class DashboardView {
                             <button class="btn btn-primary btn-sm" id="btn-verify-results" title="Review & Publish Results" style="background:#0d5c31;">
                                 ✓ Verify & Publish
                             </button>
-                            <button class="btn btn-outline btn-sm nav-hide-mobile" id="btn-manage-teachers" title="Manage Teachers">
-                                Teachers
+                            <button class="btn btn-outline btn-sm nav-hide-mobile" id="btn-manage-teachers" title="Manage Usthads">
+                                Usthads
                             </button>
                         ` : ''}
                         <button class="btn btn-outline btn-sm nav-hide-mobile" id="btn-backup" title="Backup Data">
@@ -61,7 +61,10 @@ class DashboardView {
                 <main class="main-content">
                     <div class="dashboard-hero">
                         <div class="hero-left">
-                            <h2 class="hero-title">Welcome, ${user.fullName || 'Teacher'}</h2>
+                            <h2 class="hero-title">Welcome, ${user.fullName || 'Usthad'}</h2>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                                ${user.role === 'admin' ? 'Sadar Muallim: Complete Class Control & Result Verification' : 'Usthad Portal: Manage mark sheets for your authorized classes'}
+                            </p>
                         </div>
                         <div class="hero-right">
                             <button class="btn btn-primary" id="btn-add-class">
@@ -512,18 +515,18 @@ class DashboardView {
             <div class="modal-backdrop">
                 <div class="modal-box modal-lg">
                     <div class="modal-header">
-                        <h3 class="modal-title">Teacher Permissions & Accounts</h3>
+                        <h3 class="modal-title">Sadar Muallim: Usthad Assignments & Pass Keys</h3>
                         <button class="btn-close" id="btn-close-teachers">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
                             <p style="font-size:0.88rem; color:#4b5563; margin:0;">
-                                Configure assigned classes (Class 1 to 12) for each teacher.
+                                Authorized Usthads, assigned classes, and email verification status.
                             </p>
-                            <button class="btn btn-primary btn-sm" id="btn-add-new-teacher">+ Add Teacher</button>
+                            <button class="btn btn-primary btn-sm" id="btn-add-new-teacher">+ Add New Usthad</button>
                         </div>
                         <div id="teachers-list-container">
-                            <p style="text-align:center; padding:20px; color:#6b7280;">Loading teachers list...</p>
+                            <p style="text-align:center; padding:20px; color:#6b7280;">Loading usthads list...</p>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -542,7 +545,7 @@ class DashboardView {
             try {
                 const teachers = await window.supabaseService.getTeachers();
                 if (!teachers || teachers.length === 0) {
-                    listContainer.innerHTML = '<p style="text-align:center; padding:15px;">No teachers found.</p>';
+                    listContainer.innerHTML = '<p style="text-align:center; padding:15px;">No usthads found.</p>';
                     return;
                 }
 
@@ -550,10 +553,10 @@ class DashboardView {
                     <table class="table" style="width:100%; font-size:0.88rem;">
                         <thead>
                             <tr style="border-bottom:1.5px solid #e5e7eb; text-align:left;">
-                                <th style="padding:8px;">Name</th>
+                                <th style="padding:8px;">Usthad Name</th>
                                 <th style="padding:8px;">Username</th>
-                                <th style="padding:8px;">Role</th>
                                 <th style="padding:8px;">Assigned Classes</th>
+                                <th style="padding:8px;">Recovery Email</th>
                                 <th style="padding:8px; text-align:right;">Action</th>
                             </tr>
                         </thead>
@@ -561,13 +564,24 @@ class DashboardView {
                 `;
 
                 teachers.forEach(t => {
+                    const parsed = window.supabaseService.parseTeacherProfile ? window.supabaseService.parseTeacherProfile(t) : { displayName: t.full_name || t.username, email: '', emailStatus: 'none' };
                     const classesStr = (t.assigned_classes || []).sort((a,b)=>a-b).join(', ') || 'None';
+                    
+                    let emailDisplay = '<span style="color:#9ca3af; font-size:0.75rem;">None</span>';
+                    if (parsed.email) {
+                        if (parsed.emailStatus === 'pending') {
+                            emailDisplay = `<span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:4px; font-size:0.75rem; font-weight:700;">Pending Approval</span>`;
+                        } else {
+                            emailDisplay = `<span style="color:#16a34a; font-size:0.75rem; font-weight:700;">✓ Verified</span>`;
+                        }
+                    }
+
                     html += `
                         <tr style="border-bottom:1px solid #f3f4f6;">
-                            <td style="padding:8px; font-weight:600;">${t.full_name || t.username}</td>
+                            <td style="padding:8px; font-weight:600;">${parsed.displayName}</td>
                             <td style="padding:8px; font-family:monospace;">${t.username}</td>
-                            <td style="padding:8px;"><span class="${t.role === 'admin' ? 'badge-admin' : 'badge-teacher'}">${t.role}</span></td>
-                            <td style="padding:8px; color:#156d3b; font-weight:700;">${classesStr}</td>
+                            <td style="padding:8px; color:#156d3b; font-weight:700;">Class ${classesStr}</td>
+                            <td style="padding:8px;">${emailDisplay}</td>
                             <td style="padding:8px; text-align:right;">
                                 ${t.username !== 'admin' ? `
                                     <button class="btn btn-ghost btn-sm btn-delete-t" data-id="${t.id}" style="color:#dc2626;">Delete</button>
@@ -583,7 +597,7 @@ class DashboardView {
                 listContainer.querySelectorAll('.btn-delete-t').forEach(b => {
                     b.addEventListener('click', async (e) => {
                         const id = e.target.getAttribute('data-id');
-                        if (confirm('Are you sure you want to delete this teacher account?')) {
+                        if (confirm('Are you sure you want to delete this usthad account?')) {
                             try {
                                 await window.supabaseService.deleteTeacher(id);
                                 loadTeachers();
@@ -606,7 +620,7 @@ class DashboardView {
     }
 
     /**
-     * Custom Teacher Creation Modal (No browser prompts)
+     * Custom Usthad Creation Modal (Sadar Muallim assigns ID, Pass Key, and Classes)
      */
     showCustomAddTeacherModal(onSuccess) {
         const modalContainer = document.getElementById('modal-container');
@@ -617,9 +631,9 @@ class DashboardView {
             <div class="modal-box" style="max-width: 480px;">
                 <div class="modal-header">
                     <div>
-                        <h3 class="modal-title">Add New Teacher Account</h3>
+                        <h3 class="modal-title">Add New Usthad & Set Pass Key</h3>
                         <p style="font-size:0.82rem; color:var(--text-muted); margin-top:2px;">
-                            Enter teacher credentials, contact info for password recovery, and permitted classes.
+                            Enter Usthad credentials, assign their permitted classes, and set their pass key.
                         </p>
                     </div>
                     <button class="btn-close" id="btn-close-teacher-create" title="Close dialog">&times;</button>
@@ -627,34 +641,34 @@ class DashboardView {
                 <div class="modal-body">
                     <form id="form-create-teacher-custom">
                         <div class="form-group">
-                            <label class="form-label" for="t-cust-name">Teacher Full Name *</label>
+                            <label class="form-label" for="t-cust-name">Usthad Full Name *</label>
                             <input type="text" id="t-cust-name" class="form-control" placeholder="e.g. Usthad Ibrahim" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="t-cust-user">Teacher Username (Unique ID) *</label>
-                            <input type="text" id="t-cust-user" class="form-control" placeholder="e.g. teacher_class4" required autocomplete="off">
+                            <label class="form-label" for="t-cust-user">Usthad Username (Unique ID) *</label>
+                            <input type="text" id="t-cust-user" class="form-control" placeholder="e.g. usthad_class4" required autocomplete="off">
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="t-cust-email">Email Address (Optional - For Password Reset Link)</label>
-                            <input type="email" id="t-cust-email" class="form-control" placeholder="e.g. teacher@gmail.com">
+                            <label class="form-label" for="t-cust-email">Recovery Email (Optional - Pre-approved by Sadar Muallim)</label>
+                            <input type="email" id="t-cust-email" class="form-control" placeholder="e.g. usthad@gmail.com">
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="t-cust-phone">Phone Number (Optional - For SMS OTP Recovery)</label>
+                            <label class="form-label" for="t-cust-phone">Mobile Number (Optional)</label>
                             <input type="tel" id="t-cust-phone" class="form-control" placeholder="e.g. 9876543210">
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="t-cust-pass">Initial Password *</label>
-                            <input type="password" id="t-cust-pass" class="form-control" placeholder="Initial password (e.g. 123456)" required>
+                            <label class="form-label" for="t-cust-pass">Usthad Pass Key / Password *</label>
+                            <input type="password" id="t-cust-pass" class="form-control" placeholder="Initial pass key" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="t-cust-classes">Permitted Classes (Comma separated) *</label>
                             <input type="text" id="t-cust-classes" class="form-control" placeholder="e.g. 1, 2, 5" value="1, 2, 3" required>
-                            <small style="color:var(--text-muted); font-size:0.78rem;">Teacher can only view and manage these class marks.</small>
+                            <small style="color:var(--text-muted); font-size:0.78rem;">Usthad can only view and manage these class marks.</small>
                         </div>
                         <div id="t-cust-error" class="alert alert-danger" style="display:none; margin-top:10px;"></div>
                         <div class="modal-footer" style="padding: 1rem 0 0 0; margin-top: 1rem;">
                             <button type="button" class="btn btn-outline" id="btn-cancel-teacher-create">Cancel</button>
-                            <button type="submit" class="btn btn-primary" id="btn-submit-teacher-create">Save Teacher Account</button>
+                            <button type="submit" class="btn btn-primary" id="btn-submit-teacher-create">Save Usthad Account</button>
                         </div>
                     </form>
                 </div>

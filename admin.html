@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0a3622">
-    <title>Badrudheen Madrasa - Central Admin Control Room</title>
+    <title>Badrudheen Madrasa - Sadar Muallim (صدر معلم) Control Room</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
@@ -582,7 +582,7 @@
 </head>
 <body>
 
-    <!-- Dedicated Separate Admin Login Overlay (Only opens with Admin Credentials) -->
+    <!-- Dedicated Separate Sadar Muallim Login Overlay -->
     <div id="admin-login-screen" class="admin-login-overlay">
         <div class="admin-login-box">
             <div class="admin-login-icon">
@@ -591,19 +591,19 @@
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                 </svg>
             </div>
-            <h2>Admin Control Room</h2>
-            <p>Badrudheen Madrasa • Headmaster Access Only</p>
+            <h2>Sadar Muallim (صدر معلم)</h2>
+            <p>Badrudheen Madrasa • Headmaster Command Room</p>
             
             <div id="admin-error" class="login-error"></div>
 
             <form id="admin-login-form" onsubmit="handleAdminLogin(event)">
-                <input type="text" id="admin-user-input" class="login-input" placeholder="Admin Username (e.g. admin)" required autofocus>
-                <input type="password" id="admin-pass-input" class="login-input" placeholder="Admin Password" required>
-                <button type="submit" id="btn-admin-submit" class="btn-admin-login">Unlock Control Room</button>
+                <input type="text" id="admin-user-input" class="login-input" placeholder="Sadar Muallim ID (e.g. admin)" required autofocus>
+                <input type="password" id="admin-pass-input" class="login-input" placeholder="Pass Key / Password" required>
+                <button type="submit" id="btn-admin-submit" class="btn-admin-login">Unlock Command Room</button>
             </form>
 
             <p style="margin-top: 18px; font-size: 0.78rem; color: #8fa79b;">
-                Teachers must sign in via the <a href="/teacher" style="color: #0d5c31; font-weight: 700; text-decoration: none;">Teacher Portal</a>.
+                Usthads must sign in via the <a href="/teacher" style="color: #0d5c31; font-weight: 700; text-decoration: none;">Usthad Portal</a>.
             </p>
         </div>
     </div>
@@ -615,18 +615,18 @@
                 <div class="header-titles">
                     <h1>
                         <span>Badrudheen Madrasa</span>
-                        <span class="badge-cr">Admin Control Room</span>
+                        <span class="badge-cr">Sadar Muallim Control Room</span>
                     </h1>
-                    <p>Central Examination Verification, Teacher Management & Class Authorization</p>
+                    <p>Central Examination Verification, Usthad Assignments & Pass Key Control</p>
                 </div>
             </div>
 
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="admin-user-pill">
-                    <div class="admin-avatar" id="avatar-initial">A</div>
-                    <span id="admin-display-name" style="font-weight: 700; font-size: 0.88rem;">Head Master</span>
+                    <div class="admin-avatar" id="avatar-initial">S</div>
+                    <span id="admin-display-name" style="font-weight: 700; font-size: 0.88rem;">Sadar Muallim</span>
                 </div>
-                <a href="/" target="_blank" class="btn-header-action" title="View Student Portal">Public Result ↗</a>
+                <a href="/" target="_blank" class="btn-header-action" title="View Public Student Portal">Public Result ↗</a>
                 <button onclick="handleAdminLogout()" class="btn-header-action" style="background: rgba(225, 29, 72, 0.25); border-color: rgba(225, 29, 72, 0.4);">Sign Out</button>
             </div>
         </div>
@@ -638,35 +638,35 @@
         <!-- Metrics Row -->
         <div class="metrics-grid">
             <div class="metric-box">
-                <span class="metric-title">Pending Verifications</span>
+                <span class="metric-title">Pending Result Verification</span>
                 <span class="metric-val" id="metric-pending" style="color: #d97706;">0</span>
-                <span class="metric-hint">Awaiting Admin Approval</span>
+                <span class="metric-hint">Awaiting Sadar Muallim Approval</span>
             </div>
             <div class="metric-box">
                 <span class="metric-title">Live Published Marksheets</span>
                 <span class="metric-val" id="metric-live" style="color: #059669;">0</span>
-                <span class="metric-hint">Visible to Public</span>
+                <span class="metric-hint">Visible to Public Students</span>
             </div>
             <div class="metric-box">
-                <span class="metric-title">Active Teachers</span>
+                <span class="metric-title">Pending Email Requests</span>
+                <span class="metric-val" id="metric-pending-emails" style="color: #2563eb;">0</span>
+                <span class="metric-hint">Usthads Needing Password Reset</span>
+            </div>
+            <div class="metric-box">
+                <span class="metric-title">Authorized Usthads</span>
                 <span class="metric-val" id="metric-teachers">0</span>
-                <span class="metric-hint">Authorized Staff Members</span>
-            </div>
-            <div class="metric-box">
-                <span class="metric-title">Managed Classes</span>
-                <span class="metric-val" id="metric-classes">12</span>
-                <span class="metric-hint">Classes 1 to 12</span>
+                <span class="metric-hint">Staff Members with Pass Keys</span>
             </div>
         </div>
 
         <!-- Navigation Tabs -->
         <div class="control-tabs">
             <button class="control-tab active" data-target="section-verification" onclick="switchTab('section-verification', this)">
-                <span>✓ Marksheet Verification & Approval</span>
+                <span>✓ Result Verification Queue</span>
                 <span class="tab-count" id="count-pending-badge">0</span>
             </button>
             <button class="control-tab" data-target="section-teachers" onclick="switchTab('section-teachers', this)">
-                <span>👥 Teachers & Class Permissions</span>
+                <span>👥 Usthad Management & Pass Keys</span>
                 <span class="tab-count" id="count-teachers-badge">0</span>
             </button>
             <button class="control-tab" data-target="section-classes" onclick="switchTab('section-classes', this)">
@@ -679,9 +679,9 @@
         <section id="section-verification" class="control-section active">
             <div class="section-bar">
                 <div>
-                    <h2>Submitted Marksheets Review</h2>
+                    <h2>Submitted Marksheets Queue</h2>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
-                        Teacher submissions remain private until approved here. Once verified, results go live on the public portal.
+                        When an Usthad submits results, they appear here. Verify and approve to publish them live to the public portal.
                     </p>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
@@ -716,7 +716,7 @@
                             <th>Grand Total</th>
                             <th>Exam Status</th>
                             <th>Public Visibility</th>
-                            <th style="text-align: right;">Admin Control</th>
+                            <th style="text-align: right;">Sadar Muallim Action</th>
                         </tr>
                     </thead>
                     <tbody id="results-table-body">
@@ -730,13 +730,13 @@
         <section id="section-teachers" class="control-section">
             <div class="section-bar">
                 <div>
-                    <h2>Authorized Teachers & Class Assignments</h2>
+                    <h2>Authorized Usthads, Assigned Classes & Pass Keys</h2>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
-                        Create individual IDs and passwords for teachers. Each teacher can only manage their permitted classes.
+                        Create individual Usthad accounts, assign their allowed classes, set pass keys, and verify their password recovery emails.
                     </p>
                 </div>
                 <button class="btn-action-primary" onclick="openAddTeacherModal()">
-                    + Add New Teacher
+                    + Add New Usthad
                 </button>
             </div>
 
@@ -744,15 +744,15 @@
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Teacher Name</th>
-                            <th>Assigned Username</th>
+                            <th>Usthad Name & Contact</th>
+                            <th>Login Username</th>
                             <th>Assigned Classes</th>
-                            <th>System Role</th>
+                            <th>Recovery Email Status</th>
                             <th style="text-align: right;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="teachers-table-body">
-                        <tr><td colspan="5" style="text-align: center; padding: 28px; color: #6b7280;">Loading teachers list...</td></tr>
+                        <tr><td colspan="5" style="text-align: center; padding: 28px; color: #6b7280;">Loading usthad records...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -793,49 +793,50 @@
 
     </main>
 
-    <!-- Modal: Add New Teacher with Dedicated ID & Password -->
+    <!-- Modal: Add New Usthad with Assigned Classes & Pass Key -->
     <div id="add-teacher-modal" class="modal-bg" style="display: none;">
         <div class="modal-card">
             <div class="modal-header-row">
-                <h3>Add New Teacher Account</h3>
+                <h3>Add New Usthad & Set Pass Key</h3>
                 <button class="btn-close-modal" onclick="closeTeacherModal()">&times;</button>
             </div>
             
             <form id="new-teacher-form" onsubmit="handleCreateTeacher(event)">
                 <div class="form-row">
-                    <label for="new-t-name">Teacher Full Name *</label>
+                    <label for="new-t-name">Usthad Full Name *</label>
                     <input type="text" id="new-t-name" class="form-control-modal" placeholder="e.g. Usthad Abdurahman" required>
                 </div>
 
                 <div class="form-row">
                     <label for="new-t-user">Login Username (Unique ID) *</label>
-                    <input type="text" id="new-t-user" class="form-control-modal" placeholder="e.g. teacher_class5" required autocomplete="off">
+                    <input type="text" id="new-t-user" class="form-control-modal" placeholder="e.g. usthad_class5" required autocomplete="off">
                 </div>
 
                 <div class="form-row">
-                    <label for="new-t-email">Teacher Email (For Password Reset Link)</label>
-                    <input type="email" id="new-t-email" class="form-control-modal" placeholder="e.g. teacher@gmail.com">
+                    <label for="new-t-email">Verified Email (For Direct Password Recovery)</label>
+                    <input type="email" id="new-t-email" class="form-control-modal" placeholder="e.g. usthad@gmail.com">
+                    <small style="color: var(--text-muted); font-size: 0.78rem;">If provided by Sadar Muallim here, it is automatically approved.</small>
                 </div>
 
                 <div class="form-row">
-                    <label for="new-t-phone">Teacher Phone Number (For SMS OTP Verification)</label>
+                    <label for="new-t-phone">Mobile Number (For SMS Verification)</label>
                     <input type="tel" id="new-t-phone" class="form-control-modal" placeholder="e.g. 9876543210">
                 </div>
 
                 <div class="form-row">
-                    <label for="new-t-pass">Login Password *</label>
-                    <input type="password" id="new-t-pass" class="form-control-modal" placeholder="Set a secure password" required>
+                    <label for="new-t-pass">Usthad Pass Key / Password *</label>
+                    <input type="password" id="new-t-pass" class="form-control-modal" placeholder="Set initial pass key" required>
                 </div>
 
                 <div class="form-row">
                     <label for="new-t-classes">Permitted Classes (Comma separated) *</label>
                     <input type="text" id="new-t-classes" class="form-control-modal" placeholder="e.g. 1, 2, 5" required>
-                    <small style="color: var(--text-muted); font-size: 0.78rem;">Teacher will only be permitted to view and manage these class numbers.</small>
+                    <small style="color: var(--text-muted); font-size: 0.78rem;">Usthad will only be permitted to view and manage these class numbers.</small>
                 </div>
 
                 <div class="modal-footer-btns">
                     <button type="button" class="btn-action-outline" onclick="closeTeacherModal()">Cancel</button>
-                    <button type="submit" id="btn-save-teacher" class="btn-action-primary">Create Teacher Account</button>
+                    <button type="submit" id="btn-save-teacher" class="btn-action-primary">Save Usthad Account</button>
                 </div>
             </form>
         </div>
@@ -1020,20 +1021,41 @@
                 document.getElementById('metric-teachers').textContent = teachers.length;
                 document.getElementById('count-teachers-badge').textContent = teachers.length;
 
+                let pendingEmailCount = 0;
+
                 if (teachers.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 28px; color: #6b7280;">No teachers registered yet. Click "+ Add New Teacher" above.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 28px; color: #6b7280;">No Usthads registered yet. Click "+ Add New Usthad" above.</td></tr>';
+                    document.getElementById('metric-pending-emails').textContent = '0';
                     return;
                 }
 
                 let html = '';
                 teachers.forEach(t => {
-                    const parsed = window.supabaseService.parseTeacherProfile ? window.supabaseService.parseTeacherProfile(t) : { displayName: t.full_name || t.username, email: '', phone: '' };
+                    const parsed = window.supabaseService.parseTeacherProfile ? window.supabaseService.parseTeacherProfile(t) : { displayName: t.full_name || t.username, email: '', phone: '', emailStatus: 'none' };
                     const contactDetails = [];
                     if (parsed.email) contactDetails.push(`✉ ${parsed.email}`);
                     if (parsed.phone) contactDetails.push(`📞 ${parsed.phone}`);
                     const contactStr = contactDetails.length > 0 ? `<div style="font-size:0.75rem; color:#6b7280; margin-top:2px;">${contactDetails.join(' • ')}</div>` : '';
 
                     const classesStr = (t.assigned_classes || []).sort((a,b)=>a-b).map(c => `Class ${c}`).join(', ') || 'No Classes Assigned';
+
+                    let emailBadge = '';
+                    if (parsed.email) {
+                        if (parsed.emailStatus === 'pending') {
+                            pendingEmailCount++;
+                            emailBadge = `
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="status-pill pending" style="background: #fef3c7; color: #b45309;">⏳ Awaiting Approval</span>
+                                    <button class="btn-action-primary" style="padding: 3px 8px; font-size: 0.74rem;" onclick="approveUsthadEmail('${t.id}')">Approve</button>
+                                </div>
+                            `;
+                        } else {
+                            emailBadge = `<span class="status-pill live">✓ Email Verified</span>`;
+                        }
+                    } else {
+                        emailBadge = `<span style="font-size: 0.78rem; color: #9ca3af;">No Email Linked</span>`;
+                    }
+
                     html += `
                         <tr>
                             <td>
@@ -1042,10 +1064,10 @@
                             </td>
                             <td style="font-family: monospace; color: #0d5c31; font-weight: 700;">${escapeHtml(t.username)}</td>
                             <td><span class="class-badge" style="background:#eaf5ee;">${classesStr}</span></td>
-                            <td><span class="status-pill live">Active Teacher</span></td>
+                            <td>${emailBadge}</td>
                             <td style="text-align: right;">
                                 <button class="btn-action-outline" style="color: #dc2626; border-color: #fecdd3; font-size: 0.78rem;" onclick="deleteTeacherAccount('${t.id}', '${escapeHtml(t.username)}')">
-                                    Delete Account
+                                    Delete
                                 </button>
                             </td>
                         </tr>
@@ -1053,8 +1075,19 @@
                 });
 
                 tableBody.innerHTML = html;
+                document.getElementById('metric-pending-emails').textContent = pendingEmailCount;
             } catch (err) {
-                tableBody.innerHTML = `<tr><td colspan="5" style="color: #dc2626; padding: 18px; text-align: center;">Error loading teachers: ${err.message}</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" style="color: #dc2626; padding: 18px; text-align: center;">Error loading Usthads: ${err.message}</td></tr>`;
+            }
+        }
+
+        async function approveUsthadEmail(profileId) {
+            try {
+                await window.supabaseService.approveTeacherEmail(profileId);
+                alert('Usthad email approved! The Usthad can now reset their password using forgot password.');
+                loadTeachersList();
+            } catch (err) {
+                alert('Error: ' + err.message);
             }
         }
 

@@ -1327,7 +1327,7 @@ class MarksheetView {
                     if (isAdmin) {
                         alert(`Success! ${res.count} student marksheets verified and published directly to the Public Result Portal.`);
                     } else {
-                        alert(`Mark list submitted successfully (${res.count} students).\nIt has been sent to the Headmaster / Admin for verification before public publishing.`);
+                        alert(`Mark list submitted successfully (${res.count} students)!\nYour submission is now placed in the Sadar Muallim (صدر معلم) Verification Queue. Once Sadar Muallim approves it, the results will go live on the public portal.`);
                     }
                 } catch (err) {
                     alert('Sync Error: ' + err.message);

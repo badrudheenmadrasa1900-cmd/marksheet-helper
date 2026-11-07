@@ -70,9 +70,48 @@ class SupabaseService {
     }
 
     /**
+     * Parse teacher metadata (name, email, phone, email approval status)
+     * Tags format: [email:ali@gmail.com,phone:9876543210,email_status:approved]
+     */
+    parseTeacherProfile(rawProfile) {
+        const rawFullName = rawProfile.full_name || rawProfile.username || '';
+        let baseName = rawFullName;
+        let email = '';
+        let phone = '';
+        let emailStatus = 'pending'; // 'pending' | 'approved'
+
+        const match = rawFullName.match(/^(.*?)\s*\[(.*?)\]$/);
+        if (match) {
+            baseName = match[1].trim();
+            const tags = match[2].split(',');
+            tags.forEach(tag => {
+                const [k, v] = tag.split(':');
+                if (k === 'email') email = (v || '').trim();
+                if (k === 'phone') phone = (v || '').trim();
+                if (k === 'email_status') emailStatus = (v || '').trim();
+            });
+        }
+
+        // If email was assigned with no explicit email_status, but has phone/email from admin, check status
+        if (!emailStatus) emailStatus = email ? 'approved' : 'none';
+
+        return {
+            id: rawProfile.id,
+            username: rawProfile.username,
+            displayName: baseName,
+            fullName: rawFullName,
+            email: email,
+            phone: phone,
+            emailStatus: emailStatus, // 'pending' | 'approved' | 'none'
+            role: rawProfile.role || 'teacher',
+            assignedClasses: rawProfile.assigned_classes || []
+        };
+    }
+
+    /**
      * Create or update a teacher profile (Admin only)
-     * Stores email & phone safely inside full_name metadata tag to avoid schema cache conflicts:
-     * e.g., "Usthad Ali [email:ali@gmail.com,phone:9876543210]"
+     * Stores email, phone, and approval status safely inside full_name metadata tag:
+     * e.g., "Usthad Ali [email:ali@gmail.com,phone:9876543210,email_status:approved]"
      */
     async saveTeacher(teacherData) {
         const cleanUser = teacherData.username.trim().toLowerCase();
@@ -85,6 +124,11 @@ class SupabaseService {
         if (teacherData.phone && teacherData.phone.trim()) {
             metaParts.push(`phone:${teacherData.phone.trim()}`);
         }
+        const emailStatus = teacherData.emailStatus || (teacherData.email ? 'approved' : 'none');
+        if (emailStatus) {
+            metaParts.push(`email_status:${emailStatus}`);
+        }
+
         if (metaParts.length > 0) {
             // Strip any previous meta tag
             const baseName = formattedName.replace(/\s*\[.*\]\s*$/, '').trim();
@@ -121,39 +165,86 @@ class SupabaseService {
     }
 
     /**
-     * Parse teacher metadata (name, email, phone)
+     * Usthad self-registers or adds email for password recovery
+     * Sets emailStatus to 'pending' awaiting Sadar Muallim approval
      */
-    parseTeacherProfile(rawProfile) {
-        const rawFullName = rawProfile.full_name || rawProfile.username || '';
-        let baseName = rawFullName;
-        let email = '';
-        let phone = '';
+    async requestEmailLinkForTeacher(username, email, phone = '') {
+        const cleanUser = username.trim().toLowerCase();
+        const cleanEmail = email.trim().toLowerCase();
+        const cleanPhone = phone.trim();
 
-        const match = rawFullName.match(/^(.*?)\s*\[(.*?)\]$/);
-        if (match) {
-            baseName = match[1].trim();
-            const tags = match[2].split(',');
-            tags.forEach(tag => {
-                const [k, v] = tag.split(':');
-                if (k === 'email') email = v.trim();
-                if (k === 'phone') phone = v.trim();
-            });
+        const url = `${this.url}profiles?username=eq.${encodeURIComponent(cleanUser)}&select=*`;
+        const res = await fetch(url, { headers: this.headers });
+        if (!res.ok) throw new Error('Database connection failed.');
+
+        const data = await res.json();
+        if (!data || data.length === 0) {
+            throw new Error(`Usthad username "${username}" not found.`);
+        }
+
+        const profile = data[0];
+        const parsed = this.parseTeacherProfile(profile);
+
+        // Build new metadata tag with pending status
+        const metaParts = [`email:${cleanEmail}`];
+        if (cleanPhone || parsed.phone) metaParts.push(`phone:${cleanPhone || parsed.phone}`);
+        metaParts.push(`email_status:pending`);
+
+        const newFullName = `${parsed.displayName} [${metaParts.join(',')}]`;
+
+        const patchUrl = `${this.url}profiles?id=eq.${profile.id}`;
+        const patchRes = await fetch(patchUrl, {
+            method: 'PATCH',
+            headers: this.headers,
+            body: JSON.stringify({ full_name: newFullName })
+        });
+
+        if (!patchRes.ok) {
+            const err = await patchRes.text();
+            throw new Error('Failed to submit email request: ' + err);
         }
 
         return {
-            id: rawProfile.id,
-            username: rawProfile.username,
-            displayName: baseName,
-            fullName: rawFullName,
-            email: email,
-            phone: phone,
-            role: rawProfile.role || 'teacher',
-            assignedClasses: rawProfile.assigned_classes || []
+            success: true,
+            status: 'pending',
+            displayName: parsed.displayName,
+            email: cleanEmail
         };
     }
 
     /**
+     * Sadar Muallim approves an Usthad's email linking request
+     */
+    async approveTeacherEmail(profileId) {
+        const url = `${this.url}profiles?id=eq.${profileId}&select=*`;
+        const res = await fetch(url, { headers: this.headers });
+        if (!res.ok) throw new Error('Database connection error.');
+        const data = await res.json();
+        if (!data || data.length === 0) throw new Error('Profile not found.');
+
+        const profile = data[0];
+        const parsed = this.parseTeacherProfile(profile);
+
+        const metaParts = [];
+        if (parsed.email) metaParts.push(`email:${parsed.email}`);
+        if (parsed.phone) metaParts.push(`phone:${parsed.phone}`);
+        metaParts.push(`email_status:approved`);
+
+        const updatedFullName = `${parsed.displayName} [${metaParts.join(',')}]`;
+
+        const patchUrl = `${this.url}profiles?id=eq.${profileId}`;
+        const patchRes = await fetch(patchUrl, {
+            method: 'PATCH',
+            headers: this.headers,
+            body: JSON.stringify({ full_name: updatedFullName })
+        });
+        if (!patchRes.ok) throw new Error('Could not approve email.');
+        return true;
+    }
+
+    /**
      * Find teacher by username, email, or phone for password recovery
+     * Checks if email is approved or phone OTP is verified
      */
     async findTeacherForReset(identifier) {
         const query = identifier.trim().toLowerCase();
@@ -165,15 +256,35 @@ class SupabaseService {
         const profiles = await res.json();
         for (const p of profiles) {
             const parsed = this.parseTeacherProfile(p);
-            if (
-                p.username.toLowerCase() === query ||
-                (parsed.email && parsed.email.toLowerCase() === query) ||
-                (parsed.phone && parsed.phone.replace(/[^0-9]/g, '') === query.replace(/[^0-9]/g, ''))
-            ) {
-                return { profile: p, parsed: parsed };
+            const matchesUser = p.username.toLowerCase() === query;
+            const matchesEmail = parsed.email && parsed.email.toLowerCase() === query;
+            const matchesPhone = parsed.phone && parsed.phone.replace(/[^0-9]/g, '') === query.replace(/[^0-9]/g, '');
+
+            if (matchesUser || matchesEmail || matchesPhone) {
+                // If user matched by email or requested via email:
+                if (parsed.email) {
+                    if (parsed.emailStatus === 'pending') {
+                        return {
+                            profile: p,
+                            parsed: parsed,
+                            isPendingApproval: true,
+                            message: `Your email (${parsed.email}) is awaiting approval from Sadar Muallim. Once Sadar Muallim approves it, you can reset your password.`
+                        };
+                    }
+                } else if (!parsed.phone) {
+                    // No email and no phone registered
+                    return {
+                        profile: p,
+                        parsed: parsed,
+                        needsEmailRegistration: true,
+                        message: `No recovery email is linked to account "${p.username}". Please submit your email first. Once Sadar Muallim approves, you can reset your password.`
+                    };
+                }
+
+                return { profile: p, parsed: parsed, isPendingApproval: false };
             }
         }
-        throw new Error('No registered teacher account matches this username, email, or phone number.');
+        throw new Error('No registered Usthad account matches this username, email, or phone number.');
     }
 
     /**
