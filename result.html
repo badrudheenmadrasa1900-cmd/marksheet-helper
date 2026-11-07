@@ -252,200 +252,169 @@
             box-shadow: 0 4px 12px rgba(13, 92, 49, 0.25);
         }
 
-        /* Result Display Card (Exciting, Aesthetic & Celebratory) */
+        /* Result Display Card (Compact, 1-Page aligned like Official Board) */
         .result-sheet {
-            margin-top: 28px;
+            margin-top: 20px;
             background: #ffffff;
-            border-radius: 28px;
-            box-shadow: var(--shadow-card);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(13, 92, 49, 0.12);
             border: 1px solid #dcf0e4;
             overflow: hidden;
-            animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(18px); }
+            from { opacity: 0; transform: translateY(14px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Student Hero Section */
+        /* Student Header Box */
         .student-profile {
-            background: linear-gradient(180deg, #e9f5ed 0%, #ffffff 100%);
-            padding: 24px 20px 20px;
+            background: #d1fae5;
+            padding: 16px 18px 14px;
             text-align: center;
-            position: relative;
-            border-bottom: 1px solid #eef6f1;
-        }
-
-        .avatar-circle {
-            width: 72px;
-            height: 72px;
-            margin: 0 auto 12px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #0d5c31 0%, #208e4f 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
-            font-size: 1.8rem;
-            font-weight: 800;
-            box-shadow: 0 8px 18px rgba(13, 92, 49, 0.22);
-            border: 3px solid #ffffff;
+            border-bottom: 2px solid #86efac;
         }
 
         .student-title {
-            font-size: 1.35rem;
+            font-size: 1.25rem;
             font-weight: 800;
-            color: var(--text-title);
-            letter-spacing: -0.2px;
+            color: #064e3b;
+            letter-spacing: 0.3px;
+            margin: 0;
+            text-transform: uppercase;
         }
 
         .arabic-name-lg {
             font-family: 'Amiri', serif;
-            font-size: 1.4rem;
-            color: #106637;
+            font-size: 1.35rem;
+            color: #047857;
             font-weight: 700;
-            margin: 2px 0 6px;
+            margin: 1px 0;
+            line-height: 1.2;
         }
 
         .parent-tag {
-            font-size: 0.88rem;
-            font-weight: 600;
-            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #065f46;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .madrasa-sub-badge {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #047857;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px dashed #a7f3d0;
         }
 
         .chips-row {
             display: flex;
             justify-content: center;
             gap: 8px;
-            margin-top: 14px;
+            margin-top: 10px;
         }
 
         .chip {
-            padding: 6px 16px;
-            border-radius: 30px;
-            font-size: 0.82rem;
-            font-weight: 700;
-            background: #ffffff;
-            color: var(--brand-green);
-            border: 1.5px solid #c9e4d4;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-        }
-
-        /* Subjects Marks List (Clean Cards instead of cramped table) */
-        .subjects-list {
-            padding: 16px 20px;
-        }
-
-        .subject-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 16px;
-            background: #fbfdfc;
-            border-radius: 18px;
-            margin-bottom: 10px;
-            border: 1px solid #edf4f0;
-            transition: transform 0.15s ease;
-        }
-
-        .subject-item:hover {
-            transform: translateX(3px);
-            background: #f6fbf8;
-        }
-
-        .subject-left {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .sub-name {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-title);
-        }
-
-        .sub-ar {
-            font-family: 'Amiri', serif;
-            font-size: 1.05rem;
-            color: #158043;
-            font-weight: 700;
-        }
-
-        .sub-badge {
-            font-size: 1.15rem;
-            font-weight: 800;
-            padding: 6px 16px;
-            border-radius: 14px;
-            min-width: 60px;
-            text-align: center;
-            font-family: 'Plus Jakarta Sans', monospace;
-        }
-
-        .score-good {
-            background: #ecfdf5;
-            color: #047857;
-            border: 1px solid #a7f3d0;
-        }
-
-        .score-low {
-            background: #fff1f2;
-            color: #e11d48;
-            border: 1px solid #fecdd3;
-        }
-
-        /* Grand Total Summary Box */
-        .total-box {
-            margin: 12px 20px 20px;
-            padding: 18px 20px;
-            border-radius: 22px;
-            background: linear-gradient(135deg, #0d5c31 0%, #084022 100%);
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 8px 20px rgba(13, 92, 49, 0.25);
-        }
-
-        .total-left {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .total-label {
+            padding: 5px 14px;
+            border-radius: 20px;
             font-size: 0.8rem;
+            font-weight: 800;
+            background: #10b981;
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Compact Table Design (Official Samastha Alignment) */
+        .board-result-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+        }
+
+        .board-result-table th {
+            background: #f8fafc;
+            color: #475569;
+            font-size: 0.75rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: #a7f3d0;
+            letter-spacing: 0.5px;
+            padding: 8px 14px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .board-result-table td {
+            padding: 9px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .board-result-table tr:nth-child(even) td {
+            background: #fcfdfd;
+        }
+
+        .board-result-table tr:hover td {
+            background: #f0fdf4;
+        }
+
+        .td-sub-english {
             font-weight: 700;
+            color: #1e293b;
+            font-size: 0.88rem;
+            text-align: left;
+            width: 45%;
         }
 
-        .total-ar {
-            font-family: 'Amiri', serif;
-            font-size: 1.1rem;
-            color: #fde68a;
-        }
-
-        .total-value {
-            font-size: 2rem;
+        .td-sub-score {
             font-weight: 800;
-            letter-spacing: -0.5px;
-            color: #ffffff;
-        }
-
-        /* Big Vibrant Status Banner */
-        .final-status-pill {
+            font-size: 1.05rem;
+            color: #0f172a;
             text-align: center;
-            padding: 16px;
-            font-size: 1.2rem;
+            width: 25%;
+            font-family: monospace;
+        }
+
+        .td-sub-arabic {
+            font-family: 'Amiri', serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #047857;
+            text-align: right;
+            width: 30%;
+        }
+
+        /* Grand Total Banner Row */
+        .grand-total-row td {
+            background: #0d5c31 !important;
+            color: #ffffff !important;
+            padding: 12px 14px;
             font-weight: 800;
-            letter-spacing: 0.8px;
+        }
+
+        .grand-total-val {
+            font-size: 1.35rem;
+            color: #fde68a !important;
+            font-family: monospace;
+            text-align: center;
+        }
+
+        /* Status Verdict Footer */
+        .board-status-banner {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .board-status-banner.fail {
+            background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
         }
 
         .status-celebrate {
@@ -707,17 +676,11 @@
             marksList.forEach(m => {
                 if (m.isAttendance || (m.subject && m.subject.toUpperCase().includes('ATTENDANCE'))) {
                     attendanceBadge = `
-                        <div class="subject-item" style="background: #f0fdf4; border: 1.5px solid #86efac;">
-                            <div class="subject-left">
-                                <span class="sub-name" style="color: #158043; font-weight: 800;">HAJAR / ATTENDANCE (ഹാജർ)</span>
-                                <span class="sub-ar" style="color: #16a34a;">حضور</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                <div class="sub-badge" style="background: #dcfce7; color: #166534; font-weight: 800; border: 1px solid #86efac; min-width: 50px;">
-                                    ${escapeHtml(String(m.mark))}
-                                </div>
-                            </div>
-                        </div>
+                        <tr style="background: #f0fdf4;">
+                            <td class="td-sub-english" style="color: #158043;">ATTENDANCE (HAJAR)</td>
+                            <td class="td-sub-score" style="color: #166534;">${escapeHtml(String(m.mark))}</td>
+                            <td class="td-sub-arabic" style="color: #166534;">حضور</td>
+                        </tr>
                     `;
                     return;
                 }
@@ -725,23 +688,14 @@
                 const title = m.subject || m.title || 'Subject';
                 const ar = m.arabic || '';
                 const score = (m.mark !== undefined && m.mark !== null && m.mark !== '') ? m.mark : '-';
-                const max = Number(m.max) || 50;
-                const minPass = m.passMark !== undefined ? Number(m.passMark) : Math.ceil(max * 0.36);
-                const isItemPass = Number(score) >= minPass;
+                const isFail = Number(score) < 18;
 
                 itemsHtml += `
-                    <div class="subject-item">
-                        <div class="subject-left">
-                            <span class="sub-name">${escapeHtml(title)}</span>
-                            ${ar ? `<span class="sub-ar">${escapeHtml(ar)}</span>` : ''}
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <div class="sub-badge ${isItemPass ? 'score-good' : 'score-low'}">
-                                ${escapeHtml(String(score))}
-                            </div>
-                            <span style="font-size: 0.8rem; font-weight: 700; color: #648272;">/${max}</span>
-                        </div>
-                    </div>
+                    <tr>
+                        <td class="td-sub-english">${escapeHtml(title)}</td>
+                        <td class="td-sub-score" style="${isFail ? 'color: #dc2626; font-weight: 800;' : ''}">${escapeHtml(String(score))}</td>
+                        <td class="td-sub-arabic">${escapeHtml(ar)}</td>
+                    </tr>
                 `;
             });
 
@@ -751,59 +705,57 @@
 
             const html = `
                 <div class="result-sheet">
+                    <!-- Clean Board Header -->
                     <div class="student-profile">
-                        <div class="avatar-circle">${initial}</div>
                         <h3 class="student-title">${escapeHtml(student.name || 'STUDENT')}</h3>
                         ${student.name_arabic ? `<div class="arabic-name-lg">${escapeHtml(student.name_arabic)}</div>` : ''}
                         
                         ${student.parent_name ? `
                             <div class="parent-tag">
-                                D/o / S/o ${escapeHtml(student.parent_name)}
+                                D/O / S/O ${escapeHtml(student.parent_name)}
                                 ${student.parent_name_arabic ? ` • ${escapeHtml(student.parent_name_arabic)}` : ''}
                             </div>
                         ` : ''}
 
+                        <div class="madrasa-sub-badge">
+                            ${escapeHtml(student.madrasa_code || '1900')} - ${escapeHtml(student.madrasa_name || 'BADRUDHEEN MADRASA')}
+                        </div>
+
                         <div class="chips-row">
                             <span class="chip">Class : ${escapeHtml(String(student.class_number))}</span>
                             <span class="chip">Reg. No : ${escapeHtml(String(student.register_no))}</span>
-                            ${rankValue ? `<span class="chip" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; font-weight: 800; border: 1.5px solid #f59e0b;">🏆 Rank : ${escapeHtml(rankValue)}</span>` : ''}
+                            ${rankValue ? `<span class="chip" style="background: #f59e0b;">🏆 Rank : ${escapeHtml(rankValue)}</span>` : ''}
                         </div>
                     </div>
 
-                    <div class="subjects-list">
-                        ${itemsHtml}
-                    </div>
+                    <!-- Clean 1-Page Aligned Result Table -->
+                    <table class="board-result-table">
+                        <tbody>
+                            ${itemsHtml}
+                            <tr class="grand-total-row">
+                                <td class="td-sub-english" style="color: #ffffff;">Grand Total</td>
+                                <td class="grand-total-val">${escapeHtml(String(student.grand_total || 0))}</td>
+                                <td class="td-sub-arabic" style="color: #fde68a;">المجموع الكلي</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                    <div class="total-box">
-                        <div class="total-left">
-                            <span class="total-label">Grand Total</span>
-                            <span class="total-ar">المجموع الكلي</span>
-                        </div>
-                        <div class="total-value">${escapeHtml(String(student.grand_total || 0))}</div>
-                    </div>
-
-                    <div class="final-status-pill ${isPassed ? 'status-celebrate' : 'status-alert'}">
-                        <span>${isPassed ? '🎉 ' : '⚠️ '}${escapeHtml(student.status || 'PASS')}</span>
+                    <!-- Status Banner -->
+                    <div class="board-status-banner ${isPassed ? '' : 'fail'}">
+                        <span>${isPassed ? '✓ ' : '⚠️ '}${escapeHtml(student.status && !student.status.includes('RANK:') ? student.status : (isPassed ? 'Passed' : 'Needs Improvement'))}</span>
                     </div>
 
                     <!-- Share & Print Actions -->
-                    <div class="share-actions-wrap" style="display: flex; gap: 10px; margin-top: 18px; flex-direction: column;">
-                        <button type="button" class="btn-whatsapp-share" onclick="shareToWhatsApp('${escapeHtml(student.name)}', '${student.class_number}', '${student.register_no}', '${student.grand_total || 0}', '${escapeHtml(student.status || 'PASS')}')" style="background: #25D366; color: white; border: none; border-radius: 12px; padding: 12px 18px; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <div class="share-actions-wrap" style="display: flex; gap: 8px; padding: 14px 16px; background: #f8fafc; border-top: 1px solid #e2e8f0; flex-direction: column;">
+                        <button type="button" class="btn-whatsapp-share" onclick="shareToWhatsApp('${escapeHtml(student.name)}', '${student.class_number}', '${student.register_no}', '${student.grand_total || 0}', '${escapeHtml(student.status || 'PASS')}')" style="background: #25D366; color: white; border: none; border-radius: 10px; padding: 10px 16px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.311.045-.698.077-2.285-.58-1.579-.652-2.593-2.247-2.673-2.353-.078-.106-.639-.851-.639-1.624 0-.773.405-1.154.55-1.309.144-.155.316-.194.421-.194.106 0 .211.002.304.006.097.005.228-.037.356.27.133.317.452 1.106.492 1.187.04.081.066.176.013.282-.053.106-.079.172-.158.264-.079.092-.167.206-.238.277-.08.08-.163.167-.07.327.093.159.412.68.883 1.1 1.05.934 1.944 1.222 2.219 1.336.276.115.438.097.6-.09.162-.187.693-.807.878-1.084.184-.277.369-.232.617-.14.248.092 1.571.74 1.839.873.268.134.446.2.512.311.066.111.066.646-.078 1.051z"/>
                                 <path d="M12.004 2c-5.523 0-10 4.477-10 10 0 1.77.464 3.435 1.275 4.881l-1.279 4.673 4.795-1.258c1.401.767 3.003 1.204 4.709 1.204 5.523 0 10-4.477 10-10s-4.477-10-10-10zm0 18.238c-1.536 0-3.003-.432-4.269-1.184l-.306-.182-2.845.746.759-2.772-.199-.317c-.829-1.32-1.267-2.859-1.267-4.453 0-4.542 3.696-8.238 8.238-8.238 4.541 0 8.238 3.696 8.238 8.238 0 4.542-3.697 8.238-8.238 8.238z"/>
                             </svg>
                             <span>Share Result on WhatsApp</span>
                         </button>
-                        <button type="button" class="btn-native-share" onclick="shareResultUniversal('${escapeHtml(student.name)}', '${student.class_number}', '${student.register_no}', '${student.grand_total || 0}', '${escapeHtml(student.status || 'PASS')}')" style="background: #ffffff; color: #0d5c31; border: 1.5px solid #0d5c31; border-radius: 12px; padding: 11px 18px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="18" cy="5" r="3"></circle>
-                                <circle cx="6" cy="12" r="3"></circle>
-                                <circle cx="18" cy="19" r="3"></circle>
-                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                            </svg>
-                            <span>Share to Other Apps / Copy</span>
+                        <button type="button" class="btn-native-share" onclick="window.print()" style="background: #ffffff; color: #0d5c31; border: 1.5px solid #0d5c31; border-radius: 10px; padding: 10px 16px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                            🖨️ Print Result Sheet
                         </button>
                     </div>
                 </div>
