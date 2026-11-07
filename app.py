@@ -20,10 +20,18 @@ def index():
     return render_template('result.html')
 
 @app.route('/admin')
+def admin_portal():
+    """Renders the Sadar Muallim (Headmaster) Central Control Room."""
+    try:
+        return render_template('admin.html')
+    except Exception:
+        with open(os.path.join(os.path.dirname(__file__), 'admin.html'), 'r', encoding='utf-8') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+
 @app.route('/teacher')
 @app.route('/staff')
-def admin_portal():
-    """Renders the admin and teacher marksheet management portal."""
+def teacher_portal():
+    """Renders the Usthad Marksheet & Class Management Portal."""
     return render_template('index.html')
 
 @app.errorhandler(404)
