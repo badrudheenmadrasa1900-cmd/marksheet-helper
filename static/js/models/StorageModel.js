@@ -303,6 +303,7 @@ class StorageModel {
             cls.marks[studentId][topicId] = value;
         }
 
+        cls.isDirty = true;
         cls.updatedAt = new Date().toISOString();
         this._saveUserData(session.userId, userData);
         return true;
@@ -324,6 +325,7 @@ class StorageModel {
             cls.attendance[studentId] = attendanceValue;
         }
 
+        cls.isDirty = true;
         cls.updatedAt = new Date().toISOString();
         this._saveUserData(session.userId, userData);
         return true;

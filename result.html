@@ -617,13 +617,13 @@
                 }
 
                 if (!students || students.length === 0) {
-                    showError(`No result found for Class ${selectedClass} with ID / Reg. No '${regNo}'. Please check your number.`);
+                    showError(`Result unavailable. Please check your Class and Register Number.`);
                     return;
                 }
 
                 const student = students[0];
                 if (student.syllabus === 'PENDING_APPROVAL') {
-                    showError(`Results for Class ${selectedClass} have been submitted by the teacher and are currently pending Headmaster/Admin verification. Please check back soon.`);
+                    showError(`Result unavailable. Please check back later.`);
                     return;
                 }
 

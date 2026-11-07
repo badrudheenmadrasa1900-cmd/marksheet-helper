@@ -54,10 +54,17 @@ class MarksheetView {
                         </button>
 
                         <!-- Publish & Submit to Cloud Button -->
-                        <button class="btn btn-primary btn-sm" id="btn-sync-cloud" title="Submit mark list to cloud for publishing" style="background: linear-gradient(135deg, #0d5c31 0%, #158043 100%);">
-                            <span class="btn-icon-label">🚀</span>
-                            <span class="action-btn-text" style="font-weight: 700;">Publish / Submit</span>
-                        </button>
+                        ${cls.publishedAt && !cls.isDirty ? `
+                            <button class="btn btn-outline btn-sm" id="btn-sync-cloud" title="Results already published and up to date" style="background: #f0fdf4; color: #158043; border-color: #86efac; cursor: default;">
+                                <span class="btn-icon-label">✓</span>
+                                <span class="action-btn-text" style="font-weight: 700;">Published & Verified</span>
+                            </button>
+                        ` : `
+                            <button class="btn btn-primary btn-sm" id="btn-sync-cloud" title="Submit mark list to cloud for publishing" style="background: linear-gradient(135deg, #0d5c31 0%, #158043 100%);">
+                                <span class="btn-icon-label">🚀</span>
+                                <span class="action-btn-text" style="font-weight: 700;">Publish / Submit</span>
+                            </button>
+                        `}
 
                         <!-- Print Button -->
                         <button class="btn btn-outline btn-sm btn-print" id="btn-print-nav" title="Print Marksheet">
@@ -213,10 +220,13 @@ class MarksheetView {
                             <th class="th-name sticky-col-2">Student Name</th>
                             ${topics.map(t => {
                                 const passMark = Math.ceil(Number(t.maxMarks) * (Number(cls.passPercentage) || 36) / 100);
+                                const arMatch = t.name.match(/\((.*?)\)/);
+                                const arabicTitle = arMatch ? arMatch[1].trim() : '';
                                 return `
                                     <th class="th-topic" data-topic-id="${t.id}" title="${t.name}">
                                         <div class="th-topic-inner">
-                                            <span class="topic-name-header">${t.name}</span>
+                                            <span class="topic-name-header screen-only-name">${t.name}</span>
+                                            ${arabicTitle ? `<span class="topic-arabic-print-only">${arabicTitle}</span>` : `<span class="topic-arabic-print-only">${t.name}</span>`}
                                             <span class="topic-max-badge">Max: ${t.maxMarks} • Min: ${passMark}</span>
                                         </div>
                                     </th>
@@ -1477,16 +1487,22 @@ class MarksheetView {
 
                 try {
                     const res = await window.supabaseService.syncClassToSupabase(this.currentClass, isAdmin);
+                    
+                    // Mark as published and clean
+                    this.currentClass.isDirty = false;
+                    this.currentClass.publishedAt = new Date().toISOString();
+                    window.storageModel.saveClass(this.currentClass);
+
                     if (isAdmin) {
                         alert(`Success! ${res.count} student marksheets verified and published directly to the Public Result Portal.`);
                     } else {
                         alert(`Mark list submitted for publishing (${res.count} students)!\n\nYour mark list is sent to Sadar Muallim (صدر معلم) for final verification. Once approved in the Control Room, it will be published immediately on the public portal.`);
                     }
+                    this.render(this.currentClass);
                 } catch (err) {
                     alert('Publish/Sync Error: ' + err.message);
                 } finally {
                     syncBtn.disabled = false;
-                    syncBtn.innerHTML = '🚀 Publish / Submit';
                 }
             });
         }

@@ -1682,7 +1682,8 @@ thead th.sticky-col-2 {
 
 /* Hide printable header & footer on normal screen */
 .print-only-header,
-.print-only-footer {
+.print-only-footer,
+.topic-arabic-print-only {
     display: none;
 }
 
@@ -1699,6 +1700,21 @@ thead th.sticky-col-2 {
         box-sizing: border-box !important;
         text-shadow: none !important;
         box-shadow: none !important;
+    }
+
+    .screen-only-name {
+        display: none !important;
+    }
+
+    .topic-arabic-print-only {
+        display: block !important;
+        font-family: 'Amiri', serif !important;
+        font-size: 11pt !important;
+        font-weight: 700 !important;
+        color: #000000 !important;
+        direction: rtl !important;
+        white-space: nowrap !important;
+        line-height: 1.2 !important;
     }
 
     html, body {
