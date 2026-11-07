@@ -174,13 +174,14 @@ class DashboardView {
         const modalContainer = document.getElementById('modal-container');
         const isEdit = !!classData;
 
-        // Default topics if creating new with standard subjects (all marks out of 50)
+        // Default topics if creating new with standard subjects (all marks out of 50, Qur'an & Hifz separated)
         const defaultTopics = isEdit ? classData.topics : [
             { id: 'top_1', name: 'FIQH (الفقه)', maxMarks: 50 },
             { id: 'top_2', name: "LISANUL QUR'AN (لسان القرآن)", maxMarks: 50 },
             { id: 'top_3', name: 'DUROOSUL IHSAN (دروس الإحسان)', maxMarks: 50 },
             { id: 'top_4', name: 'THAREEKH (التّاريخ)', maxMarks: 50 },
-            { id: 'top_5', name: "QUR'AN, HIFZ (القرآن والحفظ)", maxMarks: 50 }
+            { id: 'top_5', name: "QUR'AN (القرآن الكريم)", maxMarks: 50 },
+            { id: 'top_6', name: "HIFZ (الحفظ)", maxMarks: 50 }
         ];
 
         const selectedClass = isEdit ? (classData.className || 'Class 5') : 'Class 5';

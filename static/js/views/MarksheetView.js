@@ -109,6 +109,9 @@ class MarksheetView {
                             <button class="btn btn-outline btn-sm" id="btn-manage-topics">
                                 Subjects (${topics.length})
                             </button>
+                            <button class="btn btn-outline btn-sm" id="btn-bulk-add-students" title="Bulk Add Students">
+                                📋 Bulk Add
+                            </button>
                             <button class="btn btn-outline btn-sm btn-print hide-mobile" id="btn-print-toolbar">
                                 Print
                             </button>
@@ -138,6 +141,9 @@ class MarksheetView {
                     </button>
                     <button class="mobile-bar-btn" id="m-btn-ai" title="AI Scan">
                         <span class="m-label">AI Scan</span>
+                    </button>
+                    <button class="mobile-bar-btn" id="m-btn-bulk-add" title="Bulk Add">
+                        <span class="m-label">Bulk Add</span>
                     </button>
                     <button class="mobile-bar-btn active-highlight" id="m-btn-add-student" title="Add Student">
                         <span class="m-label">+ Student</span>
@@ -1121,6 +1127,129 @@ class MarksheetView {
         });
     }
 
+    showBulkAddModal() {
+        const cls = this.currentClass;
+        const modalContainer = document.getElementById('modal-container');
+        if (!modalContainer) return;
+
+        const currentCount = (cls.students || []).length;
+        const defaultStartRoll = currentCount + 1;
+
+        modalContainer.innerHTML = `
+            <div class="modal-backdrop" id="bulk-add-modal-backdrop">
+                <div class="modal-box mobile-sheet modal-lg">
+                    <div class="modal-header">
+                        <div style="display:flex; align-items:center; gap: 10px;">
+                            <span style="font-size: 1.4rem;">📋</span>
+                            <div>
+                                <h3 class="modal-title" style="margin: 0;">Bulk Add Students</h3>
+                                <p style="font-size: 0.78rem; color: #64748b; margin: 0;">Quickly paste multiple student names into this class</p>
+                            </div>
+                        </div>
+                        <button class="modal-close" id="btn-close-bulk-modal">&times;</button>
+                    </div>
+                    <form id="bulk-add-form">
+                        <div class="modal-body" style="padding: 20px;">
+                            <div class="form-row" style="margin-bottom: 14px;">
+                                <div class="form-group flex-1">
+                                    <label class="form-label">Default Gender</label>
+                                    <div class="radio-group">
+                                        <label class="radio-label">
+                                            <input type="radio" name="bulk-gender" value="boy" ${this.activeTab !== 'girls' ? 'checked' : ''}>
+                                            <span>Boys</span>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="bulk-gender" value="girl" ${this.activeTab === 'girls' ? 'checked' : ''}>
+                                            <span>Girls</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="max-width: 170px;">
+                                    <label class="form-label">Starting Roll No</label>
+                                    <input type="number" id="bulk-start-roll" class="form-control" value="${defaultStartRoll}" min="1">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" style="display: flex; justify-content: space-between;">
+                                    <span>Paste Student Names (One per line) *</span>
+                                    <span style="font-size: 0.75rem; color: #0d5c31; font-weight: 600;">Supports: Roll No + Name OR Name only</span>
+                                </label>
+                                <textarea 
+                                    id="bulk-names-textarea" 
+                                    class="form-control" 
+                                    rows="9" 
+                                    placeholder="1. MUHAMMED ALI&#10;2. AHMED SHAFEEQ&#10;3. FATHIMA ZAHRA&#10;or simply paste:&#10;SULAIMAN&#10;IBRAHIM" 
+                                    required 
+                                    style="font-family: monospace; font-size: 0.9rem; line-height: 1.6;"
+                                    autofocus
+                                ></textarea>
+                            </div>
+
+                            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 10px 14px; font-size: 0.78rem; color: #166534;">
+                                💡 <strong>Tip:</strong> You can paste directly from WhatsApp, Excel, or Word. Numbers at the beginning of each line will be recognized as Roll Numbers automatically.
+                            </div>
+                        </div>
+
+                        <div class="modal-footer" style="padding: 14px 20px;">
+                            <button type="button" class="btn btn-ghost" id="btn-cancel-bulk">Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="btn-submit-bulk">
+                                + Add All Students
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        const closeModal = () => { modalContainer.innerHTML = ''; };
+        document.getElementById('btn-close-bulk-modal').addEventListener('click', closeModal);
+        document.getElementById('btn-cancel-bulk').addEventListener('click', closeModal);
+
+        document.getElementById('bulk-add-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const rawText = document.getElementById('bulk-names-textarea').value.trim();
+            const startRoll = parseInt(document.getElementById('bulk-start-roll').value, 10) || defaultStartRoll;
+            const defaultGender = document.querySelector('input[name="bulk-gender"]:checked').value;
+
+            if (!rawText) return;
+
+            const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
+            const parsedList = [];
+            let currentRoll = startRoll;
+
+            lines.forEach((line) => {
+                // Check if line starts with roll number (e.g. "1. Ali", "1 - Ali", "01 Ali")
+                const match = line.match(/^(\d+)[\.\-\)\s\t]+(.*)$/);
+                let roll = '';
+                let name = line;
+                if (match) {
+                    roll = match[1];
+                    name = match[2].trim();
+                } else {
+                    roll = currentRoll.toString();
+                    currentRoll++;
+                }
+
+                if (name) {
+                    parsedList.push({
+                        rollNo: roll,
+                        name: name.toUpperCase(),
+                        gender: defaultGender
+                    });
+                }
+            });
+
+            if (parsedList.length === 0) {
+                alert('No valid student names found.');
+                return;
+            }
+
+            window.marksheetController.addBulkStudents(cls.id, parsedList);
+            closeModal();
+        });
+    }
+
     showManageTopicsModal() {
         const cls = this.currentClass;
         const modalContainer = document.getElementById('modal-container');
@@ -1145,7 +1274,8 @@ class MarksheetView {
                                     <option value="LISANUL QUR'AN (لسان القرآن)">LISANUL QUR'AN (لسان القرآن)</option>
                                     <option value="DUROOSUL IHSAN (دروس الإحسان)">DUROOSUL IHSAN (دروس الإحسان)</option>
                                     <option value="THAREEKH (التّاريخ)">THAREEKH (التّاريخ)</option>
-                                    <option value="QUR'AN, HIFZ (القرآن والحفظ)">QUR'AN, HIFZ (القرآن والحفظ)</option>
+                                    <option value="QUR'AN (القرآن الكريم)">QUR'AN (القرآن الكريم)</option>
+                                    <option value="HIFZ (الحفظ)">HIFZ (الحفظ)</option>
                                     <option value="THAFSEER (التّفسير)">THAFSEER (التّفسير)</option>
                                     <option value="LISANUL QUR'AN - THAJVEED (التّجويد)">LISANUL QUR'AN - THAJVEED (التّجويد)</option>
                                     <option value="AQEEDA (العقيدة)">AQEEDA (العقيدة)</option>
@@ -1345,6 +1475,12 @@ class MarksheetView {
         if (addStBtn) addStBtn.addEventListener('click', () => this.showAddStudentModal());
         if (mAddStBtn) mAddStBtn.addEventListener('click', () => this.showAddStudentModal());
         if (emptyAddStBtn) emptyAddStBtn.addEventListener('click', () => this.showAddStudentModal());
+
+        // Bulk Add Student buttons
+        const bulkAddBtn = document.getElementById('btn-bulk-add-students');
+        const mBulkAddBtn = document.getElementById('m-btn-bulk-add');
+        if (bulkAddBtn) bulkAddBtn.addEventListener('click', () => this.showBulkAddModal());
+        if (mBulkAddBtn) mBulkAddBtn.addEventListener('click', () => this.showBulkAddModal());
 
         // Mobile bottom view toggle
         const mToggleView = document.getElementById('m-btn-toggle-view');

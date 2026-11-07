@@ -21,7 +21,8 @@ class SupabaseService {
             { id: 'sub_lisan', subject: "LISANUL QUR'AN", arabic: "لسان القرآن", defaultMax: 50, passMark: 18 },
             { id: 'sub_duroos', subject: "DUROOSUL IHSAN", arabic: "دروس الإحسان", defaultMax: 50, passMark: 18 },
             { id: 'sub_thareekh', subject: "THAREEKH", arabic: "التّاريخ", defaultMax: 50, passMark: 18 },
-            { id: 'sub_quran', subject: "QUR'AN, HIFZ", arabic: "القرآن والحفظ", defaultMax: 50, passMark: 18 },
+            { id: 'sub_quran', subject: "QUR'AN", arabic: "القرآن الكريم", defaultMax: 50, passMark: 18 },
+            { id: 'sub_hifz', subject: "HIFZ", arabic: "الحفظ", defaultMax: 50, passMark: 18 },
             { id: 'sub_thafseer', subject: "THAFSEER", arabic: "التّفسير", defaultMax: 50, passMark: 18 },
             { id: 'sub_thajveed', subject: "LISANUL QUR'AN - THAJVEED", arabic: "التّجويد", defaultMax: 50, passMark: 18 },
             { id: 'sub_aqeeda', subject: "AQEEDA", arabic: "العقيدة", defaultMax: 50, passMark: 18 }
