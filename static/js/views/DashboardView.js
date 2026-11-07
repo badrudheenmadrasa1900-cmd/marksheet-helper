@@ -185,7 +185,7 @@ class DashboardView {
 
         modalContainer.innerHTML = `
             <div class="modal-backdrop">
-                <div class="modal-box modal-lg">
+                <div class="modal-box modal-lg mobile-sheet">
                     <div class="modal-header">
                         <h3 class="modal-title">${isEdit ? 'Edit Class Details' : 'Create New Class'}</h3>
                         <button class="btn-close" id="btn-close-modal">&times;</button>

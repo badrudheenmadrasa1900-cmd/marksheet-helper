@@ -1047,6 +1047,15 @@ body {
     box-shadow: var(--shadow-modal);
     border: 1px solid var(--border-color);
     animation: modalSlide 0.2s ease-out;
+    overflow: hidden;
+}
+
+.modal-box > form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 .modal-lg {
     max-width: 680px;
@@ -1063,6 +1072,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-shrink: 0;
 }
 .modal-title {
     font-size: 1.15rem;
@@ -1071,7 +1081,9 @@ body {
 .modal-body {
     padding: 1.5rem;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     flex: 1;
+    min-height: 0;
 }
 .modal-footer {
     padding: 1rem 1.5rem;
@@ -1080,6 +1092,8 @@ body {
     align-items: center;
     justify-content: flex-end;
     gap: 0.75rem;
+    flex-shrink: 0;
+    background-color: var(--bg-surface);
 }
 
 .modal-tabs {
