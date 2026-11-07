@@ -15,16 +15,16 @@ class SupabaseService {
             'Prefer': 'return=representation'
         };
 
-        // Standard Samastha syllabus subjects with Arabic translations
+        // Standard Samastha syllabus subjects with Arabic translations (all max marks 50, pass mark 18 = 36%)
         this.DEFAULT_SUBJECTS = [
-            { id: 'sub_fiqh', subject: "FIQH", arabic: "الفقه", defaultMax: 100, passMark: 36 },
-            { id: 'sub_lisan', subject: "LISANUL QUR'AN", arabic: "لسان القرآن", defaultMax: 100, passMark: 36 },
-            { id: 'sub_duroos', subject: "DUROOSUL IHSAN", arabic: "دروس الإحسان", defaultMax: 100, passMark: 36 },
-            { id: 'sub_thareekh', subject: "THAREEKH", arabic: "التّاريخ", defaultMax: 100, passMark: 36 },
-            { id: 'sub_quran', subject: "QUR'AN, HIFZ", arabic: "القرآن والحفظ", defaultMax: 100, passMark: 36 },
-            { id: 'sub_thafseer', subject: "THAFSEER", arabic: "التّفسير", defaultMax: 100, passMark: 36 },
-            { id: 'sub_thajveed', subject: "LISANUL QUR'AN - THAJVEED", arabic: "التّجويد", defaultMax: 100, passMark: 36 },
-            { id: 'sub_aqeeda', subject: "AQEEDA", arabic: "العقيدة", defaultMax: 100, passMark: 36 }
+            { id: 'sub_fiqh', subject: "FIQH", arabic: "الفقه", defaultMax: 50, passMark: 18 },
+            { id: 'sub_lisan', subject: "LISANUL QUR'AN", arabic: "لسان القرآن", defaultMax: 50, passMark: 18 },
+            { id: 'sub_duroos', subject: "DUROOSUL IHSAN", arabic: "دروس الإحسان", defaultMax: 50, passMark: 18 },
+            { id: 'sub_thareekh', subject: "THAREEKH", arabic: "التّاريخ", defaultMax: 50, passMark: 18 },
+            { id: 'sub_quran', subject: "QUR'AN, HIFZ", arabic: "القرآن والحفظ", defaultMax: 50, passMark: 18 },
+            { id: 'sub_thafseer', subject: "THAFSEER", arabic: "التّفسير", defaultMax: 50, passMark: 18 },
+            { id: 'sub_thajveed', subject: "LISANUL QUR'AN - THAJVEED", arabic: "التّجويد", defaultMax: 50, passMark: 18 },
+            { id: 'sub_aqeeda', subject: "AQEEDA", arabic: "العقيدة", defaultMax: 50, passMark: 18 }
         ];
     }
 
@@ -469,12 +469,14 @@ class SupabaseService {
                 );
 
                 const markVal = stMarks[top.id];
+                const topMax = Number(top.maxMarks) || 50;
+                const passMark = Math.ceil(topMax * 0.36);
                 studentMarks.push({
                     subject: matchedDef ? matchedDef.subject : top.name,
                     arabic: matchedDef ? matchedDef.arabic : '',
                     mark: (markVal !== undefined && markVal !== '') ? (isNaN(markVal) ? markVal : Number(markVal)) : 0,
-                    max: top.maxMarks || 100,
-                    passMark: 36
+                    max: topMax,
+                    passMark: passMark
                 });
             });
 

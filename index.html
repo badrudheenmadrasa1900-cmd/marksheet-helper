@@ -686,7 +686,9 @@
                 const title = m.subject || m.title || 'Subject';
                 const ar = m.arabic || '';
                 const score = (m.mark !== undefined && m.mark !== null && m.mark !== '') ? m.mark : '-';
-                const isItemPass = Number(score) >= 36;
+                const max = Number(m.max) || 50;
+                const minPass = m.passMark !== undefined ? Number(m.passMark) : Math.ceil(max * 0.36);
+                const isItemPass = Number(score) >= minPass;
 
                 itemsHtml += `
                     <div class="subject-item">
@@ -694,8 +696,11 @@
                             <span class="sub-name">${escapeHtml(title)}</span>
                             ${ar ? `<span class="sub-ar">${escapeHtml(ar)}</span>` : ''}
                         </div>
-                        <div class="sub-badge ${isItemPass ? 'score-good' : 'score-low'}">
-                            ${escapeHtml(String(score))}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 0.72rem; color: #648272;">/ ${max}</span>
+                            <div class="sub-badge ${isItemPass ? 'score-good' : 'score-low'}">
+                                ${escapeHtml(String(score))}
+                            </div>
                         </div>
                     </div>
                 `;

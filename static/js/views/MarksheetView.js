@@ -1187,7 +1187,7 @@ class MarksheetView {
                 row.className = 'topic-manage-row';
                 row.innerHTML = `
                     <input type="text" class="form-control topic-edit-name" value="${val}" placeholder="Subject Name" required>
-                    <input type="number" class="form-control topic-edit-max" value="100" placeholder="Max Mark" min="1" max="1000" style="max-width: 100px;" required>
+                    <input type="number" class="form-control topic-edit-max" value="50" placeholder="Max Mark" min="1" max="1000" style="max-width: 100px;" required>
                     <button type="button" class="btn-icon btn-del-topic" title="Delete">&times;</button>
                 `;
                 listContainer.appendChild(row);
