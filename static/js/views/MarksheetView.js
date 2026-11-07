@@ -1468,6 +1468,16 @@ class MarksheetView {
         const syncBtn = document.getElementById('btn-sync-cloud');
         if (syncBtn) {
             syncBtn.addEventListener('click', async () => {
+                // If results are already published and no edits have been made, avoid redundant submissions
+                if (this.currentClass.publishedAt && !this.currentClass.isDirty) {
+                    await window.showAlertDialog(
+                        'Already Published',
+                        'The mark list for this class is already verified and published on the live portal.<br><br>No new changes were made, so no re-submission is necessary.',
+                        '✅'
+                    );
+                    return;
+                }
+
                 const totalStudents = (this.currentClass.students || []).length;
                 if (totalStudents === 0) {
                     alert('No student records available to sync.');

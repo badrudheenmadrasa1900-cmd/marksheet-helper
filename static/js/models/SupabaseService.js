@@ -503,6 +503,10 @@ class SupabaseService {
             const studentRank = rankMap[student.id] || '';
             const statusWithRank = studentRank ? `RANK:${studentRank}` : '';
 
+            // If class was already published (publishedAt set) or is being submitted by admin, preserve published status 'GENERAL'
+            const isAlreadyPublished = !cls.isDirty && !!cls.publishedAt;
+            const targetSyllabus = (isAutoPublished || isAlreadyPublished) ? 'GENERAL' : 'PENDING_APPROVAL';
+
             await this.saveStudentToSupabase({
                 register_no: student.rollNo || student.id,
                 name: student.name,
@@ -512,7 +516,7 @@ class SupabaseService {
                 madrasa_name: cls.madrasaName || 'BADRUDHEEN MADRASA',
                 madrasa_code: cls.madrasaCode || '6120',
                 class_number: classNumber,
-                syllabus: isAutoPublished ? (statusWithRank || 'GENERAL') : 'PENDING_APPROVAL',
+                syllabus: targetSyllabus,
                 status: statusWithRank || undefined,
                 marks: studentMarks
             });
