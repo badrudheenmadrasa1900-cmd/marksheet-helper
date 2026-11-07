@@ -842,10 +842,84 @@
         </div>
     </div>
 
+    <!-- Reusable Custom Confirmation / Alert Modal for Sadar Muallim Control Room -->
+    <div id="admin-confirm-modal" class="modal-bg" style="display: none; z-index: 10000;">
+        <div class="modal-card" style="max-width: 440px; text-align: center; padding: 28px 24px;">
+            <div id="admin-confirm-icon" style="font-size: 2.8rem; margin-bottom: 12px; line-height: 1;">❓</div>
+            <h3 id="admin-confirm-title" style="font-size: 1.2rem; font-weight: 800; color: #072718; margin-bottom: 8px;">Confirmation</h3>
+            <p id="admin-confirm-msg" style="font-size: 0.9rem; color: #526e60; line-height: 1.5; margin-bottom: 24px;"></p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button type="button" id="btn-admin-modal-cancel" class="btn-action-outline" style="min-width: 100px;">Cancel</button>
+                <button type="button" id="btn-admin-modal-ok" class="btn-action-primary" style="min-width: 120px;">Proceed</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Core Scripts -->
     <script src="/static/js/models/SupabaseService.js"></script>
     <script>
         const ADMIN_SESSION_KEY = "bm_admin_control_session";
+
+        /**
+         * Custom Modal Confirm Dialog replacing native confirm()
+         */
+        function showAdminConfirm(title, message, icon = '❓') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('admin-confirm-modal');
+                document.getElementById('admin-confirm-title').textContent = title;
+                document.getElementById('admin-confirm-msg').innerHTML = message;
+                document.getElementById('admin-confirm-icon').textContent = icon;
+
+                const btnOk = document.getElementById('btn-admin-modal-ok');
+                const btnCancel = document.getElementById('btn-admin-modal-cancel');
+                btnCancel.style.display = 'inline-block';
+
+                modal.style.display = 'flex';
+
+                const cleanup = () => {
+                    modal.style.display = 'none';
+                    btnOk.onclick = null;
+                    btnCancel.onclick = null;
+                };
+
+                btnOk.onclick = () => {
+                    cleanup();
+                    resolve(true);
+                };
+
+                btnCancel.onclick = () => {
+                    cleanup();
+                    resolve(false);
+                };
+            });
+        }
+
+        /**
+         * Custom Modal Alert Dialog replacing native alert()
+         */
+        function showAdminAlert(title, message, icon = 'ℹ️') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('admin-confirm-modal');
+                document.getElementById('admin-confirm-title').textContent = title;
+                document.getElementById('admin-confirm-msg').innerHTML = message;
+                document.getElementById('admin-confirm-icon').textContent = icon;
+
+                const btnOk = document.getElementById('btn-admin-modal-ok');
+                const btnCancel = document.getElementById('btn-admin-modal-cancel');
+                btnCancel.style.display = 'none';
+                btnOk.textContent = 'OK';
+
+                modal.style.display = 'flex';
+
+                btnOk.onclick = () => {
+                    modal.style.display = 'none';
+                    btnCancel.style.display = 'inline-block';
+                    btnOk.textContent = 'Proceed';
+                    btnOk.onclick = null;
+                    resolve(true);
+                };
+            });
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             checkAdminSession();
@@ -904,8 +978,9 @@
             }
         }
 
-        function handleAdminLogout() {
-            if (confirm('Are you sure you want to lock the Admin Control Room and sign out?')) {
+        async function handleAdminLogout() {
+            const confirmed = await showAdminConfirm('Sign Out', 'Are you sure you want to lock the Sadar Muallim Control Room and sign out?', '🚪');
+            if (confirmed) {
                 sessionStorage.removeItem(ADMIN_SESSION_KEY);
                 localStorage.removeItem(ADMIN_SESSION_KEY);
                 window.location.reload();
@@ -990,24 +1065,25 @@
                 await window.supabaseService.setPublishStatus(regNo, !currentPublished);
                 loadSubmittedResults();
             } catch (err) {
-                alert('Could not update status: ' + err.message);
+                await showAdminAlert('Status Update Error', 'Could not update status: ' + err.message, '⚠️');
             }
         }
 
         async function publishAllFiltered() {
             const filterClass = document.getElementById('filter-class-select').value;
             if (!filterClass) {
-                alert('Please select a specific class in the dropdown to publish all students.');
+                await showAdminAlert('Select Class', 'Please select a specific class in the dropdown to publish all students.', 'ℹ️');
                 return;
             }
 
-            if (confirm(`Approve and publish ALL verified results for Class ${filterClass} to the public portal?`)) {
+            const confirmed = await showAdminConfirm('Publish Entire Class', `Approve and publish <strong>ALL verified results for Class ${filterClass}</strong> to the public portal?`, '🚀');
+            if (confirmed) {
                 try {
                     await window.supabaseService.publishEntireClass(parseInt(filterClass, 10));
-                    alert(`Class ${filterClass} results are now LIVE on the public portal.`);
+                    await showAdminAlert('Published Successfully', `Class ${filterClass} results are now <strong>LIVE</strong> on the public portal.`, '✅');
                     loadSubmittedResults();
                 } catch (err) {
-                    alert('Error: ' + err.message);
+                    await showAdminAlert('Publish Error', 'Error: ' + err.message, '⚠️');
                 }
             }
         }
@@ -1084,10 +1160,10 @@
         async function approveUsthadEmail(profileId) {
             try {
                 await window.supabaseService.approveTeacherEmail(profileId);
-                alert('Usthad email approved! The Usthad can now reset their password using forgot password.');
+                await showAdminAlert('Usthad Email Approved', 'Usthad email approved! The Usthad can now reset their password using forgot password.', '✅');
                 loadTeachersList();
             } catch (err) {
-                alert('Error: ' + err.message);
+                await showAdminAlert('Approval Error', 'Error: ' + err.message, '⚠️');
             }
         }
 
@@ -1128,12 +1204,12 @@
                     assigned_classes: assigned
                 });
 
-                alert(`Teacher Account Created Successfully!\nUsername: ${user}\nPermitted Classes: ${assigned.join(', ')}`);
+                await showAdminAlert('Account Created', `Teacher Account Created Successfully!<br><br><strong>Username:</strong> ${escapeHtml(user)}<br><strong>Permitted Classes:</strong> ${assigned.join(', ')}`, '🎉');
                 closeTeacherModal();
                 document.getElementById('new-teacher-form').reset();
                 loadTeachersList();
             } catch (err) {
-                alert('Failed to create teacher: ' + err.message);
+                await showAdminAlert('Creation Failed', 'Failed to create teacher: ' + err.message, '⚠️');
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Create Teacher Account';
@@ -1141,12 +1217,13 @@
         }
 
         async function deleteTeacherAccount(id, username) {
-            if (confirm(`Are you sure you want to delete the teacher account "${username}"? They will lose access immediately.`)) {
+            const confirmed = await showAdminConfirm('Delete Usthad Account', `Are you sure you want to delete the teacher account <strong>"${escapeHtml(username)}"</strong>?<br>They will lose access immediately.`, '🗑️');
+            if (confirmed) {
                 try {
                     await window.supabaseService.deleteTeacher(id);
                     loadTeachersList();
                 } catch (err) {
-                    alert('Error: ' + err.message);
+                    await showAdminAlert('Deletion Error', 'Error: ' + err.message, '⚠️');
                 }
             }
         }

@@ -132,16 +132,16 @@ class DashboardView {
                     return `
                         <div class="class-card" data-class-id="${cls.id}">
                             <div class="class-card-header">
-                                <span class="class-badge">${cls.academicYear || '2025-26'}</span>
+                                <span class="class-badge">${cls.academicYear || '2026-27'}</span>
                                 <div class="class-actions-menu">
                                     <button class="btn btn-outline btn-xs btn-edit-class" title="Edit" data-id="${cls.id}">Edit</button>
                                     <button class="btn btn-ghost btn-xs btn-delete-class text-danger" title="Delete" data-id="${cls.id}">Delete</button>
                                 </div>
                             </div>
                             <div class="class-card-body">
-                                <div class="class-org-name">${cls.madrasaName || ''}</div>
+                                <div class="class-org-name">${cls.madrasaName || 'BADRUDHEEN MADRASA'}</div>
                                 <h4 class="class-name-title">${cls.className || 'Class'}</h4>
-                                <div class="class-exam-tag">${cls.examName || 'Annual Exam'}</div>
+                                <div class="class-exam-tag">${cls.examName || 'Half Yearly Examination 2026-27'}</div>
 
                                 <div class="class-metrics">
                                     <div class="metric-item">
@@ -183,6 +183,8 @@ class DashboardView {
             { id: 'top_5', name: "QUR'AN, HIFZ (القرآن والحفظ)", maxMarks: 100 }
         ];
 
+        const selectedClass = isEdit ? (classData.className || 'Class 5') : 'Class 5';
+
         modalContainer.innerHTML = `
             <div class="modal-backdrop">
                 <div class="modal-box modal-lg mobile-sheet">
@@ -210,23 +212,22 @@ class DashboardView {
                                         type="text" 
                                         id="modal-year" 
                                         class="form-control" 
-                                        placeholder="2025-2026" 
-                                        value="${isEdit ? (classData.academicYear || '') : '2025-2026'}"
+                                        placeholder="2026-2027" 
+                                        value="${isEdit ? (classData.academicYear || '') : '2026-2027'}"
                                     >
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group flex-1">
-                                    <label class="form-label">Class (e.g. Class 5) *</label>
-                                    <input 
-                                        type="text" 
-                                        id="modal-classname" 
-                                        class="form-control" 
-                                        placeholder="Class 1 - 12" 
-                                        value="${isEdit ? (classData.className || '') : 'Class 5'}" 
-                                        required
-                                    >
+                                    <label class="form-label">Select Standard (Class) *</label>
+                                    <select id="modal-classname" class="form-control" required style="font-weight: 700; color: #0d5c31;">
+                                        ${[1,2,3,4,5,6,7,8,9,10,11,12].map(n => `
+                                            <option value="Class ${n}" ${selectedClass === `Class ${n}` ? 'selected' : ''}>
+                                                Class ${n} (Standard ${n})
+                                            </option>
+                                        `).join('')}
+                                    </select>
                                 </div>
                                 <div class="form-group flex-1">
                                     <label class="form-label">Examination Name *</label>
@@ -235,7 +236,7 @@ class DashboardView {
                                         id="modal-examname" 
                                         class="form-control" 
                                         placeholder="Examination Name" 
-                                        value="${isEdit ? (classData.examName || '') : 'Annual Examination 2026'}" 
+                                        value="${isEdit ? (classData.examName || '') : 'Half Yearly Examination 2026-27'}" 
                                         required
                                     >
                                 </div>
