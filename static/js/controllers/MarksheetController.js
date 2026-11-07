@@ -23,9 +23,15 @@ class MarksheetController {
 
         if (!cls.students) cls.students = [];
 
+        const clsNum = (cls.className || 'C1').replace(/\D/g, '') || '1';
+        const rollStr = studentData.rollNo || (cls.students.length + 1).toString();
+        const paddedRoll = rollStr.padStart(2, '0');
+        const uniqueStudentId = `1900-C${clsNum}-${paddedRoll}`;
+
         const newStudent = {
             id: 'st_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-            rollNo: studentData.rollNo || (cls.students.length + 1).toString(),
+            rollNo: rollStr,
+            studentId: studentData.studentId || uniqueStudentId,
             name: studentData.name,
             gender: studentData.gender || 'boy'
         };
@@ -47,10 +53,17 @@ class MarksheetController {
 
         if (!cls.students) cls.students = [];
 
+        const clsNum = (cls.className || 'C1').replace(/\D/g, '') || '1';
+
         studentsArray.forEach(st => {
+            const rollStr = st.rollNo ? st.rollNo.toString() : (cls.students.length + 1).toString();
+            const paddedRoll = rollStr.padStart(2, '0');
+            const uniqueStudentId = `1900-C${clsNum}-${paddedRoll}`;
+
             cls.students.push({
                 id: 'st_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-                rollNo: st.rollNo,
+                rollNo: rollStr,
+                studentId: st.studentId || uniqueStudentId,
                 name: st.name,
                 gender: st.gender || 'boy'
             });

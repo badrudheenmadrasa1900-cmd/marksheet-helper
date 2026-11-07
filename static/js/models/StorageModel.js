@@ -160,6 +160,21 @@ class StorageModel {
             let topicsChanged = false;
             let updatedTopics = [];
 
+            // Ensure all students have studentId
+            const clsNum = (cls.className || 'C1').replace(/\D/g, '') || '1';
+            let studentsChanged = false;
+            const updatedStudents = (cls.students || []).map((s, idx) => {
+                if (!s.studentId) {
+                    studentsChanged = true;
+                    const r = (s.rollNo || (idx + 1)).toString();
+                    return {
+                        ...s,
+                        studentId: `1900-C${clsNum}-${r.padStart(2, '0')}`
+                    };
+                }
+                return s;
+            });
+
             cls.topics.forEach(t => {
                 const upperName = (t.name || '').toUpperCase();
                 if (upperName.includes("QUR'AN, HIFZ") || upperName.includes("QURAN, HIFZ") || upperName.includes("القرآن والحفظ")) {
@@ -189,11 +204,12 @@ class StorageModel {
                 }
             });
 
-            if (topicsChanged) {
+            if (topicsChanged || studentsChanged) {
                 modified = true;
                 return {
                     ...cls,
-                    topics: updatedTopics
+                    topics: topicsChanged ? updatedTopics : cls.topics,
+                    students: studentsChanged ? updatedStudents : cls.students
                 };
             }
             return cls;

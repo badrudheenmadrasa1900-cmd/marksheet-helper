@@ -556,15 +556,14 @@
 
                 <div class="field-group">
                     <label class="field-label" for="reg-no-input">
-                        <span>Register Number</span>
-                        <span class="label-sub">e.g. 35, 101</span>
+                        <span>Register Number / Student ID</span>
+                        <span class="label-sub">e.g. 1 or 1900-C8-01</span>
                     </label>
                     <input 
-                        type="number" 
-                        inputmode="numeric" 
+                        type="text" 
                         id="reg-no-input" 
                         class="touch-input" 
-                        placeholder="Enter Register Number" 
+                        placeholder="Enter Reg. No or Student ID" 
                         required 
                         autocomplete="off"
                     >
@@ -620,23 +619,36 @@
             submitBtn.innerHTML = '<span>Loading result...</span>';
 
             try {
-                // Only return verified & published results (syllabus != PENDING_APPROVAL)
-                const queryUrl = `${SUPABASE_URL}students?class_number=eq.${encodeURIComponent(selectedClass)}&register_no=eq.${encodeURIComponent(regNo)}&select=*`;
-                const response = await fetch(queryUrl, {
+                // Check by register number OR unique student id (e.g. 1900-C8-01)
+                const isUniqueId = regNo.includes('-') || regNo.length > 5;
+                let queryUrl = `${SUPABASE_URL}students?class_number=eq.${encodeURIComponent(selectedClass)}&register_no=eq.${encodeURIComponent(regNo)}&select=*`;
+                
+                let response = await fetch(queryUrl, {
                     headers: {
                         'apikey': SUPABASE_KEY,
                         'Authorization': `Bearer ${SUPABASE_KEY}`
                     }
                 });
 
-                if (!response.ok) {
-                    throw new Error('Failed to retrieve result.');
+                let students = response.ok ? await response.json() : [];
+
+                if ((!students || students.length === 0) && isUniqueId) {
+                    // Try looking up by numeric part of unique ID (e.g. 1900-C8-02 -> 2)
+                    const cleanNum = parseInt(regNo.split('-').pop(), 10);
+                    if (!isNaN(cleanNum)) {
+                        const fallbackUrl = `${SUPABASE_URL}students?class_number=eq.${encodeURIComponent(selectedClass)}&register_no=eq.${cleanNum}&select=*`;
+                        const fbRes = await fetch(fallbackUrl, {
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                            }
+                        });
+                        if (fbRes.ok) students = await fbRes.json();
+                    }
                 }
 
-                const students = await response.json();
-
                 if (!students || students.length === 0) {
-                    showError(`No result found for Class ${selectedClass} with Register Number '${regNo}'. Please check your number.`);
+                    showError(`No result found for Class ${selectedClass} with ID / Reg. No '${regNo}'. Please check your number.`);
                     return;
                 }
 

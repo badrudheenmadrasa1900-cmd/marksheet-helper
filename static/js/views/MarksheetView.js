@@ -53,14 +53,14 @@ class MarksheetView {
                             <span class="action-btn-text">AI Scan</span>
                         </button>
 
-                        <!-- Supabase Cloud Sync -->
-                        <button class="btn btn-outline btn-sm" id="btn-sync-cloud" title="Sync result with Supabase Cloud">
-                            <span class="btn-icon-label">☁️</span>
-                            <span class="action-btn-text">Sync</span>
+                        <!-- Publish & Submit to Cloud Button -->
+                        <button class="btn btn-primary btn-sm" id="btn-sync-cloud" title="Submit mark list to cloud for publishing" style="background: linear-gradient(135deg, #0d5c31 0%, #158043 100%);">
+                            <span class="btn-icon-label">🚀</span>
+                            <span class="action-btn-text" style="font-weight: 700;">Publish / Submit</span>
                         </button>
 
                         <!-- Print Button -->
-                        <button class="btn btn-primary btn-sm btn-print" id="btn-print-nav" title="Print Marksheet">
+                        <button class="btn btn-outline btn-sm btn-print" id="btn-print-nav" title="Print Marksheet">
                             🖨️ Print
                         </button>
 
@@ -246,7 +246,10 @@ class MarksheetView {
                                     <td class="td-name sticky-col-2">
                                         <div class="student-name-box">
                                             <span class="st-gender-dot ${st.gender}"></span>
-                                            <span class="st-name-text">${st.name}</span>
+                                            <div>
+                                                <div class="st-name-text">${st.name}</div>
+                                                <div style="font-family: monospace; font-size: 0.72rem; color: #0d5c31; font-weight: 700;">${st.studentId || ('1900-C' + ((cls.className||'1').replace(/\D/g,'')||'1') + '-' + String(st.rollNo||(rowIdx+1)).padStart(2,'0'))}</div>
+                                            </div>
                                         </div>
                                     </td>
                                     ${topics.map((t, colIdx) => {
@@ -1477,13 +1480,13 @@ class MarksheetView {
                     if (isAdmin) {
                         alert(`Success! ${res.count} student marksheets verified and published directly to the Public Result Portal.`);
                     } else {
-                        alert(`Mark list submitted successfully (${res.count} students)!\nYour submission is now placed in the Sadar Muallim (صدر معلم) Verification Queue. Once Sadar Muallim approves it, the results will go live on the public portal.`);
+                        alert(`Mark list submitted for publishing (${res.count} students)!\n\nYour mark list is sent to Sadar Muallim (صدر معلم) for final verification. Once approved in the Control Room, it will be published immediately on the public portal.`);
                     }
                 } catch (err) {
-                    alert('Sync Error: ' + err.message);
+                    alert('Publish/Sync Error: ' + err.message);
                 } finally {
                     syncBtn.disabled = false;
-                    syncBtn.innerHTML = '☁️ Sync Result';
+                    syncBtn.innerHTML = '🚀 Publish / Submit';
                 }
             });
         }
