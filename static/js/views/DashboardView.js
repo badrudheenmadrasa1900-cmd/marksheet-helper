@@ -464,8 +464,9 @@ class DashboardView {
 
         const logoutBtn = document.getElementById('btn-logout');
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to sign out?')) {
+            logoutBtn.addEventListener('click', async () => {
+                const confirmed = await window.showConfirmDialog('Sign Out', 'Are you sure you want to sign out?', '🚪', 'Sign Out', 'Stay');
+                if (confirmed) {
                     window.authController.handleLogout();
                 }
             });
@@ -502,9 +503,18 @@ class DashboardView {
         });
 
         document.querySelectorAll('.btn-delete-class').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 const classId = e.currentTarget.getAttribute('data-id');
-                if (confirm('Are you sure you want to delete this class?')) {
+                const cls = window.storageModel.getClass(classId);
+                const className = cls ? cls.className : 'this class';
+                const confirmed = await window.showConfirmDialog(
+                    'Delete Class',
+                    `Are you sure you want to delete <strong>${className}</strong>?<br><span style="font-size:0.8rem; color:#64748b;">All students and marks in this class will be permanently removed.</span>`,
+                    '🗑️',
+                    'Delete Class',
+                    'Cancel'
+                );
+                if (confirmed) {
                     window.classController.deleteClass(classId);
                 }
             });

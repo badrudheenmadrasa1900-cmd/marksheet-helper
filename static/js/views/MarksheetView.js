@@ -1545,9 +1545,20 @@ class MarksheetView {
 
         // Delete student buttons
         document.querySelectorAll('.btn-del-student').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 const studentId = e.currentTarget.getAttribute('data-id');
-                if (confirm('Are you sure you want to remove this student?')) {
+                const stObj = (this.currentClass.students || []).find(s => s.id === studentId);
+                const stName = stObj ? stObj.name : 'this student';
+                
+                const confirmed = await window.showConfirmDialog(
+                    'Remove Student',
+                    `Are you sure you want to remove <strong>${stName}</strong>?<br><span style="font-size:0.8rem; color:#64748b;">Their marks in this class will also be cleared.</span>`,
+                    '🗑️',
+                    'Yes, Remove',
+                    'Cancel'
+                );
+
+                if (confirmed) {
                     window.marksheetController.deleteStudent(this.currentClass.id, studentId);
                 }
             });
