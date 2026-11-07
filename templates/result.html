@@ -693,19 +693,29 @@
             const statusUpper = (student.status || 'PASS').toUpperCase();
             const isPassed = !statusUpper.includes('FAIL');
 
+            // Extract Rank if present
+            let rankValue = '';
+            if (student.status && student.status.includes('RANK:')) {
+                rankValue = student.status.split('RANK:')[1].split(' ')[0].trim();
+            } else if (student.syllabus && student.syllabus.includes('RANK:')) {
+                rankValue = student.syllabus.split('RANK:')[1].split(' ')[0].trim();
+            }
+
             let itemsHtml = '';
             let attendanceBadge = '';
 
             marksList.forEach(m => {
                 if (m.isAttendance || (m.subject && m.subject.toUpperCase().includes('ATTENDANCE'))) {
                     attendanceBadge = `
-                        <div class="subject-item" style="background: #f0f9ff; border: 1.5px solid #bae6fd;">
+                        <div class="subject-item" style="background: #f0fdf4; border: 1.5px solid #86efac;">
                             <div class="subject-left">
-                                <span class="sub-name" style="color: #0369a1; font-weight: 800;">HAJAR / ATTENDANCE (ഹാജർ)</span>
-                                <span class="sub-ar" style="color: #0284c7;">حضور</span>
+                                <span class="sub-name" style="color: #158043; font-weight: 800;">HAJAR / ATTENDANCE (ഹാജർ)</span>
+                                <span class="sub-ar" style="color: #16a34a;">حضور</span>
                             </div>
-                            <div class="sub-badge" style="background: #e0f2fe; color: #0284c7; font-weight: 800; border: 1px solid #7dd3fc;">
-                                ${escapeHtml(String(m.mark))}
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <div class="sub-badge" style="background: #dcfce7; color: #166534; font-weight: 800; border: 1px solid #86efac; min-width: 50px;">
+                                    ${escapeHtml(String(m.mark))}
+                                </div>
                             </div>
                         </div>
                     `;
@@ -725,11 +735,11 @@
                             <span class="sub-name">${escapeHtml(title)}</span>
                             ${ar ? `<span class="sub-ar">${escapeHtml(ar)}</span>` : ''}
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 0.72rem; color: #648272;">/ ${max}</span>
+                        <div style="display: flex; align-items: center; gap: 4px;">
                             <div class="sub-badge ${isItemPass ? 'score-good' : 'score-low'}">
                                 ${escapeHtml(String(score))}
                             </div>
+                            <span style="font-size: 0.8rem; font-weight: 700; color: #648272;">/${max}</span>
                         </div>
                     </div>
                 `;
@@ -756,6 +766,7 @@
                         <div class="chips-row">
                             <span class="chip">Class : ${escapeHtml(String(student.class_number))}</span>
                             <span class="chip">Reg. No : ${escapeHtml(String(student.register_no))}</span>
+                            ${rankValue ? `<span class="chip" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; font-weight: 800; border: 1.5px solid #f59e0b;">🏆 Rank : ${escapeHtml(rankValue)}</span>` : ''}
                         </div>
                     </div>
 

@@ -457,6 +457,13 @@ class SupabaseService {
         const topics = cls.topics || [];
         const marksMap = cls.marks || {};
 
+        // Calculate student ranks using standard marksheet model
+        const processedSheet = window.marksheetModel.processSheet(cls.students, topics, marksMap, cls.passPercentage || 36);
+        const rankMap = {};
+        processedSheet.forEach(r => {
+            rankMap[r.student.id] = (r.rank && r.rank !== '-') ? String(r.rank) : '';
+        });
+
         let syncedCount = 0;
         for (const student of cls.students) {
             const studentMarks = [];
@@ -493,6 +500,9 @@ class SupabaseService {
                 });
             }
 
+            const studentRank = rankMap[student.id] || '';
+            const statusWithRank = studentRank ? `RANK:${studentRank}` : '';
+
             await this.saveStudentToSupabase({
                 register_no: student.rollNo || student.id,
                 name: student.name,
@@ -502,7 +512,8 @@ class SupabaseService {
                 madrasa_name: cls.madrasaName || 'BADRUDHEEN MADRASA',
                 madrasa_code: cls.madrasaCode || '6120',
                 class_number: classNumber,
-                syllabus: isAutoPublished ? 'GENERAL' : 'PENDING_APPROVAL',
+                syllabus: isAutoPublished ? (statusWithRank || 'GENERAL') : 'PENDING_APPROVAL',
+                status: statusWithRank || undefined,
                 marks: studentMarks
             });
             syncedCount++;
