@@ -670,6 +670,10 @@
                 rankValue = student.syllabus.split('RANK:')[1].split(' ')[0].trim();
             }
 
+            const displayStatus = (student.status && !student.status.includes('RANK:')) 
+                ? student.status 
+                : (isPassed ? 'Passed' : 'Needs Improvement');
+
             let itemsHtml = '';
             let attendanceBadge = '';
 
@@ -742,12 +746,12 @@
 
                     <!-- Status Banner -->
                     <div class="board-status-banner ${isPassed ? '' : 'fail'}">
-                        <span>${isPassed ? '✓ ' : '⚠️ '}${escapeHtml(student.status && !student.status.includes('RANK:') ? student.status : (isPassed ? 'Passed' : 'Needs Improvement'))}</span>
+                        <span>${isPassed ? '✓ ' : '⚠️ '}${escapeHtml(displayStatus)}</span>
                     </div>
 
                     <!-- Share & Print Actions -->
                     <div class="share-actions-wrap" style="display: flex; gap: 8px; padding: 14px 16px; background: #f8fafc; border-top: 1px solid #e2e8f0; flex-direction: column;">
-                        <button type="button" class="btn-whatsapp-share" onclick="shareToWhatsApp('${escapeHtml(student.name)}', '${student.class_number}', '${student.register_no}', '${student.grand_total || 0}', '${escapeHtml(student.status || 'PASS')}')" style="background: #25D366; color: white; border: none; border-radius: 10px; padding: 10px 16px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                        <button type="button" class="btn-whatsapp-share" onclick="shareToWhatsApp('${escapeHtml(student.name)}', '${student.class_number}', '${student.register_no}', '${student.grand_total || 0}', '${escapeHtml(displayStatus)}', '${escapeHtml(rankValue)}')" style="background: #25D366; color: white; border: none; border-radius: 10px; padding: 10px 16px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.311.045-.698.077-2.285-.58-1.579-.652-2.593-2.247-2.673-2.353-.078-.106-.639-.851-.639-1.624 0-.773.405-1.154.55-1.309.144-.155.316-.194.421-.194.106 0 .211.002.304.006.097.005.228-.037.356.27.133.317.452 1.106.492 1.187.04.081.066.176.013.282-.053.106-.079.172-.158.264-.079.092-.167.206-.238.277-.08.08-.163.167-.07.327.093.159.412.68.883 1.1 1.05.934 1.944 1.222 2.219 1.336.276.115.438.097.6-.09.162-.187.693-.807.878-1.084.184-.277.369-.232.617-.14.248.092 1.571.74 1.839.873.268.134.446.2.512.311.066.111.066.646-.078 1.051z"/>
                                 <path d="M12.004 2c-5.523 0-10 4.477-10 10 0 1.77.464 3.435 1.275 4.881l-1.279 4.673 4.795-1.258c1.401.767 3.003 1.204 4.709 1.204 5.523 0 10-4.477 10-10s-4.477-10-10-10zm0 18.238c-1.536 0-3.003-.432-4.269-1.184l-.306-.182-2.845.746.759-2.772-.199-.317c-.829-1.32-1.267-2.859-1.267-4.453 0-4.542 3.696-8.238 8.238-8.238 4.541 0 8.238 3.696 8.238 8.238 0 4.542-3.697 8.238-8.238 8.238z"/>
@@ -766,21 +770,23 @@
             container.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function formatShareText(name, classNum, regNo, total, status) {
+        function formatShareText(name, classNum, regNo, total, status, rank) {
             const isPass = (status || '').toUpperCase().includes('PASS');
+            const rankLine = rank ? `🏆 *Rank:* Rank ${rank}\n` : '';
             return `*BADRUDHEEN MADRASA - EXAM RESULT 2026-27*\n` +
                    `SKIMV Board No: 1900 | Half Yearly Exam\n\n` +
                    `👤 *Student:* ${name}\n` +
                    `📚 *Class:* Class ${classNum}\n` +
                    `🆔 *Reg / ID:* ${regNo}\n` +
+                   `${rankLine}` +
                    `📊 *Total Score:* ${total}\n` +
-                   `🎯 *Result:* ${isPass ? 'PASSED ✅' : 'NEEDS IMPROVEMENT ⚠️'}\n\n` +
+                   `🎯 *Status:* ${status || (isPass ? 'Passed ✅' : 'Needs Improvement ⚠️')}\n\n` +
                    `Check full online mark list here:\n` +
                    `${window.location.origin}/`;
         }
 
-        function shareToWhatsApp(name, classNum, regNo, total, status) {
-            const text = formatShareText(name, classNum, regNo, total, status);
+        function shareToWhatsApp(name, classNum, regNo, total, status, rank = '') {
+            const text = formatShareText(name, classNum, regNo, total, status, rank);
             const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
             window.open(waUrl, '_blank');
         }
