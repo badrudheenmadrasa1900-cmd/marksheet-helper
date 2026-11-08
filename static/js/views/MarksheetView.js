@@ -117,6 +117,9 @@ class MarksheetView {
                             <button class="btn btn-outline btn-sm" id="btn-reorder-roll" title="Drag & Re-order Register Numbers or auto-sequence 1, 2, 3...">
                                 ↕️ Arrange Reg No
                             </button>
+                            <button class="btn btn-outline btn-sm" id="btn-share-class-wa" title="Share Register Numbers list to WhatsApp Group with Malayalam instructions" style="color: #15803d; border-color: #86efac; background: #f0fdf4; font-weight: 700;">
+                                💬 Share Reg Nos
+                            </button>
                             <button class="btn btn-outline btn-sm" id="btn-manage-topics">
                                 Subjects (${topics.length})
                             </button>
@@ -329,6 +332,7 @@ class MarksheetView {
                                         ${res.hasAnyMark ? `<span class="badge ${res.statusClass}">${res.status === 'Pass' ? 'Pass' : 'Fail'}</span>` : '-'}
                                     </td>
                                     <td class="td-action">
+                                        <button class="btn-icon btn-share-st-wa" data-id="${st.id}" title="Share this student's Reg No to WhatsApp with Malayalam instructions" style="color: #16a34a; margin-right: 4px; font-size: 0.95rem;">💬</button>
                                         <button class="btn-icon btn-edit-student" data-id="${st.id}" title="Edit Student Details" style="color: #0d5c31; margin-right: 4px; font-size: 0.95rem;">✏️</button>
                                         <button class="btn-icon btn-del-student" data-id="${st.id}" title="Delete">&times;</button>
                                     </td>
@@ -388,6 +392,7 @@ class MarksheetView {
                                         <span class="badge ${res.statusClass}" id="card-status-${st.id}">
                                             ${res.hasAnyMark ? (res.status === 'Pass' ? 'Pass' : 'Fail') : '-'}
                                         </span>
+                                        <button class="btn-icon btn-share-st-wa" data-id="${st.id}" title="Share this student's Reg No on WhatsApp with Malayalam instructions" style="color: #16a34a; margin-right: 4px; font-size: 0.95rem;">💬</button>
                                         <button class="btn-icon btn-edit-student" data-id="${st.id}" title="Edit Student Details" style="color: #0d5c31; margin-right: 4px; font-size: 0.95rem;">✏️</button>
                                         <button class="btn-icon btn-del-student" data-id="${st.id}" title="Delete">&times;</button>
                                     </div>
@@ -1617,6 +1622,76 @@ class MarksheetView {
 
         const btnExcel = document.getElementById('btn-export-excel');
         if (btnExcel) btnExcel.addEventListener('click', () => window.exportView.exportExcel(this.currentClass, this.activeTab));
+
+        // Share entire Class Register Numbers to WhatsApp group with Malayalam instructions
+        const btnShareClassWa = document.getElementById('btn-share-class-wa');
+        if (btnShareClassWa) {
+            btnShareClassWa.addEventListener('click', () => {
+                const cls = this.currentClass;
+                const students = (cls.students || []).slice().sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
+                if (students.length === 0) {
+                    alert('വിദ്യാർത്ഥികളുടെ വിവരങ്ങൾ ലഭ്യമല്ല.');
+                    return;
+                }
+
+                const clsNumber = (cls.className || '').replace(/\D/g, '') || '1';
+                const portalUrl = window.location.origin;
+
+                let msg = `📢 *${cls.madrasaName || 'BADRUDHEEN MADRASA'}*\n`;
+                msg += `📖 *${cls.className} - പരീക്ഷാ ഫലം പ്രസിദ്ധീകരിച്ചു*\n`;
+                msg += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+                msg += `പ്രിയ രക്ഷിതാക്കളെ/വിദ്യാർത്ഥികളെ,\n`;
+                msg += `താഴെ നൽകിയിട്ടുള്ള ലിങ്കിൽ കയറി നിങ്ങളുടെ *Class* സെലക്ട് ചെയ്ത ശേഷം നൽകിയിരിക്കുന്ന *Reg. No (റജിസ്റ്റർ നമ്പർ)* നൽകി ഫലം പരിശോധിക്കാവുന്നതാണ്:\n\n`;
+                msg += `🔗 *റിസൾട്ട് പോർട്ടൽ ലിങ്ക്:*\n${portalUrl}\n\n`;
+                msg += `📋 *വിദ്യാർത്ഥികളും റജിസ്റ്റർ നമ്പറും:*\n`;
+
+                students.forEach((st, idx) => {
+                    const rNo = st.rollNo || (idx + 1);
+                    const stId = st.studentId || `1900-C${clsNumber}-${String(rNo).padStart(2, '0')}`;
+                    msg += `• *Reg No:* \`${rNo}\` (${stId}) - *${st.name}*\n`;
+                });
+
+                msg += `\n📌 *നിർദ്ദേശം:*\n`;
+                msg += `1. മുകളിൽ നൽകിയ ലിങ്ക് തുറക്കുക (${portalUrl})\n`;
+                msg += `2. നിങ്ങളുടെ ക്ലാസ്സ് (*${cls.className}*) തിരഞ്ഞെടുക്കുക\n`;
+                msg += `3. മുകളിൽ നിങ്ങളുടെ പേരിനെതിരെ ഉള്ള *Reg No* നൽകി *'Check Result'* ക്ലിക്ക് ചെയ്യുക.\n\n`;
+                msg += `_ശുഭാശംസകൾ!_ ✨`;
+
+                const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+                window.open(waUrl, '_blank');
+            });
+        }
+
+        // Single student WhatsApp share button
+        document.querySelectorAll('.btn-share-st-wa').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const studentId = e.currentTarget.getAttribute('data-id');
+                const cls = this.currentClass;
+                const st = (cls.students || []).find(s => s.id === studentId);
+                if (!st) return;
+
+                const clsNumber = (cls.className || '').replace(/\D/g, '') || '1';
+                const rNo = st.rollNo || '1';
+                const fullId = st.studentId || `1900-C${clsNumber}-${String(rNo).padStart(2, '0')}`;
+                const portalUrl = window.location.origin;
+
+                let msg = `📢 *${cls.madrasaName || 'BADRUDHEEN MADRASA'}*\n`;
+                msg += `📖 *${cls.className} - പരീക്ഷാ ഫലം*\n`;
+                msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+                msg += `👤 *വിദ്യാർത്ഥിയുടെ പേര്:* *${st.name}*\n`;
+                msg += `🆔 *റജിസ്റ്റർ നമ്പർ (Reg No):* \`${rNo}\`\n`;
+                msg += `🔢 *Student ID:* \`${fullId}\`\n`;
+                msg += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+                msg += `📌 *മാർക്ക് ഷീറ്റ് പരിശോധിക്കുന്ന വിധം:*\n`;
+                msg += `1. താഴെയുള്ള ലിങ്കിൽ ക്ലിക്ക് ചെയ്യുക:\n   👉 ${portalUrl}\n`;
+                msg += `2. നിങ്ങളുടെ ക്ലാസ്സ് (*${cls.className}*) സെലക്ട് ചെയ്യുക.\n`;
+                msg += `3. മുകളിൽ നൽകിയ റജിസ്റ്റർ നമ്പർ (\`${rNo}\`) നൽകി *'Check Result'* ക്ലിക്ക് ചെയ്യുക.\n\n`;
+                msg += `_വിജയാശംസകൾ!_ ✨`;
+
+                const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+                window.open(waUrl, '_blank');
+            });
+        });
 
         // Edit student buttons
         document.querySelectorAll('.btn-edit-student').forEach(btn => {
