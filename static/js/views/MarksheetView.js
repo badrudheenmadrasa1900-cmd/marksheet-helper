@@ -1756,16 +1756,15 @@ class MarksheetView {
         const btnReorder = document.getElementById('btn-reorder-roll');
         if (btnReorder) {
             btnReorder.addEventListener('click', async () => {
-                const scopeLabel = (this.activeTab === 'boys') ? 'Boys' : (this.activeTab === 'girls' ? 'Girls' : 'All Students');
                 const confirmed = await window.showConfirmDialog(
-                    'Order Register Numbers',
-                    `Do you want to re-number and order all <strong>${scopeLabel}</strong> register numbers sequentially (1, 2, 3...)?<br><br><span style="font-size:0.8rem; color:#64748b;">This will safely update their Roll Numbers and unique IDs (e.g. 1900-C8-01) while preserving all marks and attendance.</span>`,
+                    'Fix & Order Register Numbers',
+                    `Do you want to assign <strong>unique sequential Register Numbers (1, 2, 3...)</strong> across all students in this class?<br><br><span style="font-size:0.8rem; color:#64748b;">This will remove any duplicate roll numbers between boys and girls, keeping each student's number unique while preserving all marks.</span>`,
                     '🔢',
-                    'Yes, Order Now',
+                    'Yes, Order All (1 to N)',
                     'Cancel'
                 );
                 if (confirmed) {
-                    window.marksheetController.reorderRegisterNumbers(this.currentClass.id, 'current');
+                    window.marksheetController.reorderRegisterNumbers(this.currentClass.id, 'all');
                 }
             });
         }

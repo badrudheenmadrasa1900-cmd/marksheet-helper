@@ -86,16 +86,15 @@ class MarksheetController {
      * Re-order and re-assign register / roll numbers sequentially (1, 2, 3...)
      * either for the current gender tab ('boys' | 'girls') or across all students.
      */
-    reorderRegisterNumbers(classId, scope = 'current') {
+    reorderRegisterNumbers(classId, scope = 'all') {
         const cls = window.storageModel.getClass(classId);
         if (!cls || !cls.students || cls.students.length === 0) return;
 
         const clsNum = (cls.className || 'C1').replace(/\D/g, '') || '1';
         const activeTab = (window.marksheetView && window.marksheetView.activeTab) ? window.marksheetView.activeTab : 'all';
 
-        if (scope === 'current' && (activeTab === 'boys' || activeTab === 'girls')) {
+        if (scope === 'gender_only' && (activeTab === 'boys' || activeTab === 'girls')) {
             const targetGender = activeTab === 'girls' ? 'girl' : 'boy';
-            // Sort targeted students by current roll number
             const targetStudents = cls.students.filter(s => s.gender === targetGender);
             targetStudents.sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
 
@@ -106,9 +105,13 @@ class MarksheetController {
                 st.studentId = `1900-C${clsNum}-${paddedRoll}`;
             });
         } else {
-            // Sort all students by current roll number, or preserve gender-grouped sequence
-            cls.students.sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
-            cls.students.forEach((st, idx) => {
+            // Unify entire class (All Students) with unique sequential numbers 1, 2, 3...
+            // Boys first, then Girls (or natural roll order) to ensure ZERO duplication
+            const boys = cls.students.filter(s => s.gender !== 'girl').sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
+            const girls = cls.students.filter(s => s.gender === 'girl').sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
+            
+            const ordered = [...boys, ...girls];
+            ordered.forEach((st, idx) => {
                 const newRoll = (idx + 1).toString();
                 const paddedRoll = newRoll.padStart(2, '0');
                 st.rollNo = newRoll;
