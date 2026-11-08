@@ -1349,6 +1349,7 @@ class MarksheetView {
                                     <option value="THAFSEER (التّفسير)">THAFSEER (التّفسير)</option>
                                     <option value="LISANUL QUR'AN - THAJVEED (التّجويد)">LISANUL QUR'AN - THAJVEED (التّجويد)</option>
                                     <option value="AQEEDA (العقيدة)">AQEEDA (العقيدة)</option>
+                                    <option value="PRACTICAL EXAM (امتحان عملي)">PRACTICAL EXAM (امتحان عملي)</option>
                                 </select>
                             </div>
                             <div id="modal-topics-list">

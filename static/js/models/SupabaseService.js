@@ -25,7 +25,8 @@ class SupabaseService {
             { id: 'sub_hifz', subject: "HIFZ", arabic: "الحفظ", defaultMax: 50, passMark: 18 },
             { id: 'sub_thafseer', subject: "THAFSEER", arabic: "التّفسير", defaultMax: 50, passMark: 18 },
             { id: 'sub_thajveed', subject: "LISANUL QUR'AN - THAJVEED", arabic: "التّجويد", defaultMax: 50, passMark: 18 },
-            { id: 'sub_aqeeda', subject: "AQEEDA", arabic: "العقيدة", defaultMax: 50, passMark: 18 }
+            { id: 'sub_aqeeda', subject: "AQEEDA", arabic: "العقيدة", defaultMax: 50, passMark: 18 },
+            { id: 'sub_practical', subject: "PRACTICAL EXAM", arabic: "امتحان عملي", defaultMax: 50, passMark: 18 }
         ];
     }
 

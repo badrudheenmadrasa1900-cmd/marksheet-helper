@@ -836,9 +836,24 @@
                 <div class="form-row mt-2">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <label style="margin: 0;">Pre-ordered Core Subjects (Drag or Reorder)</label>
-                        <button type="button" class="btn-action-outline" style="padding: 4px 10px; font-size: 0.78rem;" onclick="addSyllabusSubjectRow()">
-                            + Add Subject
-                        </button>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="admin-quick-add-subject" class="form-control-modal" style="height: 34px; font-size: 0.8rem; padding: 0 8px; width: 220px;" onchange="handleAdminQuickAddSubject(this)">
+                                <option value="">-- Quick Add Subject --</option>
+                                <option value="FIQH (الفقه)">FIQH (الفقه)</option>
+                                <option value="LISANUL QUR'AN (لسان القرآن)">LISANUL QUR'AN (لسان القرآن)</option>
+                                <option value="DUROOSUL IHSAN (دروس الإحسان)">DUROOSUL IHSAN (دروس الإحسان)</option>
+                                <option value="THAREEKH (التّاريخ)">THAREEKH (التّاريخ)</option>
+                                <option value="QUR'AN (القرآن الكريم)">QUR'AN (القرآن الكريم)</option>
+                                <option value="HIFZ (الحفظ)">HIFZ (الحفظ)</option>
+                                <option value="THAFSEER (التّفسير)">THAFSEER (التّفسير)</option>
+                                <option value="LISANUL QUR'AN - THAJVEED (التّجويد)">LISANUL QUR'AN - THAJVEED (التّجويد)</option>
+                                <option value="AQEEDA (العقيدة)">AQEEDA (العقيدة)</option>
+                                <option value="PRACTICAL EXAM (امتحان عملي)">Practical Exam (امتحان عملي)</option>
+                            </select>
+                            <button type="button" class="btn-action-outline" style="padding: 4px 10px; font-size: 0.78rem;" onclick="addSyllabusSubjectRow()">
+                                + Custom
+                            </button>
+                        </div>
                     </div>
                     <div id="syllabus-subjects-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding: 4px 2px;">
                         <!-- Subject rows inserted here -->
@@ -1256,6 +1271,13 @@
 
         function closeSyllabusModal() {
             document.getElementById('edit-syllabus-modal').style.display = 'none';
+        }
+
+        function handleAdminQuickAddSubject(selectEl) {
+            const val = selectEl.value;
+            if (!val) return;
+            addSyllabusSubjectRow(val, 50);
+            selectEl.value = '';
         }
 
         function addSyllabusSubjectRow(name = '', maxMarks = 50) {
