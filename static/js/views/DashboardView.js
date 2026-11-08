@@ -174,17 +174,59 @@ class DashboardView {
         const modalContainer = document.getElementById('modal-container');
         const isEdit = !!classData;
 
-        // Default topics if creating new with standard subjects (all marks out of 50, Qur'an & Hifz separated)
-        const defaultTopics = isEdit ? classData.topics : [
-            { id: 'top_1', name: 'FIQH (الفقه)', maxMarks: 50 },
-            { id: 'top_2', name: "LISANUL QUR'AN (لسان القرآن)", maxMarks: 50 },
-            { id: 'top_3', name: 'DUROOSUL IHSAN (دروس الإحسان)', maxMarks: 50 },
-            { id: 'top_4', name: 'THAREEKH (التّاريخ)', maxMarks: 50 },
-            { id: 'top_5', name: "QUR'AN (القرآن الكريم)", maxMarks: 50 },
-            { id: 'top_6', name: "HIFZ (الحفظ)", maxMarks: 50 }
-        ];
+        // Fetch master syllabus configured by Sadar Muallim in Admin Control Room if available
+        const getMasterTopicsForClass = (clsName) => {
+            try {
+                const stored = localStorage.getItem('bm_master_syllabus_config');
+                if (stored) {
+                    const list = JSON.parse(stored);
+                    const classNum = parseInt((clsName || '').replace(/\D/g, '') || '5', 10);
+                    // Match standard (e.g. "Class 5", "Class 1 - 4", "Class 6 - 9")
+                    for (const item of list) {
+                        const std = item.standard || '';
+                        if (std.includes('-')) {
+                            const [minStr, maxStr] = std.replace(/[^\d-]/g, '').split('-');
+                            const min = parseInt(minStr, 10);
+                            const max = parseInt(maxStr, 10);
+                            if (!isNaN(min) && !isNaN(max) && classNum >= min && classNum <= max) {
+                                return (item.subjects || []).map((s, idx) => ({
+                                    id: 'top_' + (idx + 1),
+                                    name: typeof s === 'string' ? s : s.name,
+                                    maxMarks: typeof s === 'string' ? 50 : (s.maxMarks || 50)
+                                }));
+                            }
+                        } else {
+                            const num = parseInt(std.replace(/\D/g, ''), 10);
+                            if (num === classNum) {
+                                return (item.subjects || []).map((s, idx) => ({
+                                    id: 'top_' + (idx + 1),
+                                    name: typeof s === 'string' ? s : s.name,
+                                    maxMarks: typeof s === 'string' ? 50 : (s.maxMarks || 50)
+                                }));
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Error reading master syllabus', e);
+            }
+            return null;
+        };
 
         const selectedClass = isEdit ? (classData.className || 'Class 5') : 'Class 5';
+        const masterPreorderedTopics = getMasterTopicsForClass(selectedClass);
+
+        // Default topics if creating new with standard subjects (all marks out of 50, Qur'an & Hifz separated)
+        const defaultTopics = isEdit 
+            ? classData.topics 
+            : (masterPreorderedTopics || [
+                { id: 'top_1', name: 'FIQH (الفقه)', maxMarks: 50 },
+                { id: 'top_2', name: "LISANUL QUR'AN (لسان القرآن)", maxMarks: 50 },
+                { id: 'top_3', name: 'DUROOSUL IHSAN (دروس الإحسان)', maxMarks: 50 },
+                { id: 'top_4', name: 'THAREEKH (التّاريخ)', maxMarks: 50 },
+                { id: 'top_5', name: "QUR'AN (القرآن الكريم)", maxMarks: 50 },
+                { id: 'top_6', name: "HIFZ (الحفظ)", maxMarks: 50 }
+            ]);
 
         modalContainer.innerHTML = `
             <div class="modal-backdrop">

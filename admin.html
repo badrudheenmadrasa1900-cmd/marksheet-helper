@@ -764,8 +764,16 @@
                 <div>
                     <h2>Master Classes & Subjects Setup</h2>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
-                        Authorized standard classes (1 to 12) and official Samastha syllabus topics.
+                        Configure authorized classes, syllabus titles, and pre-ordered syllabus subjects with maximum marks.
                     </p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-action-outline" onclick="resetMasterSyllabusToDefault()">
+                        ↺ Reset to Samastha Default
+                    </button>
+                    <button class="btn-action-primary" onclick="openAddSyllabusGroupModal()">
+                        + Add / Configure Standard
+                    </button>
                 </div>
             </div>
 
@@ -775,23 +783,78 @@
                         <tr>
                             <th>Standard</th>
                             <th>Syllabus</th>
-                            <th>Core Subjects</th>
+                            <th>Core Subjects (Pre-ordered)</th>
                             <th>Passing Threshold</th>
                             <th>Authorization</th>
+                            <th style="text-align: right;">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr><td><strong>Class 1 - 4</strong></td><td>Primary Islamic Studies</td><td>Quran, Fiqh, Thareekh, Thajveed</td><td>36% per subject</td><td><span class="status-pill live">Admin Controlled</span></td></tr>
-                        <tr><td><strong>Class 5</strong></td><td>Public Examination (Board)</td><td>Fiqh, Lisanul Quran, Duroosul Ihsan, Thareekh, Quran/Hifz</td><td>36% per subject</td><td><span class="status-pill live">Board Verified</span></td></tr>
-                        <tr><td><strong>Class 6 - 9</strong></td><td>Secondary Islamic Studies</td><td>Fiqh, Thafseer, Lisanul Quran, Aqeeda, Thajveed</td><td>36% per subject</td><td><span class="status-pill live">Admin Controlled</span></td></tr>
-                        <tr><td><strong>Class 10</strong></td><td>Senior Secondary Board</td><td>Fiqh, Thafseer, Lisanul Quran, Duroosul Ihsan</td><td>36% per subject</td><td><span class="status-pill live">Board Verified</span></td></tr>
-                        <tr><td><strong>Class 11 - 12</strong></td><td>Higher Secondary Examination</td><td>Fiqh, Thafseer, Lisanul Quran, Duroosul Ihsan</td><td>36% per subject</td><td><span class="status-pill live">Board Verified</span></td></tr>
+                    <tbody id="master-syllabus-table-body">
+                        <!-- Populated dynamically via renderMasterSyllabusTable() -->
                     </tbody>
                 </table>
             </div>
         </section>
 
     </main>
+
+    <!-- Modal: Edit / Add Master Class Syllabus & Pre-ordered Subjects -->
+    <div id="edit-syllabus-modal" class="modal-bg" style="display: none;">
+        <div class="modal-card" style="max-width: 650px;">
+            <div class="modal-header-row">
+                <h3 id="modal-syllabus-title">Configure Syllabus & Subjects</h3>
+                <button class="btn-close-modal" onclick="closeSyllabusModal()">&times;</button>
+            </div>
+            
+            <form id="syllabus-config-form" onsubmit="handleSaveSyllabusConfig(event)">
+                <input type="hidden" id="edit-syllabus-id">
+
+                <div class="form-row">
+                    <label for="edit-standard-label">Standard / Class Range *</label>
+                    <input type="text" id="edit-standard-label" class="form-control-modal" placeholder="e.g. Class 5 or Class 1 - 4" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="edit-syllabus-name">Syllabus Title *</label>
+                    <input type="text" id="edit-syllabus-name" class="form-control-modal" placeholder="e.g. Public Examination (Board)" required>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <div class="form-row" style="flex: 1;">
+                        <label for="edit-passing-threshold">Passing Threshold</label>
+                        <input type="text" id="edit-passing-threshold" class="form-control-modal" placeholder="e.g. 36% per subject" value="36% per subject" required>
+                    </div>
+                    <div class="form-row" style="flex: 1;">
+                        <label for="edit-auth-label">Authorization</label>
+                        <select id="edit-auth-label" class="form-control-modal">
+                            <option value="Board Verified">Board Verified</option>
+                            <option value="Admin Controlled">Admin Controlled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row mt-2">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label style="margin: 0;">Pre-ordered Core Subjects (Drag or Reorder)</label>
+                        <button type="button" class="btn-action-outline" style="padding: 4px 10px; font-size: 0.78rem;" onclick="addSyllabusSubjectRow()">
+                            + Add Subject
+                        </button>
+                    </div>
+                    <div id="syllabus-subjects-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding: 4px 2px;">
+                        <!-- Subject rows inserted here -->
+                    </div>
+                    <small style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-top: 6px;">
+                        Use ⬆ / ⬇ buttons to set the exact pre-order of syllabus subjects appearing on marksheets and report cards.
+                    </small>
+                </div>
+
+                <div class="modal-footer-btns">
+                    <button type="button" class="btn-action-outline" onclick="closeSyllabusModal()">Cancel</button>
+                    <button type="submit" id="btn-save-syllabus" class="btn-action-primary">Save Syllabus Configuration</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Modal: Add New Usthad with Assigned Classes & Pass Key -->
     <div id="add-teacher-modal" class="modal-bg" style="display: none;">
@@ -998,6 +1061,295 @@
         async function loadControlRoomData() {
             loadSubmittedResults();
             loadTeachersList();
+            renderMasterSyllabusTable();
+        }
+
+        // =========================================================================
+        // Master Classes & Syllabus Setup Management (Admin Control & Pre-ordering)
+        // =========================================================================
+        const MASTER_SYLLABUS_STORAGE_KEY = "bm_master_syllabus_config";
+
+        const DEFAULT_SAMASTHA_SYLLABUS = [
+            {
+                id: "syl_1_4",
+                standard: "Class 1 - 4",
+                syllabus: "Primary Islamic Studies",
+                threshold: "36% per subject",
+                auth: "Admin Controlled",
+                subjects: [
+                    { name: "QUR'AN (القرآن الكريم)", maxMarks: 50 },
+                    { name: "FIQH (الفقه)", maxMarks: 50 },
+                    { name: "THAREEKH (التّاريخ)", maxMarks: 50 },
+                    { name: "LISANUL QUR'AN - THAJVEED (التّجويد)", maxMarks: 50 }
+                ]
+            },
+            {
+                id: "syl_5",
+                standard: "Class 5",
+                syllabus: "Public Examination (Board)",
+                threshold: "36% per subject",
+                auth: "Board Verified",
+                subjects: [
+                    { name: "FIQH (الفقه)", maxMarks: 50 },
+                    { name: "LISANUL QUR'AN (لسان القرآن)", maxMarks: 50 },
+                    { name: "DUROOSUL IHSAN (دروس الإحسان)", maxMarks: 50 },
+                    { name: "THAREEKH (التّاريخ)", maxMarks: 50 },
+                    { name: "QUR'AN (القرآن الكريم)", maxMarks: 50 },
+                    { name: "HIFZ (الحفظ)", maxMarks: 50 }
+                ]
+            },
+            {
+                id: "syl_6_9",
+                standard: "Class 6 - 9",
+                syllabus: "Secondary Islamic Studies",
+                threshold: "36% per subject",
+                auth: "Admin Controlled",
+                subjects: [
+                    { name: "FIQH (الفقه)", maxMarks: 50 },
+                    { name: "THAFSEER (التّفسير)", maxMarks: 50 },
+                    { name: "LISANUL QUR'AN (لسان القرآن)", maxMarks: 50 },
+                    { name: "AQEEDA (العقيدة)", maxMarks: 50 },
+                    { name: "LISANUL QUR'AN - THAJVEED (التّجويد)", maxMarks: 50 }
+                ]
+            },
+            {
+                id: "syl_10",
+                standard: "Class 10",
+                syllabus: "Senior Secondary Board",
+                threshold: "36% per subject",
+                auth: "Board Verified",
+                subjects: [
+                    { name: "FIQH (الفقه)", maxMarks: 50 },
+                    { name: "THAFSEER (التّفسير)", maxMarks: 50 },
+                    { name: "LISANUL QUR'AN (لسان القرآن)", maxMarks: 50 },
+                    { name: "DUROOSUL IHSAN (دروس الإحسان)", maxMarks: 50 }
+                ]
+            },
+            {
+                id: "syl_11_12",
+                standard: "Class 11 - 12",
+                syllabus: "Higher Secondary Examination",
+                threshold: "36% per subject",
+                auth: "Board Verified",
+                subjects: [
+                    { name: "FIQH (الفقه)", maxMarks: 50 },
+                    { name: "THAFSEER (التّفسير)", maxMarks: 50 },
+                    { name: "LISANUL QUR'AN (لسان القرآن)", maxMarks: 50 },
+                    { name: "DUROOSUL IHSAN (دروس الإحسان)", maxMarks: 50 }
+                ]
+            }
+        ];
+
+        function getMasterSyllabusList() {
+            try {
+                const stored = localStorage.getItem(MASTER_SYLLABUS_STORAGE_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) {
+                console.error("Error reading syllabus config", e);
+            }
+            return DEFAULT_SAMASTHA_SYLLABUS;
+        }
+
+        function saveMasterSyllabusList(list) {
+            localStorage.setItem(MASTER_SYLLABUS_STORAGE_KEY, JSON.stringify(list));
+            renderMasterSyllabusTable();
+        }
+
+        async function resetMasterSyllabusToDefault() {
+            const confirmed = await showAdminConfirm(
+                'Reset to Samastha Default',
+                'Are you sure you want to restore the default official Samastha board syllabus and subject setup for all standards?',
+                '↺'
+            );
+            if (confirmed) {
+                saveMasterSyllabusList(DEFAULT_SAMASTHA_SYLLABUS);
+                await showAdminAlert('Restored', 'Master syllabus reset to official Samastha standard defaults.', '✅');
+            }
+        }
+
+        function renderMasterSyllabusTable() {
+            const tbody = document.getElementById('master-syllabus-table-body');
+            if (!tbody) return;
+
+            const list = getMasterSyllabusList();
+            tbody.innerHTML = list.map((item, index) => {
+                const subjectsSummary = (item.subjects || []).map((s, idx) => {
+                    const cleanName = typeof s === 'string' ? s : (s.name || '');
+                    return `<span style="display:inline-block; background:#eaf5ee; color:#0d5c31; border-radius:6px; padding:2px 7px; margin:2px; font-size:0.8rem; font-weight:600;"><span style="color:#059669; font-weight:700;">${idx + 1}.</span> ${escapeHtml(cleanName)}</span>`;
+                }).join(' ') || '<span style="color:#9ca3af; font-size:0.8rem;">No subjects defined</span>';
+
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(item.standard)}</strong></td>
+                        <td>${escapeHtml(item.syllabus)}</td>
+                        <td>
+                            <div style="line-height: 1.6;">${subjectsSummary}</div>
+                        </td>
+                        <td>${escapeHtml(item.threshold || '36% per subject')}</td>
+                        <td>
+                            <span class="status-pill ${item.auth === 'Board Verified' ? 'live' : 'pending'}" style="${item.auth === 'Board Verified' ? '' : 'background:#ecfdf5; color:#065f46;'}">
+                                ${escapeHtml(item.auth || 'Admin Controlled')}
+                            </span>
+                        </td>
+                        <td style="text-align: right; white-space: nowrap;">
+                            <button class="btn-action-primary" style="padding: 4px 10px; font-size: 0.78rem; margin-right: 4px;" onclick="openEditSyllabusModal('${item.id}')">
+                                ✏️ Edit Syllabus
+                            </button>
+                            <button class="btn-action-outline" style="color: #dc2626; border-color: #fecdd3; padding: 4px 8px; font-size: 0.78rem;" onclick="deleteSyllabusGroup('${item.id}')">
+                                🗑️
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openAddSyllabusGroupModal() {
+            document.getElementById('edit-syllabus-id').value = '';
+            document.getElementById('modal-syllabus-title').textContent = 'Add Standard & Pre-order Syllabus';
+            document.getElementById('edit-standard-label').value = '';
+            document.getElementById('edit-syllabus-name').value = '';
+            document.getElementById('edit-passing-threshold').value = '36% per subject';
+            document.getElementById('edit-auth-label').value = 'Admin Controlled';
+
+            const container = document.getElementById('syllabus-subjects-container');
+            container.innerHTML = '';
+            // Preload 4 default slots
+            addSyllabusSubjectRow("FIQH (الفقه)", 50);
+            addSyllabusSubjectRow("LISANUL QUR'AN (لسان القرآن)", 50);
+            addSyllabusSubjectRow("THAREEKH (التّاريخ)", 50);
+            addSyllabusSubjectRow("QUR'AN (القرآن الكريم)", 50);
+
+            document.getElementById('edit-syllabus-modal').style.display = 'flex';
+        }
+
+        function openEditSyllabusModal(id) {
+            const list = getMasterSyllabusList();
+            const item = list.find(s => s.id === id);
+            if (!item) return;
+
+            document.getElementById('edit-syllabus-id').value = item.id;
+            document.getElementById('modal-syllabus-title').textContent = `Edit Syllabus: ${item.standard}`;
+            document.getElementById('edit-standard-label').value = item.standard;
+            document.getElementById('edit-syllabus-name').value = item.syllabus;
+            document.getElementById('edit-passing-threshold').value = item.threshold || '36% per subject';
+            document.getElementById('edit-auth-label').value = item.auth || 'Board Verified';
+
+            const container = document.getElementById('syllabus-subjects-container');
+            container.innerHTML = '';
+
+            (item.subjects || []).forEach(s => {
+                const name = typeof s === 'string' ? s : (s.name || '');
+                const max = typeof s === 'string' ? 50 : (s.maxMarks || 50);
+                addSyllabusSubjectRow(name, max);
+            });
+
+            if (container.children.length === 0) {
+                addSyllabusSubjectRow('', 50);
+            }
+
+            document.getElementById('edit-syllabus-modal').style.display = 'flex';
+        }
+
+        function closeSyllabusModal() {
+            document.getElementById('edit-syllabus-modal').style.display = 'none';
+        }
+
+        function addSyllabusSubjectRow(name = '', maxMarks = 50) {
+            const container = document.getElementById('syllabus-subjects-container');
+            const row = document.createElement('div');
+            row.className = 'syllabus-subject-item';
+            row.style.cssText = "display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px;";
+
+            row.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <button type="button" class="btn-sub-up" style="background:none; border:none; cursor:pointer; font-size:0.75rem; color:#475569; padding:0; line-height:1;" title="Move Up">▲</button>
+                    <button type="button" class="btn-sub-down" style="background:none; border:none; cursor:pointer; font-size:0.75rem; color:#475569; padding:0; line-height:1;" title="Move Down">▼</button>
+                </div>
+                <input type="text" class="form-control-modal input-sub-name" placeholder="Subject Name (e.g. FIQH (الفقه))" value="${escapeHtml(name)}" required style="height: 38px; font-size: 0.88rem; flex: 2;">
+                <input type="number" class="form-control-modal input-sub-max" placeholder="Max" value="${maxMarks}" min="1" max="1000" required style="height: 38px; font-size: 0.88rem; width: 75px; text-align: center;">
+                <button type="button" class="btn-remove-sub" style="background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem; padding: 0 4px;" title="Remove Subject">&times;</button>
+            `;
+
+            row.querySelector('.btn-sub-up').onclick = () => {
+                if (row.previousElementSibling) {
+                    container.insertBefore(row, row.previousElementSibling);
+                }
+            };
+            row.querySelector('.btn-sub-down').onclick = () => {
+                if (row.nextElementSibling) {
+                    container.insertBefore(row.nextElementSibling, row);
+                }
+            };
+            row.querySelector('.btn-remove-sub').onclick = () => {
+                if (container.children.length > 1) {
+                    row.remove();
+                } else {
+                    showAdminAlert('Required', 'At least one subject is required in the syllabus.', '⚠️');
+                }
+            };
+
+            container.appendChild(row);
+        }
+
+        async function handleSaveSyllabusConfig(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-syllabus-id').value;
+            const standard = document.getElementById('edit-standard-label').value.trim();
+            const syllabus = document.getElementById('edit-syllabus-name').value.trim();
+            const threshold = document.getElementById('edit-passing-threshold').value.trim();
+            const auth = document.getElementById('edit-auth-label').value;
+
+            const container = document.getElementById('syllabus-subjects-container');
+            const subjectRows = container.querySelectorAll('.syllabus-subject-item');
+            const subjects = [];
+
+            subjectRows.forEach(r => {
+                const sName = r.querySelector('.input-sub-name').value.trim();
+                const sMax = Number(r.querySelector('.input-sub-max').value) || 50;
+                if (sName) {
+                    subjects.push({ name: sName, maxMarks: sMax });
+                }
+            });
+
+            if (subjects.length === 0) {
+                await showAdminAlert('Subjects Needed', 'Please add at least one subject to this standard syllabus.', '⚠️');
+                return;
+            }
+
+            const list = getMasterSyllabusList();
+            if (id) {
+                const idx = list.findIndex(s => s.id === id);
+                if (idx !== -1) {
+                    list[idx] = { ...list[idx], standard, syllabus, threshold, auth, subjects };
+                }
+            } else {
+                const newId = 'syl_' + Date.now();
+                list.push({ id: newId, standard, syllabus, threshold, auth, subjects });
+            }
+
+            saveMasterSyllabusList(list);
+            closeSyllabusModal();
+            await showAdminAlert('Saved Successfully', `Syllabus for <strong>${escapeHtml(standard)}</strong> updated with ${subjects.length} pre-ordered subjects!`, '✅');
+        }
+
+        async function deleteSyllabusGroup(id) {
+            const list = getMasterSyllabusList();
+            const item = list.find(s => s.id === id);
+            if (!item) return;
+
+            const confirmed = await showAdminConfirm(
+                'Delete Syllabus Standard',
+                `Are you sure you want to remove the master setup for <strong>${escapeHtml(item.standard)}</strong>?`,
+                '🗑️'
+            );
+            if (confirmed) {
+                const filtered = list.filter(s => s.id !== id);
+                saveMasterSyllabusList(filtered);
+            }
         }
 
         async function loadSubmittedResults() {

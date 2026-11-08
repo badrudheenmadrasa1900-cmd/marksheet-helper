@@ -122,6 +122,34 @@ class MarksheetController {
         this.openClass(classId, activeTab);
     }
 
+    /**
+     * Update order of students by re-sequencing their roll numbers from an array of student IDs
+     */
+    reorderStudentsList(classId, orderedStudentIds) {
+        const cls = window.storageModel.getClass(classId);
+        if (!cls || !cls.students) return;
+
+        const clsNum = (cls.className || 'C1').replace(/\D/g, '') || '1';
+        const activeTab = (window.marksheetView && window.marksheetView.activeTab) ? window.marksheetView.activeTab : 'all';
+
+        // Reassign roll numbers 1, 2, 3... to the ordered subset of students
+        orderedStudentIds.forEach((id, idx) => {
+            const st = cls.students.find(s => s.id === id);
+            if (st) {
+                const newRoll = (idx + 1).toString();
+                const paddedRoll = newRoll.padStart(2, '0');
+                st.rollNo = newRoll;
+                st.studentId = `1900-C${clsNum}-${paddedRoll}`;
+            }
+        });
+
+        // Natural sort all students
+        cls.students.sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
+        cls.isDirty = true;
+        window.storageModel.saveClass(cls);
+        this.openClass(classId, activeTab);
+    }
+
     addBulkStudents(classId, studentsArray) {
         const cls = window.storageModel.getClass(classId);
         if (!cls) return;

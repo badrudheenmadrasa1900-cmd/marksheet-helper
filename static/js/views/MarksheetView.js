@@ -114,8 +114,8 @@ class MarksheetView {
                                 </button>
                             </div>
 
-                            <button class="btn btn-outline btn-sm" id="btn-reorder-roll" title="Order and re-sequence Register Numbers sequentially (1, 2, 3...)">
-                                🔢 Order Reg No
+                            <button class="btn btn-outline btn-sm" id="btn-reorder-roll" title="Drag & Re-order Register Numbers or auto-sequence 1, 2, 3...">
+                                ↕️ Arrange Reg No
                             </button>
                             <button class="btn btn-outline btn-sm" id="btn-manage-topics">
                                 Subjects (${topics.length})
