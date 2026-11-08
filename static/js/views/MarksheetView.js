@@ -332,6 +332,7 @@ class MarksheetView {
                                         ${res.hasAnyMark ? `<span class="badge ${res.statusClass}">${res.status === 'Pass' ? 'Pass' : 'Fail'}</span>` : '-'}
                                     </td>
                                     <td class="td-action">
+                                        <button class="btn-icon btn-sync-st-cloud" data-id="${st.id}" title="Publish / Sync this student only" style="color: #0284c7; margin-right: 4px; font-size: 0.95rem;">☁️</button>
                                         <button class="btn-icon btn-share-st-wa" data-id="${st.id}" title="Share this student's Reg No to WhatsApp with Malayalam instructions" style="color: #16a34a; margin-right: 4px; font-size: 0.95rem;">💬</button>
                                         <button class="btn-icon btn-edit-student" data-id="${st.id}" title="Edit Student Details" style="color: #0d5c31; margin-right: 4px; font-size: 0.95rem;">✏️</button>
                                         <button class="btn-icon btn-del-student" data-id="${st.id}" title="Delete">&times;</button>
@@ -392,6 +393,7 @@ class MarksheetView {
                                         <span class="badge ${res.statusClass}" id="card-status-${st.id}">
                                             ${res.hasAnyMark ? (res.status === 'Pass' ? 'Pass' : 'Fail') : '-'}
                                         </span>
+                                        <button class="btn-icon btn-sync-st-cloud" data-id="${st.id}" title="Publish / Sync this student only" style="color: #0284c7; margin-right: 4px; font-size: 0.95rem;">☁️</button>
                                         <button class="btn-icon btn-share-st-wa" data-id="${st.id}" title="Share this student's Reg No on WhatsApp with Malayalam instructions" style="color: #16a34a; margin-right: 4px; font-size: 0.95rem;">💬</button>
                                         <button class="btn-icon btn-edit-student" data-id="${st.id}" title="Edit Student Details" style="color: #0d5c31; margin-right: 4px; font-size: 0.95rem;">✏️</button>
                                         <button class="btn-icon btn-del-student" data-id="${st.id}" title="Delete">&times;</button>
@@ -1690,6 +1692,51 @@ class MarksheetView {
 
                 const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
                 window.open(waUrl, '_blank');
+            });
+        });
+
+        // Individual Student Publish / Cloud Sync button
+        document.querySelectorAll('.btn-sync-st-cloud').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const studentId = e.currentTarget.getAttribute('data-id');
+                const cls = this.currentClass;
+                const st = (cls.students || []).find(s => s.id === studentId);
+                if (!st) return;
+
+                const confirmed = await window.showConfirmDialog(
+                    'Publish Individual Student',
+                    `Do you want to publish / update the marks for <strong>${st.name}</strong> (Reg No: ${st.rollNo || '1'}) only to the live portal?`,
+                    '☁️',
+                    'Yes, Publish Student',
+                    'Cancel'
+                );
+
+                if (!confirmed) return;
+
+                const origHtml = e.currentTarget.innerHTML;
+                e.currentTarget.innerHTML = '⏳';
+                e.currentTarget.disabled = true;
+
+                try {
+                    const session = window.storageModel.getSession();
+                    const isAdmin = session && session.role === 'admin';
+                    const res = await window.supabaseService.syncSingleStudentToSupabase(cls, studentId, isAdmin);
+
+                    if (res && res.success) {
+                        await window.showAlertDialog(
+                            'Published Successfully',
+                            `Marks for <strong>${st.name}</strong> (Reg: ${st.rollNo}) have been updated on the live result portal!`,
+                            '✅'
+                        );
+                    } else {
+                        throw new Error(res.message || 'Failed to update student');
+                    }
+                } catch (err) {
+                    await window.showAlertDialog('Sync Error', 'Error publishing student: ' + err.message, '⚠️');
+                } finally {
+                    e.currentTarget.innerHTML = origHtml;
+                    e.currentTarget.disabled = false;
+                }
             });
         });
 

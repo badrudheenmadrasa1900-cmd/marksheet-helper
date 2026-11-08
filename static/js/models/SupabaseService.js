@@ -526,6 +526,76 @@ class SupabaseService {
 
         return { count: syncedCount };
     }
+
+    /**
+     * Publish/Sync a single individual student's updated mark sheet to Supabase
+     */
+    async syncSingleStudentToSupabase(cls, studentId, isAutoPublished = false) {
+        if (!cls || !cls.students) return { success: false, message: 'Class not found' };
+        
+        const student = cls.students.find(s => s.id === studentId);
+        if (!student) return { success: false, message: 'Student not found' };
+
+        const classNumber = parseInt((cls.className || '').replace(/\D/g, '') || '1', 10);
+        const topics = cls.topics || [];
+        const marksMap = cls.marks || {};
+
+        // Recalculate rank across entire class
+        const processedSheet = window.marksheetModel.processSheet(cls.students, topics, marksMap, cls.passPercentage || 36);
+        const studentRes = processedSheet.find(r => r.student.id === studentId);
+        const studentRank = (studentRes && studentRes.rank && studentRes.rank !== '-') ? String(studentRes.rank) : '';
+        const statusWithRank = studentRank ? `RANK:${studentRank}` : '';
+
+        const studentMarks = [];
+        const stMarks = marksMap[student.id] || {};
+        const attVal = (cls.attendance && cls.attendance[student.id] !== undefined) ? cls.attendance[student.id] : '';
+
+        topics.forEach(top => {
+            const matchedDef = this.DEFAULT_SUBJECTS.find(s => 
+                top.name.toUpperCase().includes(s.subject) || 
+                s.subject.includes(top.name.toUpperCase())
+            );
+            const markVal = stMarks[top.id];
+            const topMax = Number(top.maxMarks) || 50;
+            const passMark = Math.ceil(topMax * 0.36);
+            studentMarks.push({
+                subject: matchedDef ? matchedDef.subject : top.name,
+                arabic: matchedDef ? matchedDef.arabic : '',
+                mark: (markVal !== undefined && markVal !== '') ? (isNaN(markVal) ? markVal : Number(markVal)) : 0,
+                max: topMax,
+                passMark: passMark
+            });
+        });
+
+        if (attVal) {
+            studentMarks.push({
+                subject: "ATTENDANCE (HAJAR)",
+                arabic: "ഹാജർ",
+                mark: attVal,
+                max: "Att.",
+                isAttendance: true
+            });
+        }
+
+        const isAlreadyPublished = !!cls.publishedAt;
+        const targetSyllabus = (isAutoPublished || isAlreadyPublished) ? 'GENERAL' : 'PENDING_APPROVAL';
+
+        const saved = await this.saveStudentToSupabase({
+            register_no: student.rollNo || student.id,
+            name: student.name,
+            name_arabic: student.arabicName || '',
+            parent_name: student.parentName || '',
+            parent_name_arabic: student.parentArabicName || '',
+            madrasa_name: cls.madrasaName || 'BADRUDHEEN MADRASA',
+            madrasa_code: cls.madrasaCode || '6120',
+            class_number: classNumber,
+            syllabus: targetSyllabus,
+            status: statusWithRank || undefined,
+            marks: studentMarks
+        });
+
+        return { success: true, student: saved, isPublished: targetSyllabus === 'GENERAL' };
+    }
 }
 
 window.supabaseService = new SupabaseService();
