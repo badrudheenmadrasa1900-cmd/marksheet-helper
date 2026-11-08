@@ -517,8 +517,14 @@ class SupabaseService {
             const isAlreadyPublished = !cls.isDirty && !!cls.publishedAt;
             const targetSyllabus = (isAutoPublished || isAlreadyPublished) ? 'GENERAL' : 'PENDING_APPROVAL';
 
+            // Create a class-unique register_no key for Supabase storage to prevent cross-class collisions
+            // Format: 1900-C{classNumber}-{2-digit roll} e.g. 1900-C8-01, 1900-C4-01
+            const rollRaw = student.rollNo || student.id;
+            const paddedRoll = String(rollRaw).padStart(2, '0');
+            const classUniqueRegNo = student.studentId || `1900-C${classNumber}-${paddedRoll}`;
+
             await this.saveStudentToSupabase({
-                register_no: student.rollNo || student.id,
+                register_no: classUniqueRegNo,
                 name: student.name,
                 name_arabic: student.arabicName || '',
                 parent_name: student.parentName || '',
@@ -589,8 +595,12 @@ class SupabaseService {
         const isAlreadyPublished = !!cls.publishedAt;
         const targetSyllabus = (isAutoPublished || isAlreadyPublished) ? 'GENERAL' : 'PENDING_APPROVAL';
 
+        const rollRaw = student.rollNo || student.id;
+        const paddedRoll = String(rollRaw).padStart(2, '0');
+        const classUniqueRegNo = student.studentId || `1900-C${classNumber}-${paddedRoll}`;
+
         const saved = await this.saveStudentToSupabase({
-            register_no: student.rollNo || student.id,
+            register_no: classUniqueRegNo,
             name: student.name,
             name_arabic: student.arabicName || '',
             parent_name: student.parentName || '',

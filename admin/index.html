@@ -1408,10 +1408,20 @@
                     const isPublished = st.syllabus !== 'PENDING_APPROVAL';
                     if (isPublished) liveCount++; else pendingCount++;
 
+                    const displayRoll = st.register_no && st.register_no.includes('-')
+                        ? (parseInt(st.register_no.split('-').pop(), 10) || st.register_no)
+                        : st.register_no;
+                    const fullRegTag = (st.register_no && st.register_no.includes('-'))
+                        ? `<div style="font-size:0.72rem; color:#6b7280; font-family:monospace;">${escapeHtml(st.register_no)}</div>`
+                        : '';
+
                     html += `
                         <tr>
                             <td><span class="class-badge">Class ${st.class_number}</span></td>
-                            <td style="font-family: monospace; font-weight: 800; color: #072718;">${st.register_no}</td>
+                            <td style="font-family: monospace; font-weight: 800; color: #072718;">
+                                <span>${escapeHtml(String(displayRoll))}</span>
+                                ${fullRegTag}
+                            </td>
                             <td>
                                 <div>${escapeHtml(st.name)}</div>
                                 ${st.name_arabic ? `<div style="font-family: 'Amiri', serif; color: #0d5c31; font-size: 0.95rem;">${escapeHtml(st.name_arabic)}</div>` : ''}
