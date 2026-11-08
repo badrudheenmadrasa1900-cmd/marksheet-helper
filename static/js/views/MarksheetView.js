@@ -10,6 +10,8 @@ class MarksheetView {
         this.activeTab = 'boys'; // 'boys' | 'girls' | 'all' | 'analytics'
         this.viewMode = 'table'; // 'table' | 'cards'
         this.sortOrder = 'asc'; // 'asc' | 'desc'
+        this.searchQuery = '';
+        this.filterCategory = 'all'; // 'all' | 'pass' | 'fail' | 'fail_1' | 'fail_2' | 'fail_3_plus' | 'absent' | 'top10' | 'subject_fail_<topicId>' | 'subject_pass_<topicId>'
         this.currentClass = null;
     }
 
@@ -135,6 +137,56 @@ class MarksheetView {
                         </div>
                     </div>
 
+                    <!-- Comprehensive Filter & Search Bar for Teachers -->
+                    ${this.activeTab !== 'analytics' ? `
+                    <div class="marksheet-filter-strip" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 1;">
+                            <div style="position: relative; min-width: 180px; flex: 1; max-width: 280px;">
+                                <input 
+                                    type="text" 
+                                    id="filter-search-input" 
+                                    class="form-control" 
+                                    placeholder="🔍 Search Name or Reg No..." 
+                                    value="${this.searchQuery}" 
+                                    style="padding-left: 12px; height: 36px; font-size: 0.85rem;"
+                                >
+                            </div>
+
+                            <select id="filter-category-select" class="form-control" style="height: 36px; font-size: 0.85rem; font-weight: 700; color: #072718; border-color: #cbd5e1; min-width: 220px; max-width: 320px;">
+                                <optgroup label="General Performance">
+                                    <option value="all" ${this.filterCategory === 'all' ? 'selected' : ''}>📋 All Students</option>
+                                    <option value="pass" ${this.filterCategory === 'pass' ? 'selected' : ''}>✅ All Passed (Full Pass)</option>
+                                    <option value="fail" ${this.filterCategory === 'fail' ? 'selected' : ''}>⚠️ Any Failed (&lt;36% / Ab)</option>
+                                    <option value="fail_1" ${this.filterCategory === 'fail_1' ? 'selected' : ''}>❗ Failed in Exactly 1 Subject</option>
+                                    <option value="fail_2" ${this.filterCategory === 'fail_2' ? 'selected' : ''}>‼️ Failed in Exactly 2 Subjects</option>
+                                    <option value="fail_3_plus" ${this.filterCategory === 'fail_3_plus' ? 'selected' : ''}>🚨 Failed in 3 or More Subjects (3+ Fail)</option>
+                                    <option value="absent" ${this.filterCategory === 'absent' ? 'selected' : ''}>❌ Absent Students (Ab)</option>
+                                    <option value="top10" ${this.filterCategory === 'top10' ? 'selected' : ''}>🏆 Top Rankers (Rank 1 - 10)</option>
+                                    <option value="needs_entry" ${this.filterCategory === 'needs_entry' ? 'selected' : ''}>⏳ Incomplete / Missing Marks</option>
+                                </optgroup>
+                                ${topics.length > 0 ? `
+                                <optgroup label="Subject-Wise: Failed / Absent (<36%)">
+                                    ${topics.map(t => `<option value="sub_fail_${t.id}" ${this.filterCategory === `sub_fail_${t.id}` ? 'selected' : ''}>❌ Failed in: ${t.name}</option>`).join('')}
+                                </optgroup>
+                                <optgroup label="Subject-Wise: Passed (≥36%)">
+                                    ${topics.map(t => `<option value="sub_pass_${t.id}" ${this.filterCategory === `sub_pass_${t.id}` ? 'selected' : ''}>✅ Passed in: ${t.name}</option>`).join('')}
+                                </optgroup>
+                                ` : ''}
+                            </select>
+
+                            ${(this.filterCategory !== 'all' || this.searchQuery) ? `
+                                <button type="button" class="btn btn-ghost btn-sm" id="btn-reset-filters" style="color: #dc2626; font-size: 0.8rem; padding: 4px 8px;" title="Reset all filters">
+                                    ✕ Clear Filter
+                                </button>
+                            ` : ''}
+                        </div>
+
+                        <div style="font-size: 0.82rem; font-weight: 700; color: #475569;" id="filter-result-count">
+                            <!-- Populated in _getStudentsToDisplay -->
+                        </div>
+                    </div>
+                    ` : ''}
+
                     <!-- Active Tab Content -->
                     <div class="sheet-content-wrapper">
                         ${this.activeTab === 'analytics' 
@@ -191,6 +243,79 @@ class MarksheetView {
         } else {
             studentsToDisplay = cls.students || [];
             sheetResults = stats.allResults;
+        }
+
+        const topics = cls.topics || [];
+        const passPct = Number(cls.passPercentage) || 36;
+        const marksMap = cls.marks || {};
+        const totalBaseCount = studentsToDisplay.length;
+
+        // Map computed results for filtering
+        const resultMap = {};
+        (sheetResults || []).forEach(r => { resultMap[r.student.id] = r; });
+
+        // Apply Comprehensive Teacher Filter Keyword
+        if (this.filterCategory && this.filterCategory !== 'all') {
+            studentsToDisplay = studentsToDisplay.filter(st => {
+                const res = resultMap[st.id] || window.marksheetModel.computeStudentResult(st, topics, marksMap, passPct);
+                const failedCount = res.failedTopicsCount || 0;
+                const hasAbsent = !!res.hasAbsent;
+                const isPassed = !!res.isPassed;
+                const hasAnyMark = !!res.hasAnyMark;
+
+                switch (this.filterCategory) {
+                    case 'pass':
+                        return isPassed;
+                    case 'fail':
+                        return !isPassed && hasAnyMark;
+                    case 'fail_1':
+                        return failedCount === 1;
+                    case 'fail_2':
+                        return failedCount === 2;
+                    case 'fail_3_plus':
+                        return failedCount >= 3;
+                    case 'absent':
+                        return hasAbsent;
+                    case 'top10':
+                        return isPassed && (Number(res.rank) >= 1 && Number(res.rank) <= 10);
+                    case 'needs_entry':
+                        // If any subject mark is missing
+                        return topics.some(t => {
+                            const val = marksMap[st.id] ? marksMap[st.id][t.id] : undefined;
+                            return val === undefined || val === null || val === '';
+                        });
+                    default:
+                        // Subject-wise filters: sub_fail_<topicId> or sub_pass_<topicId>
+                        if (this.filterCategory.startsWith('sub_fail_')) {
+                            const topicId = this.filterCategory.replace('sub_fail_', '');
+                            const tScore = res.topicScores && res.topicScores[topicId];
+                            return tScore && (!tScore.isPassed || tScore.isAbsent);
+                        } else if (this.filterCategory.startsWith('sub_pass_')) {
+                            const topicId = this.filterCategory.replace('sub_pass_', '');
+                            const tScore = res.topicScores && res.topicScores[topicId];
+                            return tScore && tScore.isPassed && !tScore.isAbsent;
+                        }
+                        return true;
+                }
+            });
+        }
+
+        // Apply Search query (Name, Roll, Student ID)
+        if (this.searchQuery && this.searchQuery.trim() !== '') {
+            const q = this.searchQuery.trim().toLowerCase();
+            studentsToDisplay = studentsToDisplay.filter(st => {
+                const name = (st.name || '').toLowerCase();
+                const roll = (st.rollNo || '').toString().toLowerCase();
+                const sId = (st.studentId || '').toLowerCase();
+                const arName = (st.arabicName || '').toLowerCase();
+                return name.includes(q) || roll.includes(q) || sId.includes(q) || arName.includes(q);
+            });
+        }
+
+        // Update badge count in DOM if strip exists
+        const countEl = document.getElementById('filter-result-count');
+        if (countEl) {
+            countEl.innerHTML = `Showing <strong>${studentsToDisplay.length}</strong> of ${totalBaseCount} students`;
         }
 
         // Apply roll/register number ordering (asc or desc)
@@ -1477,6 +1602,39 @@ class MarksheetView {
         if (modeCards) {
             modeCards.addEventListener('click', () => {
                 this.viewMode = 'cards';
+                this.render(this.currentClass);
+            });
+        }
+
+        // Filter Strip Events (Search & Category Selector)
+        const filterSearchInput = document.getElementById('filter-search-input');
+        if (filterSearchInput) {
+            filterSearchInput.addEventListener('input', (e) => {
+                this.searchQuery = e.target.value;
+                this.render(this.currentClass);
+                // Keep focus on input after render
+                const updatedInput = document.getElementById('filter-search-input');
+                if (updatedInput) {
+                    updatedInput.focus();
+                    const len = updatedInput.value.length;
+                    updatedInput.setSelectionRange(len, len);
+                }
+            });
+        }
+
+        const filterCategorySelect = document.getElementById('filter-category-select');
+        if (filterCategorySelect) {
+            filterCategorySelect.addEventListener('change', (e) => {
+                this.filterCategory = e.target.value;
+                this.render(this.currentClass);
+            });
+        }
+
+        const btnResetFilters = document.getElementById('btn-reset-filters');
+        if (btnResetFilters) {
+            btnResetFilters.addEventListener('click', () => {
+                this.filterCategory = 'all';
+                this.searchQuery = '';
                 this.render(this.currentClass);
             });
         }
