@@ -450,8 +450,9 @@ class SupabaseService {
 
     /**
      * Batch Sync entire class of students to Supabase (Submitted by teacher or admin)
+     * If specificStudentIds array is provided or class has editedStudentIds, only sync those students.
      */
-    async syncClassToSupabase(cls, isAutoPublished = false) {
+    async syncClassToSupabase(cls, isAutoPublished = false, specificStudentIds = null) {
         if (!cls || !cls.students || cls.students.length === 0) return { count: 0 };
         
         const classNumber = parseInt((cls.className || '').replace(/\D/g, '') || '1', 10);
@@ -465,8 +466,16 @@ class SupabaseService {
             rankMap[r.student.id] = (r.rank && r.rank !== '-') ? String(r.rank) : '';
         });
 
+        // Determine target students: if specificStudentIds provided, or class is already published and only some students were edited
+        let targetStudents = cls.students;
+        if (specificStudentIds && Array.isArray(specificStudentIds) && specificStudentIds.length > 0) {
+            targetStudents = cls.students.filter(s => specificStudentIds.includes(s.id));
+        } else if (cls.publishedAt && Array.isArray(cls.editedStudentIds) && cls.editedStudentIds.length > 0) {
+            targetStudents = cls.students.filter(s => cls.editedStudentIds.includes(s.id));
+        }
+
         let syncedCount = 0;
-        for (const student of cls.students) {
+        for (const student of targetStudents) {
             const studentMarks = [];
             const stMarks = marksMap[student.id] || {};
             const attVal = (cls.attendance && cls.attendance[student.id] !== undefined) ? cls.attendance[student.id] : '';
@@ -524,7 +533,7 @@ class SupabaseService {
             syncedCount++;
         }
 
-        return { count: syncedCount };
+        return { count: syncedCount, isPartial: targetStudents.length < cls.students.length };
     }
 
     /**

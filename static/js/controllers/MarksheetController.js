@@ -75,6 +75,11 @@ class MarksheetController {
         };
 
         cls.isDirty = true;
+        if (!cls.editedStudentIds) cls.editedStudentIds = [];
+        if (!cls.editedStudentIds.includes(studentId)) {
+            cls.editedStudentIds.push(studentId);
+        }
+
         cls.students.sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
         window.storageModel.saveClass(cls);
 

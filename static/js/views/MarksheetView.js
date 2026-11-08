@@ -57,7 +57,7 @@ class MarksheetView {
                         </button>
 
                         <!-- Publish & Submit to Cloud Button -->
-                        ${cls.publishedAt && !cls.isDirty ? `
+                        ${cls.publishedAt && (!cls.isDirty || (cls.editedStudentIds && cls.editedStudentIds.length === 0)) ? `
                             <button class="btn btn-outline btn-sm" id="btn-sync-cloud" title="Results already published and up to date" style="background: #f0fdf4; color: #158043; border-color: #86efac; cursor: default;">
                                 <span class="btn-icon-label">✓</span>
                                 <span class="action-btn-text" style="font-weight: 700;">Published & Verified</span>
@@ -65,7 +65,7 @@ class MarksheetView {
                         ` : `
                             <button class="btn btn-primary btn-sm" id="btn-sync-cloud" title="Submit mark list to cloud for publishing" style="background: linear-gradient(135deg, #0d5c31 0%, #158043 100%);">
                                 <span class="btn-icon-label">🚀</span>
-                                <span class="action-btn-text" style="font-weight: 700;">Publish / Submit</span>
+                                <span class="action-btn-text" style="font-weight: 700;">${cls.publishedAt && cls.editedStudentIds && cls.editedStudentIds.length > 0 ? `Publish Changes (${cls.editedStudentIds.length})` : 'Publish / Submit'}</span>
                             </button>
                         `}
 
@@ -1672,7 +1672,7 @@ class MarksheetView {
         if (syncBtn) {
             syncBtn.addEventListener('click', async () => {
                 // If results are already published and no edits have been made, avoid redundant submissions
-                if (this.currentClass.publishedAt && !this.currentClass.isDirty) {
+                if (this.currentClass.publishedAt && (!this.currentClass.isDirty || (this.currentClass.editedStudentIds && this.currentClass.editedStudentIds.length === 0))) {
                     await window.showAlertDialog(
                         'Already Published',
                         'The mark list for this class is already verified and published on the live portal.<br><br>No new changes were made, so no re-submission is necessary.',
@@ -1701,15 +1701,19 @@ class MarksheetView {
                 try {
                     const res = await window.supabaseService.syncClassToSupabase(this.currentClass, isAdmin);
                     
-                    // Mark as published and clean
+                    // Mark as published and clear pending modified queue
                     this.currentClass.isDirty = false;
+                    this.currentClass.editedStudentIds = [];
                     this.currentClass.publishedAt = new Date().toISOString();
                     window.storageModel.saveClass(this.currentClass);
 
                     if (isAdmin) {
                         alert(`Success! ${res.count} student marksheets verified and published directly to the Public Result Portal.`);
                     } else {
-                        alert(`Mark list submitted for publishing (${res.count} students)!\n\nYour mark list is sent to Sadar Muallim (صدر معلم) for final verification. Once approved in the Control Room, it will be published immediately on the public portal.`);
+                        const noteMsg = res.isPartial 
+                            ? `Updated changes for ${res.count} student(s) submitted for verification!`
+                            : `Mark list submitted for publishing (${res.count} students)!`;
+                        alert(`${noteMsg}\n\nYour mark list is sent to Sadar Muallim (صدر معلم) for final verification. Once approved in the Control Room, it will be published immediately on the public portal.`);
                     }
                     this.render(this.currentClass);
                 } catch (err) {
@@ -1880,11 +1884,21 @@ class MarksheetView {
                     const res = await window.supabaseService.syncSingleStudentToSupabase(cls, studentId, isAdmin);
 
                     if (res && res.success) {
+                        // Remove from class modified list if present
+                        if (cls.editedStudentIds) {
+                            cls.editedStudentIds = cls.editedStudentIds.filter(id => id !== studentId);
+                        }
+                        if (!cls.editedStudentIds || cls.editedStudentIds.length === 0) {
+                            cls.isDirty = false;
+                        }
+                        window.storageModel.saveClass(cls);
+
                         await window.showAlertDialog(
                             'Published Successfully',
                             `Marks for <strong>${st.name}</strong> (Reg: ${st.rollNo}) have been updated on the live result portal!`,
                             '✅'
                         );
+                        this.render(this.currentClass);
                     } else {
                         throw new Error(res.message || 'Failed to update student');
                     }
@@ -2024,6 +2038,14 @@ class MarksheetView {
         } else {
             this.currentClass.marks[studentId][topicId] = rawVal;
         }
+
+        // Track this student as modified
+        this.currentClass.isDirty = true;
+        if (!this.currentClass.editedStudentIds) this.currentClass.editedStudentIds = [];
+        if (!this.currentClass.editedStudentIds.includes(studentId)) {
+            this.currentClass.editedStudentIds.push(studentId);
+        }
+        window.storageModel.saveClass(this.currentClass);
 
         // Synchronize both table and card views
         this._updateAllCalculations();
