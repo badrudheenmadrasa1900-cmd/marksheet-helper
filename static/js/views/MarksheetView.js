@@ -9,6 +9,7 @@ class MarksheetView {
         this.container = document.getElementById('app-root');
         this.activeTab = 'boys'; // 'boys' | 'girls' | 'all' | 'analytics'
         this.viewMode = 'table'; // 'table' | 'cards'
+        this.sortOrder = 'asc'; // 'asc' | 'desc'
         this.currentClass = null;
     }
 
@@ -113,6 +114,9 @@ class MarksheetView {
                                 </button>
                             </div>
 
+                            <button class="btn btn-outline btn-sm" id="btn-reorder-roll" title="Order and re-sequence Register Numbers sequentially (1, 2, 3...)">
+                                🔢 Order Reg No
+                            </button>
                             <button class="btn btn-outline btn-sm" id="btn-manage-topics">
                                 Subjects (${topics.length})
                             </button>
@@ -186,6 +190,12 @@ class MarksheetView {
             sheetResults = stats.allResults;
         }
 
+        // Apply roll/register number ordering (asc or desc)
+        studentsToDisplay.sort((a, b) => {
+            const diff = (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0);
+            return this.sortOrder === 'desc' ? -diff : diff;
+        });
+
         return { studentsToDisplay, sheetResults };
     }
 
@@ -216,7 +226,12 @@ class MarksheetView {
                 <table class="marksheet-table" id="marksheet-grid">
                     <thead>
                         <tr>
-                            <th class="th-roll sticky-col-1">Roll</th>
+                            <th class="th-roll sticky-col-1" id="th-sort-roll" style="cursor: pointer; user-select: none;" title="Click to order by Register Number">
+                                <div style="display: inline-flex; align-items: center; gap: 4px;">
+                                    <span>Roll</span>
+                                    <span style="font-size: 0.75rem; color: #0284c7;">${this.sortOrder === 'asc' ? '▲' : '▼'}</span>
+                                </div>
+                            </th>
                             <th class="th-name sticky-col-2">Student Name</th>
                             ${topics.map(t => {
                                 const passMark = Math.ceil(Number(t.maxMarks) * (Number(cls.passPercentage) || 36) / 100);
@@ -1559,6 +1574,33 @@ class MarksheetView {
             mToggleView.addEventListener('click', () => {
                 this.viewMode = this.viewMode === 'cards' ? 'table' : 'cards';
                 this.render(this.currentClass);
+            });
+        }
+
+        // Sort by Roll Number column header click
+        const thSortRoll = document.getElementById('th-sort-roll');
+        if (thSortRoll) {
+            thSortRoll.addEventListener('click', () => {
+                this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+                this.render(this.currentClass);
+            });
+        }
+
+        // Reorder / Sequentialize Register Numbers button
+        const btnReorder = document.getElementById('btn-reorder-roll');
+        if (btnReorder) {
+            btnReorder.addEventListener('click', async () => {
+                const scopeLabel = (this.activeTab === 'boys') ? 'Boys' : (this.activeTab === 'girls' ? 'Girls' : 'All Students');
+                const confirmed = await window.showConfirmDialog(
+                    'Order Register Numbers',
+                    `Do you want to re-number and order all <strong>${scopeLabel}</strong> register numbers sequentially (1, 2, 3...)?<br><br><span style="font-size:0.8rem; color:#64748b;">This will safely update their Roll Numbers and unique IDs (e.g. 1900-C8-01) while preserving all marks and attendance.</span>`,
+                    '🔢',
+                    'Yes, Order Now',
+                    'Cancel'
+                );
+                if (confirmed) {
+                    window.marksheetController.reorderRegisterNumbers(this.currentClass.id, 'current');
+                }
             });
         }
 

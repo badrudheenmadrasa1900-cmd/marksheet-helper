@@ -82,6 +82,46 @@ class MarksheetController {
         this.openClass(classId, currentTab);
     }
 
+    /**
+     * Re-order and re-assign register / roll numbers sequentially (1, 2, 3...)
+     * either for the current gender tab ('boys' | 'girls') or across all students.
+     */
+    reorderRegisterNumbers(classId, scope = 'current') {
+        const cls = window.storageModel.getClass(classId);
+        if (!cls || !cls.students || cls.students.length === 0) return;
+
+        const clsNum = (cls.className || 'C1').replace(/\D/g, '') || '1';
+        const activeTab = (window.marksheetView && window.marksheetView.activeTab) ? window.marksheetView.activeTab : 'all';
+
+        if (scope === 'current' && (activeTab === 'boys' || activeTab === 'girls')) {
+            const targetGender = activeTab === 'girls' ? 'girl' : 'boy';
+            // Sort targeted students by current roll number
+            const targetStudents = cls.students.filter(s => s.gender === targetGender);
+            targetStudents.sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
+
+            targetStudents.forEach((st, idx) => {
+                const newRoll = (idx + 1).toString();
+                const paddedRoll = newRoll.padStart(2, '0');
+                st.rollNo = newRoll;
+                st.studentId = `1900-C${clsNum}-${paddedRoll}`;
+            });
+        } else {
+            // Sort all students by current roll number, or preserve gender-grouped sequence
+            cls.students.sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
+            cls.students.forEach((st, idx) => {
+                const newRoll = (idx + 1).toString();
+                const paddedRoll = newRoll.padStart(2, '0');
+                st.rollNo = newRoll;
+                st.studentId = `1900-C${clsNum}-${paddedRoll}`;
+            });
+        }
+
+        cls.students.sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
+        cls.isDirty = true;
+        window.storageModel.saveClass(cls);
+        this.openClass(classId, activeTab);
+    }
+
     addBulkStudents(classId, studentsArray) {
         const cls = window.storageModel.getClass(classId);
         if (!cls) return;
