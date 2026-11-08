@@ -127,3 +127,11 @@ The application is pre-configured for instant zero-config deployment on Vercel:
 - Student results are hosted on a secure Supabase cloud database with Row-Level Security (RLS) enabled.
 - Teacher credentials and admin privileges are protected under role-based authorization.
 - Backups can be downloaded as JSON files anytime from the Teacher/Admin dashboard.
+
+---
+
+## 📊 Analytics & Tag Management (`gganalatics`)
+Google Tag Manager / Google Analytics integration is embedded across portal HTML pages:
+- **GTM ID:** `GTM-T8F8LM6B`
+- **Removal Keyword:** `gganalatics`
+  - *Trigger Command:* Whenever the user asks to remove `"gganalatics"` or *"remove gganalatics"*, the assistant will automatically clean and purge the Google Tag Manager scripts from all pages.
