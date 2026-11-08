@@ -314,6 +314,7 @@ class MarksheetView {
                                         ${res.hasAnyMark ? `<span class="badge ${res.statusClass}">${res.status === 'Pass' ? 'Pass' : 'Fail'}</span>` : '-'}
                                     </td>
                                     <td class="td-action">
+                                        <button class="btn-icon btn-edit-student" data-id="${st.id}" title="Edit Student Details" style="color: #0d5c31; margin-right: 4px; font-size: 0.95rem;">✏️</button>
                                         <button class="btn-icon btn-del-student" data-id="${st.id}" title="Delete">&times;</button>
                                     </td>
                                 </tr>
@@ -372,6 +373,7 @@ class MarksheetView {
                                         <span class="badge ${res.statusClass}" id="card-status-${st.id}">
                                             ${res.hasAnyMark ? (res.status === 'Pass' ? 'Pass' : 'Fail') : '-'}
                                         </span>
+                                        <button class="btn-icon btn-edit-student" data-id="${st.id}" title="Edit Student Details" style="color: #0d5c31; margin-right: 4px; font-size: 0.95rem;">✏️</button>
                                         <button class="btn-icon btn-del-student" data-id="${st.id}" title="Delete">&times;</button>
                                     </div>
                                 </div>
@@ -1068,18 +1070,27 @@ class MarksheetView {
     // =========================================================================
     // Manage Topics & Add Student Modals
     // =========================================================================
-    showAddStudentModal() {
+    showAddStudentModal(studentToEdit = null) {
         const cls = this.currentClass;
         const modalContainer = document.getElementById('modal-container');
         if (!modalContainer) return;
 
-        const nextRoll = ((cls.students || []).length + 1).toString();
+        const isEditing = !!studentToEdit;
+        const modalTitle = isEditing ? 'Edit Student Details' : 'Add Student Registration';
+        const submitBtnText = isEditing ? 'Save Changes' : 'Add Student';
+
+        const rollVal = isEditing ? (studentToEdit.rollNo || '') : ((cls.students || []).length + 1).toString();
+        const nameVal = isEditing ? (studentToEdit.name || '') : '';
+        const arNameVal = isEditing ? (studentToEdit.arabicName || '') : '';
+        const parentVal = isEditing ? (studentToEdit.parentName || '') : '';
+        const arParentVal = isEditing ? (studentToEdit.parentArabicName || '') : '';
+        const isGirl = isEditing ? (studentToEdit.gender === 'girl') : (this.activeTab === 'girls');
 
         modalContainer.innerHTML = `
             <div class="modal-backdrop" id="add-student-modal-backdrop">
                 <div class="modal-box mobile-sheet modal-lg">
                     <div class="modal-header">
-                        <h3 class="modal-title">Add Student Registration</h3>
+                        <h3 class="modal-title">${modalTitle}</h3>
                         <button class="modal-close" id="btn-close-st-modal">&times;</button>
                     </div>
                     <form id="add-student-form">
@@ -1087,26 +1098,26 @@ class MarksheetView {
                             <div class="form-row">
                                 <div class="form-group" style="max-width: 140px;">
                                     <label class="form-label">Reg. No / Roll *</label>
-                                    <input type="text" id="modal-roll" class="form-control" value="${nextRoll}" required>
+                                    <input type="text" id="modal-roll" class="form-control" value="${rollVal}" required>
                                 </div>
                                 <div class="form-group flex-1">
                                     <label class="form-label">Student Full Name *</label>
-                                    <input type="text" id="modal-name" class="form-control" placeholder="e.g. SARA JAZEELA" required autofocus>
+                                    <input type="text" id="modal-name" class="form-control" value="${nameVal}" placeholder="e.g. SARA JAZEELA" required autofocus>
                                 </div>
                                 <div class="form-group flex-1">
                                     <label class="form-label">Name (Arabic)</label>
-                                    <input type="text" id="modal-name-ar" class="form-control" placeholder="الاسم بالعربية (e.g. جميلة)" dir="rtl">
+                                    <input type="text" id="modal-name-ar" class="form-control" value="${arNameVal}" placeholder="الاسم بالعربية (e.g. جميلة)" dir="rtl">
                                 </div>
                             </div>
 
                             <div class="form-row mt-2">
                                 <div class="form-group flex-1">
                                     <label class="form-label">Parent / Guardian Name</label>
-                                    <input type="text" id="modal-parent" class="form-control" placeholder="D/o or S/o (e.g. ABDUL LATHEEF)">
+                                    <input type="text" id="modal-parent" class="form-control" value="${parentVal}" placeholder="D/o or S/o (e.g. ABDUL LATHEEF)">
                                 </div>
                                 <div class="form-group flex-1">
                                     <label class="form-label">Parent (Arabic)</label>
-                                    <input type="text" id="modal-parent-ar" class="form-control" placeholder="اسم الوالد (e.g. عبد اللطيف)" dir="rtl">
+                                    <input type="text" id="modal-parent-ar" class="form-control" value="${arParentVal}" placeholder="اسم الوالد (e.g. عبد اللطيف)" dir="rtl">
                                 </div>
                             </div>
 
@@ -1114,11 +1125,11 @@ class MarksheetView {
                                 <label class="form-label">Gender</label>
                                 <div class="radio-group">
                                     <label class="radio-label">
-                                        <input type="radio" name="st-gender" value="boy" ${this.activeTab !== 'girls' ? 'checked' : ''}>
+                                        <input type="radio" name="st-gender" value="boy" ${!isGirl ? 'checked' : ''}>
                                         <span>Boy</span>
                                     </label>
                                     <label class="radio-label">
-                                        <input type="radio" name="st-gender" value="girl" ${this.activeTab === 'girls' ? 'checked' : ''}>
+                                        <input type="radio" name="st-gender" value="girl" ${isGirl ? 'checked' : ''}>
                                         <span>Girl</span>
                                     </label>
                                 </div>
@@ -1126,7 +1137,7 @@ class MarksheetView {
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-ghost" id="btn-cancel-st">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Add Student</button>
+                            <button type="submit" class="btn btn-primary">${submitBtnText}</button>
                         </div>
                     </form>
                 </div>
@@ -1147,14 +1158,25 @@ class MarksheetView {
             const gender = document.querySelector('input[name="st-gender"]:checked').value;
 
             if (name) {
-                window.marksheetController.addStudent(cls.id, {
-                    rollNo,
-                    name,
-                    arabicName,
-                    parentName,
-                    parentArabicName,
-                    gender
-                });
+                if (isEditing) {
+                    window.marksheetController.updateStudent(cls.id, studentToEdit.id, {
+                        rollNo,
+                        name,
+                        arabicName,
+                        parentName,
+                        parentArabicName,
+                        gender
+                    });
+                } else {
+                    window.marksheetController.addStudent(cls.id, {
+                        rollNo,
+                        name,
+                        arabicName,
+                        parentName,
+                        parentArabicName,
+                        gender
+                    });
+                }
                 closeModal();
             }
         });
@@ -1552,6 +1574,17 @@ class MarksheetView {
 
         const btnExcel = document.getElementById('btn-export-excel');
         if (btnExcel) btnExcel.addEventListener('click', () => window.exportView.exportExcel(this.currentClass, this.activeTab));
+
+        // Edit student buttons
+        document.querySelectorAll('.btn-edit-student').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const studentId = e.currentTarget.getAttribute('data-id');
+                const stObj = (this.currentClass.students || []).find(s => s.id === studentId);
+                if (stObj) {
+                    this.showAddStudentModal(stObj);
+                }
+            });
+        });
 
         // Delete student buttons
         document.querySelectorAll('.btn-del-student').forEach(btn => {

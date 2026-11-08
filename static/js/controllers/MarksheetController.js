@@ -32,11 +32,15 @@ class MarksheetController {
             id: 'st_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
             rollNo: rollStr,
             studentId: studentData.studentId || uniqueStudentId,
-            name: studentData.name,
+            name: (studentData.name || '').trim().toUpperCase(),
+            arabicName: (studentData.arabicName || '').trim(),
+            parentName: (studentData.parentName || '').trim().toUpperCase(),
+            parentArabicName: (studentData.parentArabicName || '').trim(),
             gender: studentData.gender || 'boy'
         };
 
         cls.students.push(newStudent);
+        cls.isDirty = true;
         // Sort students naturally by roll number
         cls.students.sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
 
@@ -45,6 +49,37 @@ class MarksheetController {
         // Render in the added student's gender tab
         const targetTab = newStudent.gender === 'girl' ? 'girls' : 'boys';
         this.openClass(classId, targetTab);
+    }
+
+    updateStudent(classId, studentId, updatedData) {
+        const cls = window.storageModel.getClass(classId);
+        if (!cls || !cls.students) return;
+
+        const idx = cls.students.findIndex(s => s.id === studentId);
+        if (idx === -1) return;
+
+        const clsNum = (cls.className || 'C1').replace(/\D/g, '') || '1';
+        const rollStr = updatedData.rollNo ? updatedData.rollNo.toString().trim() : (cls.students[idx].rollNo || (idx + 1).toString());
+        const paddedRoll = rollStr.padStart(2, '0');
+        const uniqueStudentId = `1900-C${clsNum}-${paddedRoll}`;
+
+        cls.students[idx] = {
+            ...cls.students[idx],
+            name: (updatedData.name || '').trim().toUpperCase(),
+            arabicName: (updatedData.arabicName !== undefined ? updatedData.arabicName : (cls.students[idx].arabicName || '')).trim(),
+            parentName: (updatedData.parentName !== undefined ? updatedData.parentName : (cls.students[idx].parentName || '')).trim().toUpperCase(),
+            parentArabicName: (updatedData.parentArabicName !== undefined ? updatedData.parentArabicName : (cls.students[idx].parentArabicName || '')).trim(),
+            rollNo: rollStr,
+            studentId: uniqueStudentId,
+            gender: updatedData.gender || cls.students[idx].gender || 'boy'
+        };
+
+        cls.isDirty = true;
+        cls.students.sort((a, b) => (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0));
+        window.storageModel.saveClass(cls);
+
+        const currentTab = window.marksheetView ? window.marksheetView.activeTab : 'boys';
+        this.openClass(classId, currentTab);
     }
 
     addBulkStudents(classId, studentsArray) {
