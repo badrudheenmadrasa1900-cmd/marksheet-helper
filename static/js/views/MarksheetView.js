@@ -161,7 +161,9 @@ class MarksheetView {
                                     <option value="fail_2" ${this.filterCategory === 'fail_2' ? 'selected' : ''}>‼️ Failed in Exactly 2 Subjects</option>
                                     <option value="fail_3_plus" ${this.filterCategory === 'fail_3_plus' ? 'selected' : ''}>🚨 Failed in 3 or More Subjects (3+ Fail)</option>
                                     <option value="absent" ${this.filterCategory === 'absent' ? 'selected' : ''}>❌ Absent Students (Ab)</option>
-                                    <option value="top10" ${this.filterCategory === 'top10' ? 'selected' : ''}>🏆 Top Rankers (Rank 1 - 10)</option>
+                                    <option value="winners_rank" ${this.filterCategory === 'winners_rank' ? 'selected' : ''}>🏆 Winners Rank List (All-Subject Passed Rankers)</option>
+                                    <option value="all_total_rank" ${this.filterCategory === 'all_total_rank' ? 'selected' : ''}>📊 All Students Total Rank List (Rank by Total Marks - Pass & Fail)</option>
+                                    <option value="top10" ${this.filterCategory === 'top10' ? 'selected' : ''}>⭐ Top 10 Winners (Rank 1 - 10)</option>
                                     <option value="needs_entry" ${this.filterCategory === 'needs_entry' ? 'selected' : ''}>⏳ Incomplete / Missing Marks</option>
                                 </optgroup>
                                 ${topics.length > 0 ? `
@@ -276,6 +278,10 @@ class MarksheetView {
                         return failedCount >= 3;
                     case 'absent':
                         return hasAbsent;
+                    case 'winners_rank':
+                        return isPassed && hasAnyMark && (res.rank !== '-' && res.rank !== '');
+                    case 'all_total_rank':
+                        return hasAnyMark;
                     case 'top10':
                         return isPassed && (Number(res.rank) >= 1 && Number(res.rank) <= 10);
                     case 'needs_entry':
@@ -318,11 +324,33 @@ class MarksheetView {
             countEl.innerHTML = `Showing <strong>${studentsToDisplay.length}</strong> of ${totalBaseCount} students`;
         }
 
-        // Apply roll/register number ordering (asc or desc)
-        studentsToDisplay.sort((a, b) => {
-            const diff = (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0);
-            return this.sortOrder === 'desc' ? -diff : diff;
-        });
+        // Apply ordering:
+        // If 'winners_rank' is selected, sort primarily by Winners Merit Rank (1, 2, 3...)
+        // If 'all_total_rank' is selected, sort primarily by Overall Total Mark Rank (highest total first)
+        // Otherwise sort naturally by roll/register number (asc or desc)
+        if (this.filterCategory === 'winners_rank') {
+            studentsToDisplay.sort((a, b) => {
+                const resA = resultMap[a.id];
+                const resB = resultMap[b.id];
+                const rankA = (resA && resA.rank && resA.rank !== '-') ? Number(resA.rank) : 999999;
+                const rankB = (resB && resB.rank && resB.rank !== '-') ? Number(resB.rank) : 999999;
+                return rankA - rankB;
+            });
+        } else if (this.filterCategory === 'all_total_rank') {
+            studentsToDisplay.sort((a, b) => {
+                const resA = resultMap[a.id];
+                const resB = resultMap[b.id];
+                const totA = resA ? (Number(resA.totalScored) || 0) : 0;
+                const totB = resB ? (Number(resB.totalScored) || 0) : 0;
+                if (totB !== totA) return totB - totA; // Highest total first
+                return (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0);
+            });
+        } else {
+            studentsToDisplay.sort((a, b) => {
+                const diff = (Number(a.rollNo) || 0) - (Number(b.rollNo) || 0);
+                return this.sortOrder === 'desc' ? -diff : diff;
+            });
+        }
 
         return { studentsToDisplay, sheetResults };
     }
@@ -451,7 +479,15 @@ class MarksheetView {
                                         <span class="text-muted">/${res.totalMax}</span>
                                     </td>
                                     <td class="td-calc td-rank font-mono" id="rank-${st.id}">
-                                        ${res.hasAnyMark ? res.rank : '-'}
+                                        ${this.filterCategory === 'all_total_rank' ? (
+                                            res.hasAnyMark 
+                                                ? `<span class="badge" style="background:#f1f5f9; color:#0f172a; font-weight:800; border:1px solid #cbd5e1;">#${res.totalRank || '-'}</span>` 
+                                                : '-'
+                                        ) : (
+                                            res.hasAnyMark 
+                                                ? (res.rank && res.rank !== '-' ? `<span class="badge" style="background:#fef3c7; color:#92400e; font-weight:800; border:1px solid #fde68a;">🏆 ${res.rank}</span>` : '-') 
+                                                : '-'
+                                        )}
                                     </td>
                                     <td class="td-calc td-status" id="status-${st.id}">
                                         ${res.hasAnyMark ? `<span class="badge ${res.statusClass}">${res.status === 'Pass' ? 'Pass' : 'Fail'}</span>` : '-'}
@@ -564,9 +600,11 @@ class MarksheetView {
                                         </span>
                                     </div>
                                     <div class="card-summary-item">
-                                        <span class="summary-label">Rank</span>
+                                        <span class="summary-label">${this.filterCategory === 'all_total_rank' ? 'Total Rank' : 'Rank'}</span>
                                         <span class="summary-val font-mono" id="card-rank-${st.id}">
-                                            ${res.hasAnyMark ? res.rank : '-'}
+                                            ${this.filterCategory === 'all_total_rank' 
+                                                ? (res.hasAnyMark ? `#${res.totalRank || '-'}` : '-') 
+                                                : (res.hasAnyMark ? (res.rank && res.rank !== '-' ? `🏆 ${res.rank}` : '-') : '-')}
                                         </span>
                                     </div>
                                 </div>
@@ -682,6 +720,152 @@ class MarksheetView {
                                         </tr>
                                     `;
                                 }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 1. Winners Merit Rank List (All-Subject Passed Rankers) -->
+                <div class="analytics-table-card" style="border-left: 4px solid #f59e0b;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <div>
+                            <h4 class="card-title" style="margin: 0; color: #b45309; display: flex; align-items: center; gap: 6px;">
+                                <span>🏆</span> Winners Merit Rank List
+                            </h4>
+                            <p style="font-size: 0.8rem; color: #64748b; margin: 4px 0 0 0;">Students who passed in all subjects, ranked by highest total marks.</p>
+                        </div>
+                        <span class="badge" style="background: #fef3c7; color: #92400e; font-weight: 700;">
+                            ${stats.allResults.filter(r => r.isPassed && r.hasAnyMark && r.rank !== '-').length} Winners
+                        </span>
+                    </div>
+
+                    <div class="table-responsive-container">
+                        <table class="marksheet-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px; text-align: center;">Rank</th>
+                                    <th style="width: 70px;">Roll</th>
+                                    <th>Student Name</th>
+                                    <th style="text-align: center;">Gender</th>
+                                    <th style="text-align: right;">Total Scored</th>
+                                    <th style="text-align: center;">Percentage</th>
+                                    <th style="text-align: center;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${(() => {
+                                    const winners = [...stats.allResults]
+                                        .filter(r => r.isPassed && r.hasAnyMark && r.rank !== '-')
+                                        .sort((a, b) => (Number(a.rank) || 999) - (Number(b.rank) || 999));
+
+                                    if (winners.length === 0) {
+                                        return `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 20px;">No qualified all-subject passed rankers yet.</td></tr>`;
+                                    }
+
+                                    return winners.map(w => {
+                                        const rNum = Number(w.rank);
+                                        const medal = rNum === 1 ? '🥇 Rank 1' : (rNum === 2 ? '🥈 Rank 2' : (rNum === 3 ? '🥉 Rank 3' : `Rank ${w.rank}`));
+                                        const medalStyle = rNum === 1 ? 'background: #fef3c7; color: #92400e; font-weight: 800; border: 1.5px solid #f59e0b;' :
+                                                           rNum === 2 ? 'background: #f1f5f9; color: #334155; font-weight: 800; border: 1.5px solid #94a3b8;' :
+                                                           rNum === 3 ? 'background: #ffedd5; color: #9a3412; font-weight: 800; border: 1.5px solid #fb923c;' :
+                                                           'background: #f8fafc; color: #475569; font-weight: 700;';
+                                        return `
+                                            <tr>
+                                                <td style="text-align: center;">
+                                                    <span class="badge" style="${medalStyle} font-size: 0.8rem; padding: 4px 8px;">${medal}</span>
+                                                </td>
+                                                <td class="font-mono font-bold">${w.student.rollNo || '-'}</td>
+                                                <td>
+                                                    <div style="font-weight: 700; color: #0f172a;">${w.student.name}</div>
+                                                    ${w.student.arabicName ? `<div style="font-family: 'Amiri', serif; color: #0d5c31; font-size: 0.88rem;">${w.student.arabicName}</div>` : ''}
+                                                </td>
+                                                <td style="text-align: center; text-transform: capitalize; color: #64748b; font-size: 0.82rem;">${w.student.gender || '-'}</td>
+                                                <td style="text-align: right;" class="font-mono">
+                                                    <strong style="color: #0d5c31; font-size: 1rem;">${w.totalScored}</strong>
+                                                    <span style="color: #94a3b8; font-size: 0.78rem;">/${w.totalMax}</span>
+                                                </td>
+                                                <td style="text-align: center; font-weight: 700; color: #0284c7;" class="font-mono">${w.percentage}%</td>
+                                                <td style="text-align: center;">
+                                                    <span class="badge badge-pass">Pass</span>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('');
+                                })()}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 2. All Students Total Mark Rank List (Rank by Total Marks - Pass & Fail) -->
+                <div class="analytics-table-card" style="border-left: 4px solid #0284c7;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <div>
+                            <h4 class="card-title" style="margin: 0; color: #0369a1; display: flex; align-items: center; gap: 6px;">
+                                <span>📊</span> All Students Total Mark Rank List
+                            </h4>
+                            <p style="font-size: 0.8rem; color: #64748b; margin: 4px 0 0 0;">Complete ranking of every student purely by total marks obtained (both Pass and Fail included).</p>
+                        </div>
+                        <span class="badge" style="background: #e0f2fe; color: #0369a1; font-weight: 700;">
+                            ${stats.allResults.filter(r => r.hasAnyMark).length} Total Ranked
+                        </span>
+                    </div>
+
+                    <div class="table-responsive-container">
+                        <table class="marksheet-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px; text-align: center;">Total Rank</th>
+                                    <th style="width: 70px;">Roll</th>
+                                    <th>Student Name</th>
+                                    <th style="text-align: center;">Gender</th>
+                                    <th style="text-align: right;">Total Scored</th>
+                                    <th style="text-align: center;">Percentage</th>
+                                    <th style="text-align: center;">Exam Status</th>
+                                    <th style="text-align: center;">Winners Merit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${(() => {
+                                    const allRanked = [...stats.allResults]
+                                        .filter(r => r.hasAnyMark)
+                                        .sort((a, b) => (Number(a.totalRank) || 999) - (Number(b.totalRank) || 999));
+
+                                    if (allRanked.length === 0) {
+                                        return `<tr><td colspan="8" style="text-align: center; color: #94a3b8; padding: 20px;">No mark entries available yet.</td></tr>`;
+                                    }
+
+                                    return allRanked.map(r => {
+                                        return `
+                                            <tr style="${!r.isPassed ? 'background: #fff8f8;' : ''}">
+                                                <td style="text-align: center;">
+                                                    <span class="badge" style="background: #f1f5f9; color: #0f172a; font-weight: 800; border: 1px solid #cbd5e1; font-size: 0.82rem; padding: 3px 8px;">
+                                                        #${r.totalRank || '-'}
+                                                    </span>
+                                                </td>
+                                                <td class="font-mono font-bold">${r.student.rollNo || '-'}</td>
+                                                <td>
+                                                    <div style="font-weight: 700; color: #0f172a;">${r.student.name}</div>
+                                                    ${r.student.arabicName ? `<div style="font-family: 'Amiri', serif; color: #0d5c31; font-size: 0.88rem;">${r.student.arabicName}</div>` : ''}
+                                                </td>
+                                                <td style="text-align: center; text-transform: capitalize; color: #64748b; font-size: 0.82rem;">${r.student.gender || '-'}</td>
+                                                <td style="text-align: right;" class="font-mono">
+                                                    <strong style="color: ${r.isPassed ? '#0d5c31' : '#b91c1c'}; font-size: 1rem;">${r.totalScored}</strong>
+                                                    <span style="color: #94a3b8; font-size: 0.78rem;">/${r.totalMax}</span>
+                                                </td>
+                                                <td style="text-align: center; font-weight: 700; color: #475569;" class="font-mono">${r.percentage}%</td>
+                                                <td style="text-align: center;">
+                                                    <span class="badge ${r.statusClass}">${r.status === 'Pass' ? 'Pass' : 'Fail'}</span>
+                                                </td>
+                                                <td style="text-align: center;">
+                                                    ${(r.isPassed && r.rank && r.rank !== '-') 
+                                                        ? `<span class="badge" style="background: #fef3c7; color: #92400e; font-weight: 800;">🏆 Rank ${r.rank}</span>` 
+                                                        : `<span style="color: #94a3b8; font-size: 0.8rem;">—</span>`}
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('');
+                                })()}
                             </tbody>
                         </table>
                     </div>

@@ -155,6 +155,20 @@ class MarksheetModel {
             }
         });
 
+        // Compute overall rank purely by total marks regardless of Pass / Fail status
+        const sortedByTotal = [...results].sort((a, b) => b.totalScored - a.totalScored);
+        let currentTotalRank = 1;
+        sortedByTotal.forEach((item, index) => {
+            if (!item.hasAnyMark) {
+                item.totalRank = '-';
+            } else {
+                if (index > 0 && sortedByTotal[index - 1].hasAnyMark && item.totalScored < sortedByTotal[index - 1].totalScored) {
+                    currentTotalRank = index + 1;
+                }
+                item.totalRank = currentTotalRank;
+            }
+        });
+
         // Return back in original student order (usually by Roll No)
         return results;
     }
