@@ -345,12 +345,16 @@ class SupabaseService {
      * Save student result directly to Supabase students table
      */
     async saveStudentToSupabase(studentData) {
-        // Calculate totals, pass status & distinction
+        // Calculate totals, pass status & distinction (EXCLUDING attendance)
         let grandTotal = 0;
         let isFailed = false;
 
         const marks = studentData.marks || [];
         marks.forEach(m => {
+            // Exclude attendance from academic grand total and pass/fail calculations
+            const isAttendance = m.isAttendance || (m.subject && (m.subject.toUpperCase().includes('ATTENDANCE') || m.subject.toUpperCase().includes('HAJAR')));
+            if (isAttendance) return;
+
             const markVal = Number(m.mark);
             if (!isNaN(markVal)) {
                 grandTotal += markVal;
